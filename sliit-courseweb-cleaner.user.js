@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLIIT Courseweb Module Cleaner
 // @namespace    http://tampermonkey.net/
-// @version      6.2
+// @version      6.3
 // @description  A professional, context-aware module filter for SLIIT Courseweb.
 // @author       Dulith Divisekara
 // @match        *://courseweb.sliit.lk/course/view.php*
@@ -22,9 +22,9 @@
         enabled: GM_getValue('enabled', true),
         ghostMode: GM_getValue('ghostMode', false),
         campus: GM_getValue('campus', 'malabe'),
-        batchType: GM_getValue('batchType', 'weekday'), // Defaulted to weekday
-        batchTypeShort: GM_getValue('batchTypeShort', 'wd'), // Defaulted to wd
-        groupId: GM_getValue('groupId', '') // Defaulted to empty
+        batchType: GM_getValue('batchType', 'weekday'),
+        batchTypeShort: GM_getValue('batchTypeShort', 'wd'),
+        groupId: GM_getValue('groupId', '')
     };
     // --------------------------------
 
@@ -134,7 +134,7 @@
     // --- USER INTERFACE (SETTINGS & WELCOME MENU) ---
     function injectUI() {
         GM_addStyle(`
-            #sliit-filter-btn { position: fixed; top: 120px; right: 0; background-color: #f7b924; color: #212529; border: none; border-radius: 6px 0 0 6px; padding: 10px 14px 10px 18px; font-size: 13px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; cursor: pointer; box-shadow: -2px 2px 6px rgba(0,0,0,0.15); z-index: 9999; transition: all 0.2s ease-in-out; display: flex; align-items: center; gap: 8px; }
+            #sliit-filter-btn { position: fixed; top: 150px; right: 0; background-color: #f7b924; color: #212529; border: none; border-radius: 6px 0 0 6px; padding: 10px 14px 10px 18px; font-size: 13px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; cursor: pointer; box-shadow: -2px 2px 6px rgba(0,0,0,0.15); z-index: 9999; transition: all 0.2s ease-in-out; display: flex; align-items: center; gap: 8px; }
             #sliit-filter-btn:hover { background-color: #e5a919; padding-right: 20px; }
             #sliit-filter-btn svg { width: 16px; height: 16px; }
             
@@ -174,12 +174,11 @@
             #sliit-filter-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9998; backdrop-filter: blur(3px); }
 
             /* Welcome Modal Specifics */
-            .sf-welcome-header { text-align: center; margin-bottom: 20px; }
+            .sf-welcome-header { text-align: center; margin-bottom: 15px; }
             .sf-welcome-header svg { stroke: #0f3b5f; width: 42px; height: 42px; margin-bottom: 10px; }
-            .sf-welcome-header h3 { display: block; border: none; font-size: 20px; margin: 0; padding: 0; justify-content: center; }
+            .sf-welcome-header h3 { display: block; border: none; font-size: 18px; margin: 0; padding: 0; justify-content: center; color: #212529; }
             .sf-welcome-text { font-size: 13px; color: #495057; line-height: 1.5; margin-bottom: 15px; text-align: center; }
-            .sf-welcome-credit { background: #f8f9fa; border-left: 3px solid #f7b924; padding: 12px; font-size: 12px; color: #6c757d; margin-bottom: 20px; }
-            .sf-welcome-credit strong { color: #0f3b5f; }
+            .sf-welcome-credit { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 12px; font-size: 12px; color: #495057; margin-bottom: 20px; text-align: left; line-height: 1.6; }
         `);
 
         const overlay = document.createElement('div');
@@ -194,16 +193,16 @@
         settingsModal.className = 'sf-modal-container';
         settingsModal.id = 'sliit-filter-modal';
         settingsModal.innerHTML = `
-            <h3>Filter Settings</h3>
+            <h3>Filter Configuration</h3>
             <div class="sf-toggle-container">
-                <span class="sf-toggle-label">Enable Filter <span class="sf-toggle-sub">Turn on/off entire script</span></span>
+                <span class="sf-toggle-label">Module Filter <span class="sf-toggle-sub">Enable or disable filtering logic</span></span>
                 <label class="sf-switch"><input type="checkbox" id="sf-enabled" ${CONFIG.enabled ? 'checked' : ''}><span class="sf-slider"></span></label>
             </div>
             <div class="sf-toggle-container">
-                <span class="sf-toggle-label">Ghost Mode <span class="sf-toggle-sub">Dim items instead of hiding</span></span>
+                <span class="sf-toggle-label">Ghost Mode <span class="sf-toggle-sub">Fade filtered items instead of hiding</span></span>
                 <label class="sf-switch"><input type="checkbox" id="sf-ghost" ${CONFIG.ghostMode ? 'checked' : ''}><span class="sf-slider"></span></label>
             </div>
-            <label class="sf-input-label">Campus</label>
+            <label class="sf-input-label">Target Campus</label>
             <select id="sf-campus">
                 <option value="malabe">Malabe</option>
                 <option value="metro">Metro</option>
@@ -212,23 +211,22 @@
                 <option value="matara">Matara</option>
                 <option value="jaffna">Jaffna</option>
             </select>
-            <label class="sf-input-label">Batch Type</label>
+            <label class="sf-input-label">Batch Classification</label>
             <select id="sf-type">
                 <option value="weekday">Weekday (WD)</option>
                 <option value="weekend">Weekend (WE)</option>
             </select>
-            <label class="sf-input-label">Group ID (e.g., 0301)</label>
-            <input type="text" id="sf-group" placeholder="Leave empty for all groups">
+            <label class="sf-input-label">Group ID (Optional)</label>
+            <input type="text" id="sf-group" placeholder="e.g., 0301 (Leave empty for batch-wide view)">
             <div class="sliit-modal-actions">
                 <button class="sliit-btn sliit-btn-reset" id="sf-reset">Reset</button>
                 <div>
                     <button class="sliit-btn sliit-btn-cancel" id="sf-cancel">Cancel</button>
-                    <button class="sliit-btn sliit-btn-save" id="sf-save">Save</button>
+                    <button class="sliit-btn sliit-btn-save" id="sf-save">Apply Setup</button>
                 </div>
             </div>
             <div class="sf-footer">
-                <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner/issues" target="_blank">Report Bug</a> • 
-                <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner" target="_blank">Source Code</a>
+                <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner/issues" target="_blank">Documentation & Issues</a>
             </div>
         `;
 
@@ -239,18 +237,20 @@
         welcomeModal.innerHTML = `
             <div class="sf-welcome-header">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-                <h3>Courseweb Cleaner</h3>
+                <h3>Extension Initialized</h3>
             </div>
-            <p class="sf-welcome-text">Thank you for installing the extension. This tool is designed to keep your Moodle dashboard distraction-free by automatically filtering out irrelevant batches and centers.</p>
+            <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner is now active. This utility seamlessly optimizes your Moodle dashboard by filtering out unassigned contexts and centers.</p>
             <div class="sf-welcome-credit">
-                Developed by <strong>Dulith Divisekara</strong>.<br><br>
-                If you find this tool helpful, please consider supporting the project by viewing the source code and starring the repository.
+                <strong>Release Information</strong><br>
+                Version: 6.3.0<br>
+                Maintainer: Dulith Divisekara<br>
+                License: Open Source (MIT)
             </div>
             <div class="sliit-modal-actions" style="justify-content: space-between;">
                 <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner" target="_blank" class="sliit-btn sliit-btn-github">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg> GitHub
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg> View Repository
                 </a>
-                <button class="sliit-btn sliit-btn-save" id="sf-welcome-start" style="flex-grow: 1;">Configure Settings</button>
+                <button class="sliit-btn sliit-btn-save" id="sf-welcome-start" style="flex-grow: 1;">Configure Setup</button>
             </div>
         `;
 
@@ -279,13 +279,13 @@
             document.getElementById('sf-welcome-start').onclick = () => {
                 GM_setValue('hasSeenWelcome', true);
                 welcomeModal.style.display = 'none';
-                showSettings(); // Move them right into settings to set up their batch
+                showSettings();
             };
         }
 
         // Settings Logic
         document.getElementById('sf-reset').onclick = () => {
-            if(confirm('Are you sure you want to reset all settings to default?')) {
+            if(confirm('Are you sure you want to reset all configurations to default?')) {
                 GM_deleteValue('hasSeenWelcome');
                 GM_deleteValue('enabled');
                 GM_deleteValue('ghostMode');
