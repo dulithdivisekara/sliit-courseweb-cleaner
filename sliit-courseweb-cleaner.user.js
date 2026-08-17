@@ -1,10 +1,12 @@
 // ==UserScript==
 // @name         SLIIT Courseweb Module Cleaner
 // @namespace    http://tampermonkey.net/
-// @version      6.0
+// @version      6.1
 // @description  A professional, context-aware module filter for SLIIT Courseweb.
 // @author       Dulith Divisekara
 // @match        *://courseweb.sliit.lk/course/view.php*
+// @updateURL    https://github.com/dulithdivisekara/sliit-courseweb-cleaner/raw/refs/heads/main/sliit-courseweb-cleaner.user.js
+// @downloadURL  https://github.com/dulithdivisekara/sliit-courseweb-cleaner/raw/refs/heads/main/sliit-courseweb-cleaner.user.js
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_deleteValue
@@ -16,6 +18,7 @@
 
     // --- LOAD SAVED CONFIGURATION ---
     const CONFIG = {
+        hasSeenWelcome: GM_getValue('hasSeenWelcome', false),
         enabled: GM_getValue('enabled', true),
         ghostMode: GM_getValue('ghostMode', false),
         campus: GM_getValue('campus', 'malabe'),
@@ -89,7 +92,7 @@
     }
 
     function cleanCoursePage() {
-        if (!CONFIG.enabled) return; // Master Kill Switch Check
+        if (!CONFIG.enabled) return;
 
         const activities = document.querySelectorAll('.activity');
         let hideSection = false;
@@ -128,21 +131,20 @@
         });
     }
 
-    // --- USER INTERFACE (SETTINGS MENU) ---
+    // --- USER INTERFACE (SETTINGS & WELCOME MENU) ---
     function injectUI() {
         GM_addStyle(`
             #sliit-filter-btn { position: fixed; top: 120px; right: 0; background-color: #f7b924; color: #212529; border: none; border-radius: 6px 0 0 6px; padding: 10px 14px 10px 18px; font-size: 13px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; cursor: pointer; box-shadow: -2px 2px 6px rgba(0,0,0,0.15); z-index: 9999; transition: all 0.2s ease-in-out; display: flex; align-items: center; gap: 8px; }
             #sliit-filter-btn:hover { background-color: #e5a919; padding-right: 20px; }
             #sliit-filter-btn svg { width: 16px; height: 16px; }
             
-            #sliit-filter-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ffffff; padding: 24px; border-radius: 8px; border-top: 4px solid #0f3b5f; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 10000; width: 340px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-            #sliit-filter-modal h3 { margin-top: 0; margin-bottom: 20px; color: #0f3b5f; font-size: 18px; font-weight: 600; border-bottom: 1px solid #dee2e6; padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+            .sf-modal-container { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ffffff; padding: 24px; border-radius: 8px; border-top: 4px solid #0f3b5f; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 10000; width: 340px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+            .sf-modal-container h3 { margin-top: 0; margin-bottom: 20px; color: #0f3b5f; font-size: 18px; font-weight: 600; border-bottom: 1px solid #dee2e6; padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
             
             .sf-toggle-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #dee2e6; }
             .sf-toggle-label { font-size: 13px; font-weight: 600; color: #212529; }
             .sf-toggle-sub { font-size: 11px; color: #6c757d; font-weight: normal; display: block; }
             
-            /* Toggle Switch CSS */
             .sf-switch { position: relative; display: inline-block; width: 40px; height: 22px; }
             .sf-switch input { opacity: 0; width: 0; height: 0; }
             .sf-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ced4da; transition: .3s; border-radius: 22px; }
@@ -150,12 +152,12 @@
             input:checked + .sf-slider { background-color: #0f3b5f; }
             input:checked + .sf-slider:before { transform: translateX(18px); }
 
-            #sliit-filter-modal label.sf-input-label { display: block; margin-top: 15px; font-size: 12px; font-weight: 600; color: #495057; }
-            #sliit-filter-modal select, #sliit-filter-modal input[type="text"] { width: 100%; padding: 10px 12px; margin-top: 6px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box; font-size: 14px; color: #495057; background-color: #f8f9fa; }
-            #sliit-filter-modal select:focus, #sliit-filter-modal input[type="text"]:focus { outline: none; border-color: #f7b924; background-color: #fff; }
+            .sf-input-label { display: block; margin-top: 15px; font-size: 12px; font-weight: 600; color: #495057; }
+            .sf-modal-container select, .sf-modal-container input[type="text"] { width: 100%; padding: 10px 12px; margin-top: 6px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box; font-size: 14px; color: #495057; background-color: #f8f9fa; }
+            .sf-modal-container select:focus, .sf-modal-container input[type="text"]:focus { outline: none; border-color: #f7b924; background-color: #fff; }
             
             .sliit-modal-actions { margin-top: 25px; display: flex; justify-content: space-between; align-items: center; }
-            .sliit-btn { padding: 9px 14px; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background-color 0.15s ease-in-out; }
+            .sliit-btn { padding: 9px 14px; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background-color 0.15s ease-in-out; text-decoration: none; text-align: center; }
             .sliit-btn-save { background: #0f3b5f; color: white; }
             .sliit-btn-save:hover { background: #0a2942; }
             .sliit-btn-cancel { background: #e9ecef; color: #495057; }
@@ -163,11 +165,16 @@
             .sliit-btn-reset { background: transparent; color: #dc3545; border: 1px solid #dc3545; padding: 8px 12px; }
             .sliit-btn-reset:hover { background: #dc3545; color: white; }
             
-            .sf-footer { margin-top: 20px; text-align: center; font-size: 11px; color: #6c757d; }
-            .sf-footer a { color: #0f3b5f; text-decoration: none; font-weight: 600; }
+            .sf-footer { margin-top: 20px; text-align: center; font-size: 12px; color: #6c757d; }
+            .sf-footer a { color: #0f3b5f; text-decoration: none; font-weight: 600; margin: 0 5px; }
             .sf-footer a:hover { text-decoration: underline; }
             
             #sliit-filter-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9998; backdrop-filter: blur(3px); }
+
+            /* Welcome Modal Specifics */
+            .sf-welcome-text { font-size: 13px; color: #495057; line-height: 1.5; margin-bottom: 15px; }
+            .sf-welcome-credit { background: #f8f9fa; border-left: 3px solid #f7b924; padding: 12px; font-size: 12px; color: #6c757d; margin-bottom: 20px; }
+            .sf-welcome-credit strong { color: #0f3b5f; }
         `);
 
         const overlay = document.createElement('div');
@@ -177,21 +184,20 @@
         btn.id = 'sliit-filter-btn';
         btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Settings`;
 
-        const modal = document.createElement('div');
-        modal.id = 'sliit-filter-modal';
-        modal.innerHTML = `
+        // The Main Settings Modal
+        const settingsModal = document.createElement('div');
+        settingsModal.className = 'sf-modal-container';
+        settingsModal.id = 'sliit-filter-modal';
+        settingsModal.innerHTML = `
             <h3>Filter Settings</h3>
-            
             <div class="sf-toggle-container">
                 <span class="sf-toggle-label">Enable Filter <span class="sf-toggle-sub">Turn on/off entire script</span></span>
                 <label class="sf-switch"><input type="checkbox" id="sf-enabled" ${CONFIG.enabled ? 'checked' : ''}><span class="sf-slider"></span></label>
             </div>
-            
             <div class="sf-toggle-container">
                 <span class="sf-toggle-label">Ghost Mode <span class="sf-toggle-sub">Dim items instead of hiding</span></span>
                 <label class="sf-switch"><input type="checkbox" id="sf-ghost" ${CONFIG.ghostMode ? 'checked' : ''}><span class="sf-slider"></span></label>
             </div>
-
             <label class="sf-input-label">Campus</label>
             <select id="sf-campus">
                 <option value="malabe">Malabe</option>
@@ -208,7 +214,6 @@
             </select>
             <label class="sf-input-label">Group ID (e.g., 0301)</label>
             <input type="text" id="sf-group" placeholder="Leave empty for all groups">
-            
             <div class="sliit-modal-actions">
                 <button class="sliit-btn sliit-btn-reset" id="sf-reset">Reset</button>
                 <div>
@@ -216,31 +221,62 @@
                     <button class="sliit-btn sliit-btn-save" id="sf-save">Save</button>
                 </div>
             </div>
-            
             <div class="sf-footer">
-                Created by <strong>Dulith Divisekara</strong><br>
-                <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner/issues" target="_blank">Report Bug</a> | 
+                <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner/issues" target="_blank">Report Bug</a> • 
                 <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner" target="_blank">Source Code</a>
+            </div>
+        `;
+
+        // The Welcome Modal
+        const welcomeModal = document.createElement('div');
+        welcomeModal.className = 'sf-modal-container';
+        welcomeModal.id = 'sliit-welcome-modal';
+        welcomeModal.innerHTML = `
+            <h3>Welcome! 👋</h3>
+            <p class="sf-welcome-text">Thank you for installing the <strong>SLIIT Courseweb Cleaner</strong>. This tool is designed to keep your dashboard distraction-free by automatically filtering out irrelevant batches and centers.</p>
+            <div class="sf-welcome-credit">
+                Developed by <strong>Dulith Divisekara</strong>.<br><br>
+                If you find this tool helpful, please consider supporting the project by leaving a star on GitHub!
+            </div>
+            <div class="sliit-modal-actions" style="justify-content: space-between;">
+                <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner" target="_blank" class="sliit-btn sliit-btn-cancel">⭐ Star on GitHub</a>
+                <button class="sliit-btn sliit-btn-save" id="sf-welcome-start">Configure Settings</button>
             </div>
         `;
 
         document.body.appendChild(overlay);
         document.body.appendChild(btn);
-        document.body.appendChild(modal);
+        document.body.appendChild(settingsModal);
+        document.body.appendChild(welcomeModal);
 
         // Populate selects
         document.getElementById('sf-campus').value = CONFIG.campus;
         document.getElementById('sf-type').value = CONFIG.batchType;
         document.getElementById('sf-group').value = CONFIG.groupId;
 
-        // Event Listeners
-        btn.onclick = () => { modal.style.display = 'block'; overlay.style.display = 'block'; };
-        const close = () => { modal.style.display = 'none'; overlay.style.display = 'none'; };
-        document.getElementById('sf-cancel').onclick = close;
-        overlay.onclick = close;
+        // Display Logic
+        const showSettings = () => { settingsModal.style.display = 'block'; overlay.style.display = 'block'; };
+        const closeModals = () => { settingsModal.style.display = 'none'; welcomeModal.style.display = 'none'; overlay.style.display = 'none'; };
 
+        btn.onclick = showSettings;
+        document.getElementById('sf-cancel').onclick = closeModals;
+        overlay.onclick = closeModals;
+
+        // Welcome Modal Logic
+        if (!CONFIG.hasSeenWelcome) {
+            welcomeModal.style.display = 'block';
+            overlay.style.display = 'block';
+            document.getElementById('sf-welcome-start').onclick = () => {
+                GM_setValue('hasSeenWelcome', true);
+                welcomeModal.style.display = 'none';
+                showSettings(); // Move them right into settings to set up their batch
+            };
+        }
+
+        // Settings Logic
         document.getElementById('sf-reset').onclick = () => {
             if(confirm('Are you sure you want to reset all settings to default?')) {
+                GM_deleteValue('hasSeenWelcome');
                 GM_deleteValue('enabled');
                 GM_deleteValue('ghostMode');
                 GM_deleteValue('campus');
