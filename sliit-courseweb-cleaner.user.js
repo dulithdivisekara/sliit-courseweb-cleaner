@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLIIT Courseweb Module Cleaner
 // @namespace    http://tampermonkey.net/
-// @version      6.5.0
+// @version      6.6.0
 // @description  A professional, context-aware module filter for SLIIT Courseweb.
 // @author       Dulith Divisekara
 // @match        *://courseweb.sliit.lk/course/view.php*
@@ -20,7 +20,7 @@
     const CONFIG = {
         hasSeenWelcome: GM_getValue('hasSeenWelcome', false),
         enabled: GM_getValue('enabled', true),
-        ghostMode: GM_getValue('ghostMode', true), // Default changed to TRUE
+        ghostMode: GM_getValue('ghostMode', true),
         campus: GM_getValue('campus', 'malabe'),
         batchType: GM_getValue('batchType', 'weekday'),
         batchTypeShort: GM_getValue('batchTypeShort', 'wd'),
@@ -29,20 +29,33 @@
     // --------------------------------
 
     function isExplicitlyMine(lower) {
+        // 1. Exact Group Match (Malabe Standard)
         if (CONFIG.groupId) {
             const exactGroup = `y2.s1.${CONFIG.batchTypeShort}.it.${CONFIG.groupId}`;
             if (lower.includes(exactGroup)) return true;
         }
+
+        // 2. Explicit Campus & Batch Mentions
         if (lower.includes(CONFIG.campus) && lower.includes(CONFIG.batchType)) return true;
 
-        // BUG FIX: Protect standard SLIIT Weekday batch naming conventions (e.g., "Malabe Batch 01")
-        if (CONFIG.batchType === 'weekday') {
-            if (lower.includes(CONFIG.campus) && /\bbatch\s*\d+\b/i.test(lower) && !lower.includes('weekend')) {
+        // 3. Malabe Weekday Fix ("Malabe Batch 01")
+        if (CONFIG.campus === 'malabe' && CONFIG.batchType === 'weekday') {
+            if (lower.includes('malabe') && /\bbatch\s*\d+\b/i.test(lower) && !lower.includes('weekend')) {
                 return true;
             }
         }
 
+        // 4. Global Protection (Notices)
         if (lower.includes('notice') || lower.includes('rescheduled') || lower.includes('announcement')) return true;
+
+        // 5. Regional Campus Formats (Kandy/Metro/Jaffna etc.)
+        if (CONFIG.campus !== 'malabe') {
+            // Protect standard regional naming formats (Y2S1.B01, Y2S1.LAB_G1)
+            if (/\by2s1\.b\d+/i.test(lower) || /\by2s1\.lab_\w+/i.test(lower)) {
+                return true;
+            }
+            if (lower.includes(CONFIG.campus)) return true;
+        }
 
         return false;
     }
@@ -51,32 +64,50 @@
         const lower = text.toLowerCase().trim();
         if (!lower) return false;
 
+        // If it explicitly belongs to the user, never block it.
         if (isExplicitlyMine(lower)) return false;
 
+        // 1. Block other specific groups in the same format
         if (CONFIG.groupId) {
             const otherGroupsRegex = new RegExp(`y2\\.s1\\.${CONFIG.batchTypeShort}\\.it\\.(?!${CONFIG.groupId})\\d+`, 'i');
             if (otherGroupsRegex.test(lower)) return true;
         }
 
+        // 2. Block opposite batch type acronyms (.WE. vs .WD.)
         const oppositeShort = CONFIG.batchTypeShort === 'we' ? 'wd' : 'we';
         if (lower.includes(`.${oppositeShort}.`) || lower.includes(`${oppositeShort}.it`)) return true;
+
+        // 3. Block opposite batch full word
         const oppositeFull = CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
 
+        // 4. Global Keyword Blocklist
         const blockKeywords = [
             'malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara',
             'jaffna', 'northern', 'nothern', oppositeFull,
             'nu group', 'nu dataset', 'batch'
         ];
 
+        // Remove the user's campus from the blocklist so they can see their own stuff
         const filteredBlockKeywords = blockKeywords.filter(word => word !== CONFIG.campus);
         if (filteredBlockKeywords.some(word => lower.includes(word))) return true;
 
-        const blockRegexes = [
-            /\bbatch\s*\d+\b/i,
-            /\by2s1\.b\d+/i,
-            /\by2s1\.lab_\w+/i
-        ];
-        if (blockRegexes.some(regex => regex.test(lower))) return true;
+        // 5. Malabe-Only Regex Blocklist
+        if (CONFIG.campus === 'malabe') {
+            const malabeBlockRegexes = [
+                /\bbatch\s*\d+\b/i, // General batch mentions
+                /\by2s1\.b\d+/i,    // Kandy/Metro B01 format
+                /\by2s1\.lab_\w+/i  // Kandy/Metro Lab format
+            ];
+            if (malabeBlockRegexes.some(regex => regex.test(lower))) return true;
+        }
+
+        // 6. Regional-Only Regex Blocklist (Block Malabe Formats)
+        if (CONFIG.campus !== 'malabe') {
+            // Block Y2.S1.WD.IT.xxxx and Y2.S1.WE.IT.xxxx for non-Malabe students
+            if (/y2\.s1\.(wd|we)\.it\.?\d+/i.test(lower)) {
+                return true;
+            }
+        }
 
         return false;
     }
@@ -110,6 +141,7 @@
             const lower = text.toLowerCase();
             const isTitle = activity.classList.contains('modtype_label') || activity.querySelector('h1, h2, h3, h4, h5');
 
+            // Reset section hiding if a valid header or generic term is found
             if (isExplicitlyMine(lower) || lower.includes(CONFIG.batchType) || lower.includes(`${CONFIG.batchTypeShort}.`) || lower.includes('lecture') || lower.includes('general') || lower.includes('workshop') || lower.includes('lab ')) {
                 hideSection = false;
             } else if (shouldBlock(text) && !lower.includes(CONFIG.batchType) && !lower.includes(`${CONFIG.batchTypeShort}.`)) {
@@ -256,7 +288,7 @@
             <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner is now active. This utility seamlessly optimizes your Moodle dashboard by filtering out unassigned contexts and centers.</p>
             <div class="sf-welcome-credit">
                 <strong>Release Information</strong><br>
-                Version: 6.5.0<br>
+                Version: 6.6.0<br>
                 Maintainer: Dulith Divisekara<br>
                 License: Open Source (MIT)
             </div>
