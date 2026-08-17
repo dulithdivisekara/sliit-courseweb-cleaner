@@ -4,9 +4,13 @@ A context-aware userscript designed to optimize the SLIIT Moodle (Courseweb) int
 
 ## Visual Overview
 
+<div align="center">
+
 | Before (Cluttered) | After (Cleaned) |
 | :---: | :---: |
 | <img src="assets/before.png" width="400"> | <img src="assets/after.png" width="400"> |
+
+</div>
 
 ## Key Features
 
@@ -34,9 +38,11 @@ Once Tampermonkey is active, click the link below to install the Courseweb Clean
 
 A Tampermonkey confirmation screen will appear. Click the **Install** button as shown below:
 
-<p align="center">
-  <img src="assets/install-screen.png" width="700" alt="Tampermonkey Install Screen">
-</p>
+<div align="center">
+  <br>
+  <img src="assets/install-screen.png" width="650" alt="Tampermonkey Install Screen">
+  <br><br>
+</div>
 
 ### 3. Initialize
 Navigate to [SLIIT Courseweb](https://courseweb.sliit.lk/) and open any module page. The script will initialize automatically and display a one-time welcome screen.
@@ -50,9 +56,11 @@ You do not need to edit any code to use this script. All settings are managed th
 ### Accessing Settings
 Look for the **Settings** tab anchored to the right side of your Courseweb screen (just below the navigation bar). Click it to open the configuration modal.
 
-<p align="center">
-  <img src="assets/settings-tab.png" width="450" alt="Settings Tab Location">
-</p>
+<div align="center">
+  <br>
+  <img src="assets/settings-tab.png" width="600" alt="Settings Tab Location">
+  <br><br>
+</div>
 
 ### Setting Up Your Filter
 1. **Module Filter:** Toggle the entire script on or off.
@@ -62,9 +70,11 @@ Look for the **Settings** tab anchored to the right side of your Courseweb scree
 5. **Group ID (Optional):** Enter your specific 4-digit group ID (e.g., `0301`). If left blank, the script will show all materials relevant to your general batch type.
 6. Click **Apply Setup**. The page will automatically reload with your saved preferences.
 
-<p align="center">
-  <img src="assets/config-modal.png" width="400" alt="Configuration Modal">
-</p>
+<div align="center">
+  <br>
+  <img src="assets/config-modal.png" width="450" alt="Configuration Modal">
+  <br><br>
+</div>
 
 ---
 
