@@ -36,13 +36,13 @@ Recent browser security updates require you to explicitly allow Tampermonkey to 
 1. Right-click the Tampermonkey icon in your browser toolbar and select **Manage Extension**.
 <div align="center">
   <br>
-  <img src="assets/manage-extension.png" width="350" alt="Manage Extension Menu">
+  <img src="assets/manage-extension.png" width="700" alt="Manage Extension Menu">
   <br><br>
 </div>
 2. Scroll down to the settings page and toggle on **Allow User Scripts** (as shown below).
 <div align="center">
   <br>
-  <img src="assets/allow-user-scripts.png" width="650" alt="Allow User Scripts Toggle">
+  <img src="assets/allow-user-scripts.png" width="800" alt="Allow User Scripts Toggle">
   <br><br>
 </div>
 
