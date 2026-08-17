@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLIIT Courseweb Module Cleaner
 // @namespace    http://tampermonkey.net/
-// @version      6.6.0
+// @version      6.7.0
 // @description  A professional, context-aware module filter for SLIIT Courseweb.
 // @author       Dulith Divisekara
 // @match        *://courseweb.sliit.lk/course/view.php*
@@ -29,84 +29,52 @@
     // --------------------------------
 
     function isExplicitlyMine(lower) {
-        // 1. Exact Group Match (Malabe Standard)
         if (CONFIG.groupId) {
             const exactGroup = `y2.s1.${CONFIG.batchTypeShort}.it.${CONFIG.groupId}`;
             if (lower.includes(exactGroup)) return true;
         }
-
-        // 2. Explicit Campus & Batch Mentions
         if (lower.includes(CONFIG.campus) && lower.includes(CONFIG.batchType)) return true;
 
-        // 3. Malabe Weekday Fix ("Malabe Batch 01")
         if (CONFIG.campus === 'malabe' && CONFIG.batchType === 'weekday') {
             if (lower.includes('malabe') && /\bbatch\s*\d+\b/i.test(lower) && !lower.includes('weekend')) {
                 return true;
             }
         }
-
-        // 4. Global Protection (Notices)
-        if (lower.includes('notice') || lower.includes('rescheduled') || lower.includes('announcement')) return true;
-
-        // 5. Regional Campus Formats (Kandy/Metro/Jaffna etc.)
-        if (CONFIG.campus !== 'malabe') {
-            // Protect standard regional naming formats (Y2S1.B01, Y2S1.LAB_G1)
-            if (/\by2s1\.b\d+/i.test(lower) || /\by2s1\.lab_\w+/i.test(lower)) {
-                return true;
-            }
-            if (lower.includes(CONFIG.campus)) return true;
-        }
-
         return false;
     }
 
-    function shouldBlock(text) {
-        const lower = text.toLowerCase().trim();
+    function shouldBlock(text, lower) {
         if (!lower) return false;
 
-        // If it explicitly belongs to the user, never block it.
-        if (isExplicitlyMine(lower)) return false;
-
-        // 1. Block other specific groups in the same format
         if (CONFIG.groupId) {
             const otherGroupsRegex = new RegExp(`y2\\.s1\\.${CONFIG.batchTypeShort}\\.it\\.(?!${CONFIG.groupId})\\d+`, 'i');
             if (otherGroupsRegex.test(lower)) return true;
         }
 
-        // 2. Block opposite batch type acronyms (.WE. vs .WD.)
         const oppositeShort = CONFIG.batchTypeShort === 'we' ? 'wd' : 'we';
         if (lower.includes(`.${oppositeShort}.`) || lower.includes(`${oppositeShort}.it`)) return true;
 
-        // 3. Block opposite batch full word
         const oppositeFull = CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
+        if (lower.includes(oppositeFull)) return true;
 
-        // 4. Global Keyword Blocklist
-        const blockKeywords = [
-            'malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara',
-            'jaffna', 'northern', 'nothern', oppositeFull,
-            'nu group', 'nu dataset', 'batch'
-        ];
+        const campuses = ['malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara', 'jaffna', 'northern', 'nothern'];
+        const foreignCampuses = campuses.filter(c => c !== CONFIG.campus);
+        if (foreignCampuses.some(c => lower.includes(c))) return true;
 
-        // Remove the user's campus from the blocklist so they can see their own stuff
-        const filteredBlockKeywords = blockKeywords.filter(word => word !== CONFIG.campus);
-        if (filteredBlockKeywords.some(word => lower.includes(word))) return true;
-
-        // 5. Malabe-Only Regex Blocklist
         if (CONFIG.campus === 'malabe') {
             const malabeBlockRegexes = [
-                /\bbatch\s*\d+\b/i, // General batch mentions
-                /\by2s1\.b\d+/i,    // Kandy/Metro B01 format
-                /\by2s1\.lab_\w+/i  // Kandy/Metro Lab format
+                /\bbatch\s*\d+\b/i,
+                /\by2s1\.b\d+/i,
+                /\by2s1\.lab_\w+/i
             ];
-            if (malabeBlockRegexes.some(regex => regex.test(lower))) return true;
-        }
-
-        // 6. Regional-Only Regex Blocklist (Block Malabe Formats)
-        if (CONFIG.campus !== 'malabe') {
-            // Block Y2.S1.WD.IT.xxxx and Y2.S1.WE.IT.xxxx for non-Malabe students
-            if (/y2\.s1\.(wd|we)\.it\.?\d+/i.test(lower)) {
+            if (malabeBlockRegexes.some(regex => regex.test(lower))) {
+                if (CONFIG.batchType === 'weekday' && lower.includes('malabe') && !lower.includes('weekend')) return false;
                 return true;
             }
+        }
+
+        if (CONFIG.campus !== 'malabe') {
+            if (/y2\.s1\.(wd|we)\.it\.?\d+/i.test(lower)) return true;
         }
 
         return false;
@@ -134,44 +102,75 @@
         if (!CONFIG.enabled) return;
 
         const activities = document.querySelectorAll('.activity');
-        let hideSection = false;
+        const campuses = ['malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara', 'jaffna', 'northern', 'nothern'];
+        const oppositeFull = CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
+
+        let activeSectionCampus = 'all';
+        let activeSectionBatch = 'all';
 
         activities.forEach(activity => {
             const text = activity.innerText;
             const lower = text.toLowerCase();
             const isTitle = activity.classList.contains('modtype_label') || activity.querySelector('h1, h2, h3, h4, h5');
 
-            // Reset section hiding if a valid header or generic term is found
-            if (isExplicitlyMine(lower) || lower.includes(CONFIG.batchType) || lower.includes(`${CONFIG.batchTypeShort}.`) || lower.includes('lecture') || lower.includes('general') || lower.includes('workshop') || lower.includes('lab ')) {
-                hideSection = false;
-            } else if (shouldBlock(text) && !lower.includes(CONFIG.batchType) && !lower.includes(`${CONFIG.batchTypeShort}.`)) {
-                hideSection = true;
+            // --- SMART SECTION TRACKING ---
+            if (isTitle) {
+                const mentionedCampus = campuses.find(c => lower.includes(c));
+                if (mentionedCampus) {
+                    activeSectionCampus = mentionedCampus;
+                } else if (lower.includes('general') || lower.includes('notice') || lower.includes('announcement')) {
+                    activeSectionCampus = 'all';
+                }
+
+                if (lower.includes(CONFIG.batchType)) {
+                    activeSectionBatch = CONFIG.batchType;
+                } else if (lower.includes(oppositeFull)) {
+                    activeSectionBatch = oppositeFull;
+                } else if (lower.includes('general') || lower.includes('notice')) {
+                    activeSectionBatch = 'all';
+                }
             }
 
-            if (isTitle || isExplicitlyMine(lower)) {
-                applyHiding(activity, false);
-            } else if (shouldBlock(text) || hideSection) {
-                applyHiding(activity, true);
-            } else {
-                applyHiding(activity, false);
+            let shouldHide = false;
+
+            // --- FILTER LOGIC ---
+            if (isExplicitlyMine(lower) || lower.includes('notice') || lower.includes('rescheduled') || lower.includes('announcement')) {
+                shouldHide = false;
+            } else if (activeSectionCampus !== 'all' && activeSectionCampus !== CONFIG.campus) {
+                shouldHide = true; // Block items under a different campus header
+            } else if (activeSectionBatch !== 'all' && activeSectionBatch !== CONFIG.batchType) {
+                shouldHide = true; // Block items under a different batch header
+            } else if (shouldBlock(text, lower)) {
+                shouldHide = true;
             }
+
+            // Ensure the titles themselves hide if they belong to another region
+            if (isTitle) {
+                if ((activeSectionCampus !== 'all' && activeSectionCampus !== CONFIG.campus) ||
+                    (activeSectionBatch !== 'all' && activeSectionBatch !== CONFIG.batchType)) {
+                    shouldHide = true;
+                } else {
+                    shouldHide = false;
+                }
+            }
+
+            applyHiding(activity, shouldHide);
         });
 
         const innerElements = document.querySelectorAll('.no-overflow p, .no-overflow li, .no-overflow div');
-
         innerElements.forEach(el => {
             if (el.children.length > 2 && el.tagName === 'DIV') return;
             const lowerText = el.innerText.toLowerCase();
 
-            if (isExplicitlyMine(lowerText)) {
+            if (isExplicitlyMine(lowerText) || lowerText.includes('notice')) {
                 applyHiding(el, false);
-            } else if (shouldBlock(el.innerText)) {
+            } else if (shouldBlock(el.innerText, lowerText)) {
                 applyHiding(el, true);
             }
         });
     }
 
-    // --- USER INTERFACE (SETTINGS & WELCOME MENU) ---
+    // --- USER INTERFACE (SETTINGS MENU) ---
     function injectUI() {
         GM_addStyle(`
             #sliit-filter-btn { position: fixed; top: 150px; right: 0; background-color: #f7b924; color: #212529; border: none; border-radius: 6px 0 0 6px; padding: 10px 14px 10px 18px; font-size: 13px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; cursor: pointer; box-shadow: -2px 2px 6px rgba(0,0,0,0.15); z-index: 9999; transition: all 0.2s ease-in-out; display: flex; align-items: center; gap: 8px; }
@@ -288,7 +287,7 @@
             <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner is now active. This utility seamlessly optimizes your Moodle dashboard by filtering out unassigned contexts and centers.</p>
             <div class="sf-welcome-credit">
                 <strong>Release Information</strong><br>
-                Version: 6.6.0<br>
+                Version: 6.7.0<br>
                 Maintainer: Dulith Divisekara<br>
                 License: Open Source (MIT)
             </div>
@@ -305,12 +304,10 @@
         document.body.appendChild(settingsModal);
         document.body.appendChild(welcomeModal);
 
-        // Populate selects
         document.getElementById('sf-campus').value = CONFIG.campus;
         document.getElementById('sf-type').value = CONFIG.batchType;
         document.getElementById('sf-group').value = CONFIG.groupId;
 
-        // Display Logic
         const showSettings = () => { settingsModal.style.display = 'block'; overlay.style.display = 'block'; };
         const closeModals = () => { settingsModal.style.display = 'none'; welcomeModal.style.display = 'none'; overlay.style.display = 'none'; };
 
@@ -318,7 +315,6 @@
         document.getElementById('sf-cancel').onclick = closeModals;
         overlay.onclick = closeModals;
 
-        // Welcome Modal Logic
         if (!CONFIG.hasSeenWelcome) {
             welcomeModal.style.display = 'block';
             overlay.style.display = 'block';
@@ -329,7 +325,6 @@
             };
         }
 
-        // Settings Logic
         document.getElementById('sf-reset').onclick = () => {
             if(confirm('Are you sure you want to reset all configurations to default?')) {
                 GM_deleteValue('hasSeenWelcome');
