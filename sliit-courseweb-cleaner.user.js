@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLIIT Courseweb Module Cleaner
 // @namespace    http://tampermonkey.net/
-// @version      5.8
+// @version      5.9
 // @description  Hides specific links for other centers and adds a native-themed Settings UI.
 // @author       You
 // @match        *://courseweb.sliit.lk/course/view.php*
@@ -115,23 +115,31 @@
             /* NATIVE MOODLE THEME SYNC */
             #sliit-filter-btn { 
                 position: fixed; 
-                top: 80px; 
-                right: 30px; 
-                background-color: #ffffff; 
-                color: #0f3b5f; /* SLIIT Navy */
-                border: 1px solid #0f3b5f; 
-                border-radius: 4px; 
-                padding: 6px 14px; 
+                top: 120px; 
+                right: 0; 
+                background-color: #f7b924; /* SLIIT Yellow Accent */
+                color: #212529; 
+                border: none; 
+                border-radius: 6px 0 0 6px; /* Flush against the right edge */
+                padding: 10px 14px 10px 18px; 
                 font-size: 13px; 
+                font-weight: 600;
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
                 cursor: pointer; 
-                box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+                box-shadow: -2px 2px 6px rgba(0,0,0,0.15); 
                 z-index: 9999; 
                 transition: all 0.2s ease-in-out; 
+                display: flex;
+                align-items: center;
+                gap: 8px;
             }
             #sliit-filter-btn:hover { 
-                background-color: #0f3b5f; 
-                color: #ffffff; 
+                background-color: #e5a919; 
+                padding-right: 20px; /* Slight slide-out effect on hover */
+            }
+            #sliit-filter-btn svg {
+                width: 16px;
+                height: 16px;
             }
             
             #sliit-filter-modal { 
@@ -142,9 +150,9 @@
                 transform: translate(-50%, -50%); 
                 background: #ffffff; 
                 padding: 24px; 
-                border-radius: 6px; 
-                border: 1px solid rgba(0,0,0,0.1);
-                box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+                border-radius: 8px; 
+                border-top: 4px solid #0f3b5f; /* SLIIT Navy Header Accent */
+                box-shadow: 0 10px 40px rgba(0,0,0,0.2); 
                 z-index: 10000; 
                 width: 340px; 
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -152,34 +160,35 @@
             #sliit-filter-modal h3 { 
                 margin-top: 0; 
                 margin-bottom: 20px;
-                color: #212529; 
+                color: #0f3b5f; 
                 font-size: 18px;
                 font-weight: 600;
                 border-bottom: 1px solid #dee2e6;
-                padding-bottom: 10px;
+                padding-bottom: 12px;
             }
             #sliit-filter-modal label { 
                 display: block; 
                 margin-top: 15px; 
                 font-size: 13px; 
-                font-weight: 500;
+                font-weight: 600;
                 color: #495057; 
             }
             #sliit-filter-modal select, #sliit-filter-modal input { 
                 width: 100%; 
-                padding: 8px 12px; 
+                padding: 10px 12px; 
                 margin-top: 6px; 
                 border: 1px solid #ced4da; 
                 border-radius: 4px; 
                 box-sizing: border-box; 
                 font-size: 14px;
                 color: #495057;
-                background-color: #fff;
+                background-color: #f8f9fa;
+                transition: border-color 0.15s ease-in-out;
             }
             #sliit-filter-modal select:focus, #sliit-filter-modal input:focus {
                 outline: none;
-                border-color: #80bdff;
-                box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+                border-color: #f7b924; /* SLIIT Yellow Focus */
+                background-color: #fff;
             }
             .sliit-modal-actions { 
                 margin-top: 25px; 
@@ -188,24 +197,24 @@
                 gap: 10px; 
             }
             .sliit-btn { 
-                padding: 8px 16px; 
+                padding: 9px 18px; 
                 border: none; 
                 border-radius: 4px; 
                 font-size: 14px;
-                font-weight: 500;
+                font-weight: 600;
                 cursor: pointer; 
                 transition: background-color 0.15s ease-in-out;
             }
             .sliit-btn-save { 
-                background: #0f3b5f; /* Native SLIIT Blue instead of bright green */
+                background: #0f3b5f; 
                 color: white; 
             }
             .sliit-btn-save:hover { background: #0a2942; }
             .sliit-btn-cancel { 
-                background: #6c757d; /* Standard Bootstrap grey instead of bright red */
-                color: white; 
+                background: #e9ecef; 
+                color: #495057; 
             }
-            .sliit-btn-cancel:hover { background: #5a6268; }
+            .sliit-btn-cancel:hover { background: #dde0e3; }
             #sliit-filter-overlay { 
                 display: none; 
                 position: fixed; 
@@ -213,9 +222,9 @@
                 left: 0; 
                 width: 100%; 
                 height: 100%; 
-                background: rgba(0,0,0,0.4); 
+                background: rgba(0,0,0,0.5); 
                 z-index: 9998; 
-                backdrop-filter: blur(2px);
+                backdrop-filter: blur(3px);
             }
         `);
 
@@ -224,7 +233,9 @@
 
         const btn = document.createElement('button');
         btn.id = 'sliit-filter-btn';
-        btn.innerHTML = 'Filter Settings';
+        // Clean inline SVG instead of emoji
+        const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`;
+        btn.innerHTML = `${svgIcon} Settings`;
 
         const modal = document.createElement('div');
         modal.id = 'sliit-filter-modal';
