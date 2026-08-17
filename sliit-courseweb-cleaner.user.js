@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLIIT Courseweb Module Cleaner
 // @namespace    http://tampermonkey.net/
-// @version      6.8.0
+// @version      6.9.0
 // @description  A professional, context-aware module filter for SLIIT Courseweb.
 // @author       Dulith Divisekara
 // @match        *://courseweb.sliit.lk/course/view.php*
@@ -31,26 +31,43 @@
     function shouldBlock(text, lower) {
         if (!lower) return false;
 
-        // Block foreign groups
-        if (CONFIG.groupId) {
-            const otherGroupsRegex = new RegExp(`y2\\.s1\\.${CONFIG.batchTypeShort}\\.it\\.(?!${CONFIG.groupId})\\d+`, 'i');
-            if (otherGroupsRegex.test(lower)) return true;
-        }
-
-        // Block opposite batch abbreviations (.WE. vs .WD.)
-        const oppositeShort = CONFIG.batchTypeShort === 'we' ? 'wd' : 'we';
-        if (lower.includes(`.${oppositeShort}.`) || lower.includes(`${oppositeShort}.it`)) return true;
-
-        // Block opposite full batch names
-        const oppositeFull = CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
-        if (lower.includes(oppositeFull)) return true;
-
-        // Block foreign campuses
+        // Core Identifiers
         const campuses = ['malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara', 'jaffna', 'northern', 'nothern'];
         const foreignCampuses = campuses.filter(c => c !== CONFIG.campus);
-        if (foreignCampuses.some(c => lower.includes(c))) return true;
 
-        // Malabe-only format logic
+        const oppositeFull = CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
+        const oppositeShort = CONFIG.batchTypeShort === 'we' ? 'wd' : 'we';
+
+        // Aggregated List Heuristics
+        const hasMyCampus = lower.includes(CONFIG.campus);
+        const hasForeignCampus = foreignCampuses.some(c => lower.includes(c));
+        const isAggregatedCampusList = hasMyCampus && hasForeignCampus;
+
+        const hasMyBatchFull = lower.includes(CONFIG.batchType);
+        const hasOppositeFull = lower.includes(oppositeFull);
+        const isAggregatedBatchList = hasMyBatchFull && hasOppositeFull;
+
+        const hasMyShort = lower.includes(`.${CONFIG.batchTypeShort}.`) || lower.includes(`${CONFIG.batchTypeShort}.it`);
+        const hasOppositeShort = lower.includes(`.${oppositeShort}.`) || lower.includes(`${oppositeShort}.it`);
+        const isAggregatedShortList = hasMyShort && hasOppositeShort;
+
+        // 1. Block foreign groups (Unless it's an aggregated block containing my group)
+        if (CONFIG.groupId) {
+            const otherGroupsRegex = new RegExp(`y2\\.s1\\.${CONFIG.batchTypeShort}\\.it\\.(?!${CONFIG.groupId})\\d+`, 'i');
+            const myGroupRegex = new RegExp(`y2\\.s1\\.${CONFIG.batchTypeShort}\\.it\\.${CONFIG.groupId}`, 'i');
+            if (otherGroupsRegex.test(lower) && !myGroupRegex.test(lower)) return true;
+        }
+
+        // 2. Block opposite batch abbreviations (Protect Aggregated)
+        if (hasOppositeShort && !isAggregatedShortList && !isAggregatedCampusList) return true;
+
+        // 3. Block opposite full batch names (Protect Aggregated)
+        if (hasOppositeFull && !isAggregatedBatchList && !isAggregatedCampusList) return true;
+
+        // 4. Block foreign campuses (Protect Aggregated)
+        if (hasForeignCampus && !isAggregatedCampusList) return true;
+
+        // 5. Malabe-only format logic
         if (CONFIG.campus === 'malabe') {
             const malabeBlockRegexes = [/\bbatch\s*\d+\b/i, /\by2s1\.b\d+/i, /\by2s1\.lab_\w+/i];
             if (malabeBlockRegexes.some(regex => regex.test(lower))) {
@@ -59,9 +76,9 @@
             }
         }
 
-        // Regional-only format logic
+        // 6. Regional-only format logic
         if (CONFIG.campus !== 'malabe') {
-            if (/y2\.s1\.(wd|we)\.it\.?\d+/i.test(lower)) return true;
+            if (/y2\.s1\.(wd|we)\.it\.?\d+/i.test(lower) && !isAggregatedCampusList && !hasMyCampus && !/\by2s1\.b\d+/i.test(lower)) return true;
         }
 
         return false;
@@ -109,11 +126,9 @@
                     if (mentionedCampus) activeCampus = mentionedCampus;
                     if (mentionedBatch) activeBatch = mentionedBatch;
 
-                    // Prevent state bleeding (e.g., "Malabe Weekend" bleeding 'weekend' into "Kandy Uni")
                     if (mentionedCampus && !mentionedBatch) activeBatch = 'all';
                     if (!mentionedCampus && mentionedBatch) activeCampus = 'all';
                 } else {
-                    // Neutral headers like "Week 01" wipe the state clean
                     activeCampus = 'all';
                     activeBatch = 'all';
                 }
@@ -121,27 +136,19 @@
 
             let shouldHide = false;
 
-            // Priority 1: Exact group match overrides all
+            // Execution Priority Stack
             if (CONFIG.groupId && lower.includes(`y2.s1.${CONFIG.batchTypeShort}.it.${CONFIG.groupId}`)) {
                 shouldHide = false;
-            }
-            // Priority 2: General notices are safe
-            else if (lower.includes('notice') || lower.includes('rescheduled') || lower.includes('announcement')) {
+            } else if (lower.includes('notice') || lower.includes('rescheduled') || lower.includes('announcement')) {
                 shouldHide = false;
-            }
-            // Priority 3: Hide based on active tracker block
-            else if (activeCampus !== 'all' && activeCampus !== CONFIG.campus) {
+            } else if (activeCampus !== 'all' && activeCampus !== CONFIG.campus) {
                 shouldHide = true;
-            }
-            else if (activeBatch !== 'all' && activeBatch !== CONFIG.batchType) {
+            } else if (activeBatch !== 'all' && activeBatch !== CONFIG.batchType) {
                 shouldHide = true;
-            }
-            // Priority 4: Hide based on raw text violations
-            else if (shouldBlock(text, lower)) {
+            } else if (shouldBlock(text, lower)) {
                 shouldHide = true;
             }
 
-            // Titles evaluate themselves
             if (isTitle) {
                 if ((activeCampus !== 'all' && activeCampus !== CONFIG.campus) ||
                     (activeBatch !== 'all' && activeBatch !== CONFIG.batchType)) {
@@ -154,7 +161,7 @@
             applyHiding(activity, shouldHide);
         });
 
-        // Inner elements backup cleaner
+        // Inner elements backup cleaner (Strips foreign items out of aggregated lists)
         const innerElements = document.querySelectorAll('.no-overflow p, .no-overflow li, .no-overflow div');
         innerElements.forEach(el => {
             if (el.children.length > 2 && el.tagName === 'DIV') return;
@@ -162,7 +169,7 @@
 
             if (CONFIG.groupId && lowerText.includes(`y2.s1.${CONFIG.batchTypeShort}.it.${CONFIG.groupId}`)) {
                 applyHiding(el, false);
-            } else if (lowerText.includes('notice')) {
+            } else if (lowerText.includes('notice') || lowerText.includes('general')) {
                 applyHiding(el, false);
             } else if (shouldBlock(el.innerText, lowerText)) {
                 applyHiding(el, true);
@@ -287,7 +294,7 @@
             <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner is now active. This utility seamlessly optimizes your Moodle dashboard by filtering out unassigned contexts and centers.</p>
             <div class="sf-welcome-credit">
                 <strong>Release Information</strong><br>
-                Version: 6.8.0<br>
+                Version: 6.9.0<br>
                 Maintainer: Dulith Divisekara<br>
                 License: Open Source (MIT)
             </div>
