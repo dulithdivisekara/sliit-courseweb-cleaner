@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         SLIIT Courseweb Module Cleaner
 // @namespace    http://tampermonkey.net/
-// @version      5.7
-// @description  Hides specific links for other centers and adds a custom Settings UI.
+// @version      5.8
+// @description  Hides specific links for other centers and adds a native-themed Settings UI.
 // @author       You
 // @match        *://courseweb.sliit.lk/course/view.php*
 // @grant        GM_getValue
@@ -23,7 +23,6 @@
     // --------------------------------------------------
 
     function isExplicitlyMine(lower) {
-        // If the user hasn't set a group ID, skip exact match
         if (CONFIG.groupId) {
             const exactGroup = `y2.s1.${CONFIG.batchTypeShort}.it.${CONFIG.groupId}`;
             if (lower.includes(exactGroup)) return true;
@@ -50,14 +49,12 @@
         if (lower.includes(`.${oppositeShort}.`) || lower.includes(`${oppositeShort}.it`)) return true;
         const oppositeFull = CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
 
-        // BUG FIX: Added 'malabe' to the general block list
         const blockKeywords = [
             'malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara',
             'jaffna', 'northern', 'nothern', oppositeFull,
             'nu group', 'nu dataset', 'batch'
         ];
 
-        // Dynamically remove the user's selected campus from the block list so they can see their own stuff!
         const filteredBlockKeywords = blockKeywords.filter(word => word !== CONFIG.campus);
         if (filteredBlockKeywords.some(word => lower.includes(word))) return true;
 
@@ -115,19 +112,111 @@
     // --- USER INTERFACE (SETTINGS MENU) ---
     function injectUI() {
         GM_addStyle(`
-            /* UI UPGRADE: Moved button to Top Right, changed color to eye-catching orange */
-            #sliit-filter-btn { position: fixed; top: 75px; right: 20px; background: #FF5722; color: white; border: none; border-radius: 5px; padding: 10px 15px; font-size: 13px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 9999; font-weight: bold; transition: all 0.3s ease; }
-            #sliit-filter-btn:hover { background: #E64A19; transform: translateY(-2px); }
+            /* NATIVE MOODLE THEME SYNC */
+            #sliit-filter-btn { 
+                position: fixed; 
+                top: 80px; 
+                right: 30px; 
+                background-color: #ffffff; 
+                color: #0f3b5f; /* SLIIT Navy */
+                border: 1px solid #0f3b5f; 
+                border-radius: 4px; 
+                padding: 6px 14px; 
+                font-size: 13px; 
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                cursor: pointer; 
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+                z-index: 9999; 
+                transition: all 0.2s ease-in-out; 
+            }
+            #sliit-filter-btn:hover { 
+                background-color: #0f3b5f; 
+                color: #ffffff; 
+            }
             
-            #sliit-filter-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 25px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 10000; width: 320px; font-family: sans-serif; }
-            #sliit-filter-modal h3 { margin-top: 0; color: #333; }
-            #sliit-filter-modal label { display: block; margin-top: 15px; font-size: 13px; color: #555; }
-            #sliit-filter-modal select, #sliit-filter-modal input { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-            .sliit-modal-actions { margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; }
-            .sliit-btn { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; }
-            .sliit-btn-save { background: #28a745; color: white; }
-            .sliit-btn-cancel { background: #dc3545; color: white; }
-            #sliit-filter-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9998; }
+            #sliit-filter-modal { 
+                display: none; 
+                position: fixed; 
+                top: 50%; 
+                left: 50%; 
+                transform: translate(-50%, -50%); 
+                background: #ffffff; 
+                padding: 24px; 
+                border-radius: 6px; 
+                border: 1px solid rgba(0,0,0,0.1);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+                z-index: 10000; 
+                width: 340px; 
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            }
+            #sliit-filter-modal h3 { 
+                margin-top: 0; 
+                margin-bottom: 20px;
+                color: #212529; 
+                font-size: 18px;
+                font-weight: 600;
+                border-bottom: 1px solid #dee2e6;
+                padding-bottom: 10px;
+            }
+            #sliit-filter-modal label { 
+                display: block; 
+                margin-top: 15px; 
+                font-size: 13px; 
+                font-weight: 500;
+                color: #495057; 
+            }
+            #sliit-filter-modal select, #sliit-filter-modal input { 
+                width: 100%; 
+                padding: 8px 12px; 
+                margin-top: 6px; 
+                border: 1px solid #ced4da; 
+                border-radius: 4px; 
+                box-sizing: border-box; 
+                font-size: 14px;
+                color: #495057;
+                background-color: #fff;
+            }
+            #sliit-filter-modal select:focus, #sliit-filter-modal input:focus {
+                outline: none;
+                border-color: #80bdff;
+                box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+            }
+            .sliit-modal-actions { 
+                margin-top: 25px; 
+                display: flex; 
+                justify-content: flex-end; 
+                gap: 10px; 
+            }
+            .sliit-btn { 
+                padding: 8px 16px; 
+                border: none; 
+                border-radius: 4px; 
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer; 
+                transition: background-color 0.15s ease-in-out;
+            }
+            .sliit-btn-save { 
+                background: #0f3b5f; /* Native SLIIT Blue instead of bright green */
+                color: white; 
+            }
+            .sliit-btn-save:hover { background: #0a2942; }
+            .sliit-btn-cancel { 
+                background: #6c757d; /* Standard Bootstrap grey instead of bright red */
+                color: white; 
+            }
+            .sliit-btn-cancel:hover { background: #5a6268; }
+            #sliit-filter-overlay { 
+                display: none; 
+                position: fixed; 
+                top: 0; 
+                left: 0; 
+                width: 100%; 
+                height: 100%; 
+                background: rgba(0,0,0,0.4); 
+                z-index: 9998; 
+                backdrop-filter: blur(2px);
+            }
         `);
 
         const overlay = document.createElement('div');
@@ -135,12 +224,12 @@
 
         const btn = document.createElement('button');
         btn.id = 'sliit-filter-btn';
-        btn.innerHTML = '⚙️ Filter Settings';
+        btn.innerHTML = 'Filter Settings';
 
         const modal = document.createElement('div');
         modal.id = 'sliit-filter-modal';
         modal.innerHTML = `
-            <h3>Courseweb Filter Settings</h3>
+            <h3>Filter Configuration</h3>
             <label>Campus</label>
             <select id="sf-campus">
                 <option value="malabe">Malabe</option>
@@ -155,8 +244,8 @@
                 <option value="weekend">Weekend (WE)</option>
                 <option value="weekday">Weekday (WD)</option>
             </select>
-            <label>Group ID (e.g., 0301 or leave empty)</label>
-            <input type="text" id="sf-group" placeholder="Enter your 4-digit ID">
+            <label>Group ID (e.g., 0301)</label>
+            <input type="text" id="sf-group" placeholder="Leave empty for all groups">
             <div class="sliit-modal-actions">
                 <button class="sliit-btn sliit-btn-cancel" id="sf-cancel">Cancel</button>
                 <button class="sliit-btn sliit-btn-save" id="sf-save">Save & Reload</button>
