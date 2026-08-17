@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLIIT Courseweb Module Cleaner
 // @namespace    http://tampermonkey.net/
-// @version      6.1
+// @version      6.2
 // @description  A professional, context-aware module filter for SLIIT Courseweb.
 // @author       Dulith Divisekara
 // @match        *://courseweb.sliit.lk/course/view.php*
@@ -22,9 +22,9 @@
         enabled: GM_getValue('enabled', true),
         ghostMode: GM_getValue('ghostMode', false),
         campus: GM_getValue('campus', 'malabe'),
-        batchType: GM_getValue('batchType', 'weekend'),
-        batchTypeShort: GM_getValue('batchTypeShort', 'we'),
-        groupId: GM_getValue('groupId', '0301')
+        batchType: GM_getValue('batchType', 'weekday'), // Defaulted to weekday
+        batchTypeShort: GM_getValue('batchTypeShort', 'wd'), // Defaulted to wd
+        groupId: GM_getValue('groupId', '') // Defaulted to empty
     };
     // --------------------------------
 
@@ -157,11 +157,13 @@
             .sf-modal-container select:focus, .sf-modal-container input[type="text"]:focus { outline: none; border-color: #f7b924; background-color: #fff; }
             
             .sliit-modal-actions { margin-top: 25px; display: flex; justify-content: space-between; align-items: center; }
-            .sliit-btn { padding: 9px 14px; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background-color 0.15s ease-in-out; text-decoration: none; text-align: center; }
+            .sliit-btn { padding: 9px 14px; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background-color 0.15s ease-in-out; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; }
             .sliit-btn-save { background: #0f3b5f; color: white; }
             .sliit-btn-save:hover { background: #0a2942; }
             .sliit-btn-cancel { background: #e9ecef; color: #495057; }
             .sliit-btn-cancel:hover { background: #dde0e3; }
+            .sliit-btn-github { background: #24292e; color: white; flex-grow: 1; margin-right: 10px; }
+            .sliit-btn-github:hover { background: #1b1f23; }
             .sliit-btn-reset { background: transparent; color: #dc3545; border: 1px solid #dc3545; padding: 8px 12px; }
             .sliit-btn-reset:hover { background: #dc3545; color: white; }
             
@@ -172,7 +174,10 @@
             #sliit-filter-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9998; backdrop-filter: blur(3px); }
 
             /* Welcome Modal Specifics */
-            .sf-welcome-text { font-size: 13px; color: #495057; line-height: 1.5; margin-bottom: 15px; }
+            .sf-welcome-header { text-align: center; margin-bottom: 20px; }
+            .sf-welcome-header svg { stroke: #0f3b5f; width: 42px; height: 42px; margin-bottom: 10px; }
+            .sf-welcome-header h3 { display: block; border: none; font-size: 20px; margin: 0; padding: 0; justify-content: center; }
+            .sf-welcome-text { font-size: 13px; color: #495057; line-height: 1.5; margin-bottom: 15px; text-align: center; }
             .sf-welcome-credit { background: #f8f9fa; border-left: 3px solid #f7b924; padding: 12px; font-size: 12px; color: #6c757d; margin-bottom: 20px; }
             .sf-welcome-credit strong { color: #0f3b5f; }
         `);
@@ -209,8 +214,8 @@
             </select>
             <label class="sf-input-label">Batch Type</label>
             <select id="sf-type">
-                <option value="weekend">Weekend (WE)</option>
                 <option value="weekday">Weekday (WD)</option>
+                <option value="weekend">Weekend (WE)</option>
             </select>
             <label class="sf-input-label">Group ID (e.g., 0301)</label>
             <input type="text" id="sf-group" placeholder="Leave empty for all groups">
@@ -232,15 +237,20 @@
         welcomeModal.className = 'sf-modal-container';
         welcomeModal.id = 'sliit-welcome-modal';
         welcomeModal.innerHTML = `
-            <h3>Welcome! 👋</h3>
-            <p class="sf-welcome-text">Thank you for installing the <strong>SLIIT Courseweb Cleaner</strong>. This tool is designed to keep your dashboard distraction-free by automatically filtering out irrelevant batches and centers.</p>
+            <div class="sf-welcome-header">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                <h3>Courseweb Cleaner</h3>
+            </div>
+            <p class="sf-welcome-text">Thank you for installing the extension. This tool is designed to keep your Moodle dashboard distraction-free by automatically filtering out irrelevant batches and centers.</p>
             <div class="sf-welcome-credit">
                 Developed by <strong>Dulith Divisekara</strong>.<br><br>
-                If you find this tool helpful, please consider supporting the project by leaving a star on GitHub!
+                If you find this tool helpful, please consider supporting the project by viewing the source code and starring the repository.
             </div>
             <div class="sliit-modal-actions" style="justify-content: space-between;">
-                <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner" target="_blank" class="sliit-btn sliit-btn-cancel">⭐ Star on GitHub</a>
-                <button class="sliit-btn sliit-btn-save" id="sf-welcome-start">Configure Settings</button>
+                <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner" target="_blank" class="sliit-btn sliit-btn-github">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg> GitHub
+                </a>
+                <button class="sliit-btn sliit-btn-save" id="sf-welcome-start" style="flex-grow: 1;">Configure Settings</button>
             </div>
         `;
 
