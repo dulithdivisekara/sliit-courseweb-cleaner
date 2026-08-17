@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLIIT Courseweb Module Cleaner
 // @namespace    http://tampermonkey.net/
-// @version      6.3
+// @version      6.4
 // @description  A professional, context-aware module filter for SLIIT Courseweb.
 // @author       Dulith Divisekara
 // @match        *://courseweb.sliit.lk/course/view.php*
@@ -153,32 +153,38 @@
             input:checked + .sf-slider:before { transform: translateX(18px); }
 
             .sf-input-label { display: block; margin-top: 15px; font-size: 12px; font-weight: 600; color: #495057; }
-            .sf-modal-container select, .sf-modal-container input[type="text"] { width: 100%; padding: 10px 12px; margin-top: 6px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box; font-size: 14px; color: #495057; background-color: #f8f9fa; }
+            .sf-modal-container select, .sf-modal-container input[type="text"] { width: 100%; padding: 10px 12px; margin-top: 6px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; font-size: 14px; color: #495057; background-color: #f8f9fa; }
             .sf-modal-container select:focus, .sf-modal-container input[type="text"]:focus { outline: none; border-color: #f7b924; background-color: #fff; }
             
-            .sliit-modal-actions { margin-top: 25px; display: flex; justify-content: space-between; align-items: center; }
-            .sliit-btn { padding: 9px 14px; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background-color 0.15s ease-in-out; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; }
+            /* --- REFINED BUTTON STYLING --- */
+            .sliit-modal-actions { margin-top: 25px; display: flex; justify-content: space-between; align-items: center; width: 100%; }
+            .sliit-modal-actions-right { display: flex; gap: 10px; }
+            
+            .sliit-btn { padding: 9px 16px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; }
             .sliit-btn-save { background: #0f3b5f; color: white; }
             .sliit-btn-save:hover { background: #0a2942; }
             .sliit-btn-cancel { background: #e9ecef; color: #495057; }
             .sliit-btn-cancel:hover { background: #dde0e3; }
-            .sliit-btn-github { background: #24292e; color: white; flex-grow: 1; margin-right: 10px; }
+            .sliit-btn-github { background: #24292e; color: white; }
             .sliit-btn-github:hover { background: #1b1f23; }
-            .sliit-btn-reset { background: transparent; color: #dc3545; border: 1px solid #dc3545; padding: 8px 12px; }
+            .sliit-btn-reset { background: transparent; color: #dc3545; border: 1px solid #dc3545; padding: 8px 14px; }
             .sliit-btn-reset:hover { background: #dc3545; color: white; }
             
+            /* Welcome Modal Specifics */
+            #sliit-welcome-modal .sliit-modal-actions { display: flex; gap: 12px; justify-content: center; }
+            #sliit-welcome-modal .sliit-btn { flex: 1; padding: 10px 16px; } /* Ensures both buttons take up equal space nicely */
+
             .sf-footer { margin-top: 20px; text-align: center; font-size: 12px; color: #6c757d; }
             .sf-footer a { color: #0f3b5f; text-decoration: none; font-weight: 600; margin: 0 5px; }
             .sf-footer a:hover { text-decoration: underline; }
             
             #sliit-filter-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9998; backdrop-filter: blur(3px); }
 
-            /* Welcome Modal Specifics */
             .sf-welcome-header { text-align: center; margin-bottom: 15px; }
             .sf-welcome-header svg { stroke: #0f3b5f; width: 42px; height: 42px; margin-bottom: 10px; }
             .sf-welcome-header h3 { display: block; border: none; font-size: 18px; margin: 0; padding: 0; justify-content: center; color: #212529; }
             .sf-welcome-text { font-size: 13px; color: #495057; line-height: 1.5; margin-bottom: 15px; text-align: center; }
-            .sf-welcome-credit { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 12px; font-size: 12px; color: #495057; margin-bottom: 20px; text-align: left; line-height: 1.6; }
+            .sf-welcome-credit { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; padding: 12px; font-size: 12px; color: #495057; margin-bottom: 20px; text-align: left; line-height: 1.6; }
         `);
 
         const overlay = document.createElement('div');
@@ -218,13 +224,15 @@
             </select>
             <label class="sf-input-label">Group ID (Optional)</label>
             <input type="text" id="sf-group" placeholder="e.g., 0301 (Leave empty for batch-wide view)">
+            
             <div class="sliit-modal-actions">
                 <button class="sliit-btn sliit-btn-reset" id="sf-reset">Reset</button>
-                <div>
+                <div class="sliit-modal-actions-right">
                     <button class="sliit-btn sliit-btn-cancel" id="sf-cancel">Cancel</button>
                     <button class="sliit-btn sliit-btn-save" id="sf-save">Apply Setup</button>
                 </div>
             </div>
+            
             <div class="sf-footer">
                 <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner/issues" target="_blank">Documentation & Issues</a>
             </div>
@@ -242,15 +250,15 @@
             <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner is now active. This utility seamlessly optimizes your Moodle dashboard by filtering out unassigned contexts and centers.</p>
             <div class="sf-welcome-credit">
                 <strong>Release Information</strong><br>
-                Version: 6.3.0<br>
+                Version: 6.4.0<br>
                 Maintainer: Dulith Divisekara<br>
                 License: Open Source (MIT)
             </div>
-            <div class="sliit-modal-actions" style="justify-content: space-between;">
+            <div class="sliit-modal-actions">
                 <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner" target="_blank" class="sliit-btn sliit-btn-github">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg> View Repository
                 </a>
-                <button class="sliit-btn sliit-btn-save" id="sf-welcome-start" style="flex-grow: 1;">Configure Setup</button>
+                <button class="sliit-btn sliit-btn-save" id="sf-welcome-start">Configure Setup</button>
             </div>
         `;
 
