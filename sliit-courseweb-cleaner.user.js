@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLIIT Courseweb Module Cleaner
 // @namespace    http://tampermonkey.net/
-// @version      6.7.0
+// @version      6.8.0
 // @description  A professional, context-aware module filter for SLIIT Courseweb.
 // @author       Dulith Divisekara
 // @match        *://courseweb.sliit.lk/course/view.php*
@@ -28,51 +28,38 @@
     };
     // --------------------------------
 
-    function isExplicitlyMine(lower) {
-        if (CONFIG.groupId) {
-            const exactGroup = `y2.s1.${CONFIG.batchTypeShort}.it.${CONFIG.groupId}`;
-            if (lower.includes(exactGroup)) return true;
-        }
-        if (lower.includes(CONFIG.campus) && lower.includes(CONFIG.batchType)) return true;
-
-        if (CONFIG.campus === 'malabe' && CONFIG.batchType === 'weekday') {
-            if (lower.includes('malabe') && /\bbatch\s*\d+\b/i.test(lower) && !lower.includes('weekend')) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     function shouldBlock(text, lower) {
         if (!lower) return false;
 
+        // Block foreign groups
         if (CONFIG.groupId) {
             const otherGroupsRegex = new RegExp(`y2\\.s1\\.${CONFIG.batchTypeShort}\\.it\\.(?!${CONFIG.groupId})\\d+`, 'i');
             if (otherGroupsRegex.test(lower)) return true;
         }
 
+        // Block opposite batch abbreviations (.WE. vs .WD.)
         const oppositeShort = CONFIG.batchTypeShort === 'we' ? 'wd' : 'we';
         if (lower.includes(`.${oppositeShort}.`) || lower.includes(`${oppositeShort}.it`)) return true;
 
+        // Block opposite full batch names
         const oppositeFull = CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
         if (lower.includes(oppositeFull)) return true;
 
+        // Block foreign campuses
         const campuses = ['malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara', 'jaffna', 'northern', 'nothern'];
         const foreignCampuses = campuses.filter(c => c !== CONFIG.campus);
         if (foreignCampuses.some(c => lower.includes(c))) return true;
 
+        // Malabe-only format logic
         if (CONFIG.campus === 'malabe') {
-            const malabeBlockRegexes = [
-                /\bbatch\s*\d+\b/i,
-                /\by2s1\.b\d+/i,
-                /\by2s1\.lab_\w+/i
-            ];
+            const malabeBlockRegexes = [/\bbatch\s*\d+\b/i, /\by2s1\.b\d+/i, /\by2s1\.lab_\w+/i];
             if (malabeBlockRegexes.some(regex => regex.test(lower))) {
                 if (CONFIG.batchType === 'weekday' && lower.includes('malabe') && !lower.includes('weekend')) return false;
                 return true;
             }
         }
 
+        // Regional-only format logic
         if (CONFIG.campus !== 'malabe') {
             if (/y2\.s1\.(wd|we)\.it\.?\d+/i.test(lower)) return true;
         }
@@ -105,49 +92,59 @@
         const campuses = ['malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara', 'jaffna', 'northern', 'nothern'];
         const oppositeFull = CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
 
-        let activeSectionCampus = 'all';
-        let activeSectionBatch = 'all';
+        let activeCampus = 'all';
+        let activeBatch = 'all';
 
         activities.forEach(activity => {
             const text = activity.innerText;
             const lower = text.toLowerCase();
             const isTitle = activity.classList.contains('modtype_label') || activity.querySelector('h1, h2, h3, h4, h5');
 
-            // --- SMART SECTION TRACKING ---
+            // --- AUTO-RESETTING CONTEXT ENGINE ---
             if (isTitle) {
                 const mentionedCampus = campuses.find(c => lower.includes(c));
-                if (mentionedCampus) {
-                    activeSectionCampus = mentionedCampus;
-                } else if (lower.includes('general') || lower.includes('notice') || lower.includes('announcement')) {
-                    activeSectionCampus = 'all';
-                }
+                const mentionedBatch = lower.includes(CONFIG.batchType) ? CONFIG.batchType : (lower.includes(oppositeFull) ? oppositeFull : null);
 
-                if (lower.includes(CONFIG.batchType)) {
-                    activeSectionBatch = CONFIG.batchType;
-                } else if (lower.includes(oppositeFull)) {
-                    activeSectionBatch = oppositeFull;
-                } else if (lower.includes('general') || lower.includes('notice')) {
-                    activeSectionBatch = 'all';
+                if (mentionedCampus || mentionedBatch) {
+                    if (mentionedCampus) activeCampus = mentionedCampus;
+                    if (mentionedBatch) activeBatch = mentionedBatch;
+
+                    // Prevent state bleeding (e.g., "Malabe Weekend" bleeding 'weekend' into "Kandy Uni")
+                    if (mentionedCampus && !mentionedBatch) activeBatch = 'all';
+                    if (!mentionedCampus && mentionedBatch) activeCampus = 'all';
+                } else {
+                    // Neutral headers like "Week 01" wipe the state clean
+                    activeCampus = 'all';
+                    activeBatch = 'all';
                 }
             }
 
             let shouldHide = false;
 
-            // --- FILTER LOGIC ---
-            if (isExplicitlyMine(lower) || lower.includes('notice') || lower.includes('rescheduled') || lower.includes('announcement')) {
+            // Priority 1: Exact group match overrides all
+            if (CONFIG.groupId && lower.includes(`y2.s1.${CONFIG.batchTypeShort}.it.${CONFIG.groupId}`)) {
                 shouldHide = false;
-            } else if (activeSectionCampus !== 'all' && activeSectionCampus !== CONFIG.campus) {
-                shouldHide = true; // Block items under a different campus header
-            } else if (activeSectionBatch !== 'all' && activeSectionBatch !== CONFIG.batchType) {
-                shouldHide = true; // Block items under a different batch header
-            } else if (shouldBlock(text, lower)) {
+            }
+            // Priority 2: General notices are safe
+            else if (lower.includes('notice') || lower.includes('rescheduled') || lower.includes('announcement')) {
+                shouldHide = false;
+            }
+            // Priority 3: Hide based on active tracker block
+            else if (activeCampus !== 'all' && activeCampus !== CONFIG.campus) {
+                shouldHide = true;
+            }
+            else if (activeBatch !== 'all' && activeBatch !== CONFIG.batchType) {
+                shouldHide = true;
+            }
+            // Priority 4: Hide based on raw text violations
+            else if (shouldBlock(text, lower)) {
                 shouldHide = true;
             }
 
-            // Ensure the titles themselves hide if they belong to another region
+            // Titles evaluate themselves
             if (isTitle) {
-                if ((activeSectionCampus !== 'all' && activeSectionCampus !== CONFIG.campus) ||
-                    (activeSectionBatch !== 'all' && activeSectionBatch !== CONFIG.batchType)) {
+                if ((activeCampus !== 'all' && activeCampus !== CONFIG.campus) ||
+                    (activeBatch !== 'all' && activeBatch !== CONFIG.batchType)) {
                     shouldHide = true;
                 } else {
                     shouldHide = false;
@@ -157,12 +154,15 @@
             applyHiding(activity, shouldHide);
         });
 
+        // Inner elements backup cleaner
         const innerElements = document.querySelectorAll('.no-overflow p, .no-overflow li, .no-overflow div');
         innerElements.forEach(el => {
             if (el.children.length > 2 && el.tagName === 'DIV') return;
             const lowerText = el.innerText.toLowerCase();
 
-            if (isExplicitlyMine(lowerText) || lowerText.includes('notice')) {
+            if (CONFIG.groupId && lowerText.includes(`y2.s1.${CONFIG.batchTypeShort}.it.${CONFIG.groupId}`)) {
+                applyHiding(el, false);
+            } else if (lowerText.includes('notice')) {
                 applyHiding(el, false);
             } else if (shouldBlock(el.innerText, lowerText)) {
                 applyHiding(el, true);
@@ -287,7 +287,7 @@
             <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner is now active. This utility seamlessly optimizes your Moodle dashboard by filtering out unassigned contexts and centers.</p>
             <div class="sf-welcome-credit">
                 <strong>Release Information</strong><br>
-                Version: 6.7.0<br>
+                Version: 6.8.0<br>
                 Maintainer: Dulith Divisekara<br>
                 License: Open Source (MIT)
             </div>
