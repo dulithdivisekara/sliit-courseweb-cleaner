@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLIIT Courseweb Module Cleaner
 // @namespace    http://tampermonkey.net/
-// @version      6.9.0
+// @version      6.10.0
 // @description  A professional, context-aware module filter for SLIIT Courseweb.
 // @author       Dulith Divisekara
 // @match        *://courseweb.sliit.lk/course/view.php*
@@ -117,18 +117,38 @@
             const lower = text.toLowerCase();
             const isTitle = activity.classList.contains('modtype_label') || activity.querySelector('h1, h2, h3, h4, h5');
 
-            // --- AUTO-RESETTING CONTEXT ENGINE ---
+            // --- AUTO-RESETTING CONTEXT ENGINE (GREEDY BUG FIX) ---
             if (isTitle) {
-                const mentionedCampus = campuses.find(c => lower.includes(c));
-                const mentionedBatch = lower.includes(CONFIG.batchType) ? CONFIG.batchType : (lower.includes(oppositeFull) ? oppositeFull : null);
+                const foundCampuses = campuses.filter(c => lower.includes(c));
+                const hasBothBatches = lower.includes(CONFIG.batchType) && lower.includes(oppositeFull);
 
-                if (mentionedCampus || mentionedBatch) {
-                    if (mentionedCampus) activeCampus = mentionedCampus;
-                    if (mentionedBatch) activeBatch = mentionedBatch;
+                if (foundCampuses.length > 0 || lower.includes(CONFIG.batchType) || lower.includes(oppositeFull)) {
 
-                    if (mentionedCampus && !mentionedBatch) activeBatch = 'all';
-                    if (!mentionedCampus && mentionedBatch) activeCampus = 'all';
+                    // Neutralize if multiple campuses are found (Aggregated List)
+                    if (foundCampuses.length > 1) {
+                        activeCampus = 'all';
+                    } else if (foundCampuses.length === 1) {
+                        activeCampus = foundCampuses[0];
+                    }
+
+                    // Neutralize if both batches are found
+                    if (hasBothBatches) {
+                        activeBatch = 'all';
+                    } else if (lower.includes(CONFIG.batchType)) {
+                        activeBatch = CONFIG.batchType;
+                    } else if (lower.includes(oppositeFull)) {
+                        activeBatch = oppositeFull;
+                    }
+
+                    // Prevent state bleeding across mismatched properties
+                    if (foundCampuses.length > 0 && !hasBothBatches && !lower.includes(CONFIG.batchType) && !lower.includes(oppositeFull)) {
+                        activeBatch = 'all';
+                    }
+                    if (foundCampuses.length === 0 && (lower.includes(CONFIG.batchType) || lower.includes(oppositeFull))) {
+                        activeCampus = 'all';
+                    }
                 } else {
+                    // Standard structural reset for neutral headers
                     activeCampus = 'all';
                     activeBatch = 'all';
                 }
@@ -294,7 +314,7 @@
             <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner is now active. This utility seamlessly optimizes your Moodle dashboard by filtering out unassigned contexts and centers.</p>
             <div class="sf-welcome-credit">
                 <strong>Release Information</strong><br>
-                Version: 6.9.0<br>
+                Version: 6.10.0<br>
                 Maintainer: Dulith Divisekara<br>
                 License: Open Source (MIT)
             </div>
