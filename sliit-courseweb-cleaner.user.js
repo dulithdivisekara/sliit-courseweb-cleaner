@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLIIT Courseweb Module Cleaner
 // @namespace    http://tampermonkey.net/
-// @version      6.11.0
+// @version      6.12.0
 // @description  A professional, context-aware module filter for SLIIT Courseweb.
 // @author       Dulith Divisekara
 // @match        *://courseweb.sliit.lk/course/view.php*
@@ -31,7 +31,7 @@
     function shouldBlock(text, lower) {
         if (!lower) return false;
 
-        // Core Identifiers (Expanded to catch Northern Uni acronyms)
+        // Core Identifiers
         const campuses = ['malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara', 'jaffna', 'northern', 'nothern', 'nu group', 'nu dataset'];
         const foreignCampuses = campuses.filter(c => c !== CONFIG.campus);
 
@@ -72,6 +72,7 @@
             const malabeBlockRegexes = [/\bbatch\s*\d+\b/i, /\by2s1\.b\d+/i, /\by2s1\.lab_\w+/i];
             if (malabeBlockRegexes.some(regex => regex.test(lower))) {
                 if (CONFIG.batchType === 'weekday' && lower.includes('malabe') && !lower.includes('weekend')) return false;
+                if (CONFIG.batchType === 'weekend' && lower.includes('malabe') && lower.includes('weekend')) return false;
                 return true;
             }
         }
@@ -106,7 +107,6 @@
         if (!CONFIG.enabled) return;
 
         const activities = document.querySelectorAll('.activity');
-        // Expanded to catch Northern Uni acronyms in section headers
         const campuses = ['malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara', 'jaffna', 'northern', 'nothern', 'nu group', 'nu dataset'];
         const oppositeFull = CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
 
@@ -309,7 +309,7 @@
             <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner is now active. This utility seamlessly optimizes your Moodle dashboard by filtering out unassigned contexts and centers.</p>
             <div class="sf-welcome-credit">
                 <strong>Release Information</strong><br>
-                Version: 6.11.0<br>
+                Version: 6.12.0<br>
                 Maintainer: Dulith Divisekara<br>
                 License: Open Source (MIT)
             </div>
