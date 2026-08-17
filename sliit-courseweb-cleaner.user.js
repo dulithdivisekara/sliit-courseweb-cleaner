@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLIIT Courseweb Module Cleaner
 // @namespace    http://tampermonkey.net/
-// @version      5.6
+// @version      5.7
 // @description  Hides specific links for other centers and adds a custom Settings UI.
 // @author       You
 // @match        *://courseweb.sliit.lk/course/view.php*
@@ -23,8 +23,11 @@
     // --------------------------------------------------
 
     function isExplicitlyMine(lower) {
-        const exactGroup = `y2.s1.${CONFIG.batchTypeShort}.it.${CONFIG.groupId}`;
-        if (lower.includes(exactGroup)) return true;
+        // If the user hasn't set a group ID, skip exact match
+        if (CONFIG.groupId) {
+            const exactGroup = `y2.s1.${CONFIG.batchTypeShort}.it.${CONFIG.groupId}`;
+            if (lower.includes(exactGroup)) return true;
+        }
 
         if (lower.includes(CONFIG.campus) && lower.includes(CONFIG.batchType)) return true;
         if (lower.includes('notice') || lower.includes('rescheduled') || lower.includes('announcement')) return true;
@@ -38,19 +41,23 @@
 
         if (isExplicitlyMine(lower)) return false;
 
-        const otherGroupsRegex = new RegExp(`y2\\.s1\\.${CONFIG.batchTypeShort}\\.it\\.(?!${CONFIG.groupId})\\d+`, 'i');
-        if (otherGroupsRegex.test(lower)) return true;
+        if (CONFIG.groupId) {
+            const otherGroupsRegex = new RegExp(`y2\\.s1\\.${CONFIG.batchTypeShort}\\.it\\.(?!${CONFIG.groupId})\\d+`, 'i');
+            if (otherGroupsRegex.test(lower)) return true;
+        }
 
         const oppositeShort = CONFIG.batchTypeShort === 'we' ? 'wd' : 'we';
         if (lower.includes(`.${oppositeShort}.`) || lower.includes(`${oppositeShort}.it`)) return true;
         const oppositeFull = CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
 
+        // BUG FIX: Added 'malabe' to the general block list
         const blockKeywords = [
-            'kandy', 'kurunegal', 'metro', 'matara', 'mathara',
+            'malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara',
             'jaffna', 'northern', 'nothern', oppositeFull,
-            'nu group', 'nu dataset', 'malabe batch'
+            'nu group', 'nu dataset', 'batch'
         ];
 
+        // Dynamically remove the user's selected campus from the block list so they can see their own stuff!
         const filteredBlockKeywords = blockKeywords.filter(word => word !== CONFIG.campus);
         if (filteredBlockKeywords.some(word => lower.includes(word))) return true;
 
@@ -108,8 +115,10 @@
     // --- USER INTERFACE (SETTINGS MENU) ---
     function injectUI() {
         GM_addStyle(`
-            #sliit-filter-btn { position: fixed; bottom: 20px; right: 20px; background: #00529b; color: white; border: none; border-radius: 50px; padding: 12px 20px; font-size: 14px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2); z-index: 9999; font-weight: bold; transition: background 0.3s; }
-            #sliit-filter-btn:hover { background: #003d73; }
+            /* UI UPGRADE: Moved button to Top Right, changed color to eye-catching orange */
+            #sliit-filter-btn { position: fixed; top: 75px; right: 20px; background: #FF5722; color: white; border: none; border-radius: 5px; padding: 10px 15px; font-size: 13px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 9999; font-weight: bold; transition: all 0.3s ease; }
+            #sliit-filter-btn:hover { background: #E64A19; transform: translateY(-2px); }
+            
             #sliit-filter-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 25px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 10000; width: 320px; font-family: sans-serif; }
             #sliit-filter-modal h3 { margin-top: 0; color: #333; }
             #sliit-filter-modal label { display: block; margin-top: 15px; font-size: 13px; color: #555; }
@@ -146,7 +155,7 @@
                 <option value="weekend">Weekend (WE)</option>
                 <option value="weekday">Weekday (WD)</option>
             </select>
-            <label>Group ID (e.g., 0301)</label>
+            <label>Group ID (e.g., 0301 or leave empty)</label>
             <input type="text" id="sf-group" placeholder="Enter your 4-digit ID">
             <div class="sliit-modal-actions">
                 <button class="sliit-btn sliit-btn-cancel" id="sf-cancel">Cancel</button>
@@ -174,15 +183,15 @@
             GM_setValue('campus', document.getElementById('sf-campus').value);
             GM_setValue('batchType', newType);
             GM_setValue('batchTypeShort', newType === 'weekend' ? 'we' : 'wd');
-            GM_setValue('groupId', document.getElementById('sf-group').value);
-            location.reload(); // Instantly apply changes!
+            GM_setValue('groupId', document.getElementById('sf-group').value.trim());
+            location.reload();
         };
     }
 
     // Run core logic
     window.addEventListener('load', () => {
         cleanCoursePage();
-        injectUI(); // Inject the settings button
+        injectUI();
     });
     setTimeout(cleanCoursePage, 1000);
     setTimeout(cleanCoursePage, 2500);
