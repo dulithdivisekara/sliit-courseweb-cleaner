@@ -34,7 +34,9 @@ Once Tampermonkey is active, click the link below to install the Courseweb Clean
 
 A Tampermonkey confirmation screen will appear. Click the **Install** button as shown below:
 
-<img src="assets/install-screen.png" width="600" alt="Tampermonkey Install Screen">
+<p align="center">
+  <img src="assets/install-screen.png" width="700" alt="Tampermonkey Install Screen">
+</p>
 
 ### 3. Initialize
 Navigate to [SLIIT Courseweb](https://courseweb.sliit.lk/) and open any module page. The script will initialize automatically and display a one-time welcome screen.
@@ -48,7 +50,9 @@ You do not need to edit any code to use this script. All settings are managed th
 ### Accessing Settings
 Look for the **Settings** tab anchored to the right side of your Courseweb screen (just below the navigation bar). Click it to open the configuration modal.
 
-<img src="assets/settings-tab.png" width="300" alt="Settings Tab Location">
+<p align="center">
+  <img src="assets/settings-tab.png" width="450" alt="Settings Tab Location">
+</p>
 
 ### Setting Up Your Filter
 1. **Module Filter:** Toggle the entire script on or off.
@@ -58,7 +62,9 @@ Look for the **Settings** tab anchored to the right side of your Courseweb scree
 5. **Group ID (Optional):** Enter your specific 4-digit group ID (e.g., `0301`). If left blank, the script will show all materials relevant to your general batch type.
 6. Click **Apply Setup**. The page will automatically reload with your saved preferences.
 
-<img src="assets/config-modal.png" width="350" alt="Configuration Modal">
+<p align="center">
+  <img src="assets/config-modal.png" width="400" alt="Configuration Modal">
+</p>
 
 ---
 
