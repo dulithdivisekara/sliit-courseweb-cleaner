@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLIIT Courseweb Module Cleaner
 // @namespace    http://tampermonkey.net/
-// @version      6.10.0
+// @version      6.11.0
 // @description  A professional, context-aware module filter for SLIIT Courseweb.
 // @author       Dulith Divisekara
 // @match        *://courseweb.sliit.lk/course/view.php*
@@ -31,8 +31,8 @@
     function shouldBlock(text, lower) {
         if (!lower) return false;
 
-        // Core Identifiers
-        const campuses = ['malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara', 'jaffna', 'northern', 'nothern'];
+        // Core Identifiers (Expanded to catch Northern Uni acronyms)
+        const campuses = ['malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara', 'jaffna', 'northern', 'nothern', 'nu group', 'nu dataset'];
         const foreignCampuses = campuses.filter(c => c !== CONFIG.campus);
 
         const oppositeFull = CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
@@ -106,7 +106,8 @@
         if (!CONFIG.enabled) return;
 
         const activities = document.querySelectorAll('.activity');
-        const campuses = ['malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara', 'jaffna', 'northern', 'nothern'];
+        // Expanded to catch Northern Uni acronyms in section headers
+        const campuses = ['malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara', 'jaffna', 'northern', 'nothern', 'nu group', 'nu dataset'];
         const oppositeFull = CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
 
         let activeCampus = 'all';
@@ -117,21 +118,19 @@
             const lower = text.toLowerCase();
             const isTitle = activity.classList.contains('modtype_label') || activity.querySelector('h1, h2, h3, h4, h5');
 
-            // --- AUTO-RESETTING CONTEXT ENGINE (GREEDY BUG FIX) ---
+            // --- AUTO-RESETTING CONTEXT ENGINE ---
             if (isTitle) {
                 const foundCampuses = campuses.filter(c => lower.includes(c));
                 const hasBothBatches = lower.includes(CONFIG.batchType) && lower.includes(oppositeFull);
 
                 if (foundCampuses.length > 0 || lower.includes(CONFIG.batchType) || lower.includes(oppositeFull)) {
 
-                    // Neutralize if multiple campuses are found (Aggregated List)
                     if (foundCampuses.length > 1) {
                         activeCampus = 'all';
                     } else if (foundCampuses.length === 1) {
                         activeCampus = foundCampuses[0];
                     }
 
-                    // Neutralize if both batches are found
                     if (hasBothBatches) {
                         activeBatch = 'all';
                     } else if (lower.includes(CONFIG.batchType)) {
@@ -140,7 +139,6 @@
                         activeBatch = oppositeFull;
                     }
 
-                    // Prevent state bleeding across mismatched properties
                     if (foundCampuses.length > 0 && !hasBothBatches && !lower.includes(CONFIG.batchType) && !lower.includes(oppositeFull)) {
                         activeBatch = 'all';
                     }
@@ -148,7 +146,6 @@
                         activeCampus = 'all';
                     }
                 } else {
-                    // Standard structural reset for neutral headers
                     activeCampus = 'all';
                     activeBatch = 'all';
                 }
@@ -156,7 +153,6 @@
 
             let shouldHide = false;
 
-            // Execution Priority Stack
             if (CONFIG.groupId && lower.includes(`y2.s1.${CONFIG.batchTypeShort}.it.${CONFIG.groupId}`)) {
                 shouldHide = false;
             } else if (lower.includes('notice') || lower.includes('rescheduled') || lower.includes('announcement')) {
@@ -181,7 +177,6 @@
             applyHiding(activity, shouldHide);
         });
 
-        // Inner elements backup cleaner (Strips foreign items out of aggregated lists)
         const innerElements = document.querySelectorAll('.no-overflow p, .no-overflow li, .no-overflow div');
         innerElements.forEach(el => {
             if (el.children.length > 2 && el.tagName === 'DIV') return;
@@ -314,7 +309,7 @@
             <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner is now active. This utility seamlessly optimizes your Moodle dashboard by filtering out unassigned contexts and centers.</p>
             <div class="sf-welcome-credit">
                 <strong>Release Information</strong><br>
-                Version: 6.10.0<br>
+                Version: 6.11.0<br>
                 Maintainer: Dulith Divisekara<br>
                 License: Open Source (MIT)
             </div>
