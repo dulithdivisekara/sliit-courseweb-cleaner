@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         SLIIT Courseweb Module Cleaner (v5.4 - Keep Titles)
+// @name         SLIIT Courseweb Module Cleaner
 // @namespace    http://tampermonkey.net/
-// @version      5.4
+// @version      5.5
 // @description  Hides specific links for other centers but KEEPS the section titles visible.
 // @author       You
 // @match        *://courseweb.sliit.lk/course/view.php*
@@ -11,10 +11,23 @@
 (function() {
     'use strict';
 
+    // --- USER CONFIGURATION ---
+    // Edit these values to match your specific batch details
+    const CONFIG = {
+        campus: 'malabe',       // Options: 'malabe', 'kandy', 'kurunegala', 'metro', 'jaffna', 'northern'
+        batchType: 'weekend',   // Options: 'weekend', 'weekday'
+        batchTypeShort: 'we',   // Options: 'we', 'wd'
+        groupId: '0301'         // Your specific group number
+    };
+    // --------------------------
+
     function isExplicitlyMine(lower) {
-        if (lower.includes('y2.s1.we.it.0301')) return true;
-        if (lower.includes('malabe') && lower.includes('weekend')) return true;
+        const exactGroup = `y2.s1.${CONFIG.batchTypeShort}.it.${CONFIG.groupId}`;
+        if (lower.includes(exactGroup)) return true;
+
+        if (lower.includes(CONFIG.campus) && lower.includes(CONFIG.batchType)) return true;
         if (lower.includes('notice') || lower.includes('rescheduled') || lower.includes('announcement')) return true;
+
         return false;
     }
 
@@ -23,15 +36,26 @@
         if (!lower) return false;
 
         if (isExplicitlyMine(lower)) return false;
-        if (/y2\.s1\.we\.it\.(?!0301)\d+/i.test(lower)) return true;
-        if (lower.includes('.wd.') || lower.includes('wd.it')) return true;
+
+        // Block other groups of the same batch type (e.g., other WE groups if you are WE)
+        const otherGroupsRegex = new RegExp(`y2\\.s1\\.${CONFIG.batchTypeShort}\\.it\\.(?!${CONFIG.groupId})\\d+`, 'i');
+        if (otherGroupsRegex.test(lower)) return true;
+
+        // Block the opposite batch type dynamically (e.g., WD if you are WE)
+        const oppositeShort = CONFIG.batchTypeShort === 'we' ? 'wd' : 'we';
+        if (lower.includes(`.${oppositeShort}.`) || lower.includes(`${oppositeShort}.it`)) return true;
+        const oppositeFull = CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
 
         const blockKeywords = [
-            'kandy', 'kurunegal', 'metro', 'matara', 'mathara', 
-            'jaffna', 'northern', 'nothern', 'weekday', 
+            'kandy', 'kurunegal', 'metro', 'matara', 'mathara',
+            'jaffna', 'northern', 'nothern', oppositeFull,
             'nu group', 'nu dataset', 'malabe batch'
         ];
-        if (blockKeywords.some(word => lower.includes(word))) return true;
+
+        // Remove the user's campus from the block list just in case
+        const filteredBlockKeywords = blockKeywords.filter(word => word !== CONFIG.campus);
+
+        if (filteredBlockKeywords.some(word => lower.includes(word))) return true;
 
         const blockRegexes = [
             /\bbatch\s*\d+\b/i,
@@ -50,38 +74,33 @@
         activities.forEach(activity => {
             const text = activity.innerText;
             const lower = text.toLowerCase();
-            
-            // Check if this item is just a structural Title/Label
+
             const isTitle = activity.classList.contains('modtype_label') || activity.querySelector('h1, h2, h3, h4, h5');
 
-            // 1. Toggle "Hide Section" mode based on what the title says
-            if (isExplicitlyMine(lower) || lower.includes('weekend') || lower.includes('we.') || lower.includes('lecture') || lower.includes('general') || lower.includes('workshop') || lower.includes('lab ')) {
+            if (isExplicitlyMine(lower) || lower.includes(CONFIG.batchType) || lower.includes(`${CONFIG.batchTypeShort}.`) || lower.includes('lecture') || lower.includes('general') || lower.includes('workshop') || lower.includes('lab ')) {
                 hideSection = false;
-            } else if (shouldBlock(text) && !lower.includes('weekend') && !lower.includes('we.')) {
+            } else if (shouldBlock(text) && !lower.includes(CONFIG.batchType) && !lower.includes(`${CONFIG.batchTypeShort}.`)) {
                 hideSection = true;
             }
 
-            // 2. Apply visibility rules
             if (isTitle) {
-                // NEVER hide titles! Leave them visible on the page.
                 activity.style.display = '';
             } else if (isExplicitlyMine(lower)) {
-                activity.style.display = ''; // Force show your specific links
+                activity.style.display = '';
             } else if (shouldBlock(text) || hideSection) {
-                activity.style.display = 'none'; // Hide the actionable links for other groups
+                activity.style.display = 'none';
             } else {
-                activity.style.display = ''; // Safe links stay visible
+                activity.style.display = '';
             }
         });
 
-        // Clean inner elements (removed heading tags from this list to protect inner titles too)
         const innerElements = document.querySelectorAll('.no-overflow p, .no-overflow li, .no-overflow div');
 
         innerElements.forEach(el => {
             if (el.children.length > 2 && el.tagName === 'DIV') return;
-            
+
             const lowerText = el.innerText.toLowerCase();
-            
+
             if (isExplicitlyMine(lowerText)) {
                 el.style.display = '';
             } else if (shouldBlock(el.innerText)) {
@@ -90,7 +109,6 @@
         });
     }
 
-    // Run when page loads and handle dynamic Moodle rendering
     window.addEventListener('load', cleanCoursePage);
     setTimeout(cleanCoursePage, 1000);
     setTimeout(cleanCoursePage, 2500);
