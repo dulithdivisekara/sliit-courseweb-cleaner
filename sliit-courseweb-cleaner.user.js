@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLIIT Courseweb Module Cleaner
 // @namespace    http://tampermonkey.net/
-// @version      6.4
+// @version      6.5.0
 // @description  A professional, context-aware module filter for SLIIT Courseweb.
 // @author       Dulith Divisekara
 // @match        *://courseweb.sliit.lk/course/view.php*
@@ -20,7 +20,7 @@
     const CONFIG = {
         hasSeenWelcome: GM_getValue('hasSeenWelcome', false),
         enabled: GM_getValue('enabled', true),
-        ghostMode: GM_getValue('ghostMode', false),
+        ghostMode: GM_getValue('ghostMode', true), // Default changed to TRUE
         campus: GM_getValue('campus', 'malabe'),
         batchType: GM_getValue('batchType', 'weekday'),
         batchTypeShort: GM_getValue('batchTypeShort', 'wd'),
@@ -34,6 +34,14 @@
             if (lower.includes(exactGroup)) return true;
         }
         if (lower.includes(CONFIG.campus) && lower.includes(CONFIG.batchType)) return true;
+
+        // BUG FIX: Protect standard SLIIT Weekday batch naming conventions (e.g., "Malabe Batch 01")
+        if (CONFIG.batchType === 'weekday') {
+            if (lower.includes(CONFIG.campus) && /\bbatch\s*\d+\b/i.test(lower) && !lower.includes('weekend')) {
+                return true;
+            }
+        }
+
         if (lower.includes('notice') || lower.includes('rescheduled') || lower.includes('announcement')) return true;
 
         return false;
@@ -156,7 +164,6 @@
             .sf-modal-container select, .sf-modal-container input[type="text"] { width: 100%; padding: 10px 12px; margin-top: 6px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; font-size: 14px; color: #495057; background-color: #f8f9fa; }
             .sf-modal-container select:focus, .sf-modal-container input[type="text"]:focus { outline: none; border-color: #f7b924; background-color: #fff; }
             
-            /* --- REFINED BUTTON STYLING --- */
             .sliit-modal-actions { margin-top: 25px; display: flex; justify-content: space-between; align-items: center; width: 100%; }
             .sliit-modal-actions-right { display: flex; gap: 10px; }
             
@@ -170,9 +177,8 @@
             .sliit-btn-reset { background: transparent; color: #dc3545; border: 1px solid #dc3545; padding: 8px 14px; }
             .sliit-btn-reset:hover { background: #dc3545; color: white; }
             
-            /* Welcome Modal Specifics */
             #sliit-welcome-modal .sliit-modal-actions { display: flex; gap: 12px; justify-content: center; }
-            #sliit-welcome-modal .sliit-btn { flex: 1; padding: 10px 16px; } /* Ensures both buttons take up equal space nicely */
+            #sliit-welcome-modal .sliit-btn { flex: 1; padding: 10px 16px; } 
 
             .sf-footer { margin-top: 20px; text-align: center; font-size: 12px; color: #6c757d; }
             .sf-footer a { color: #0f3b5f; text-decoration: none; font-weight: 600; margin: 0 5px; }
@@ -250,7 +256,7 @@
             <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner is now active. This utility seamlessly optimizes your Moodle dashboard by filtering out unassigned contexts and centers.</p>
             <div class="sf-welcome-credit">
                 <strong>Release Information</strong><br>
-                Version: 6.4.0<br>
+                Version: 6.5.0<br>
                 Maintainer: Dulith Divisekara<br>
                 License: Open Source (MIT)
             </div>
