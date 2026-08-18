@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLIIT Courseweb Module Cleaner
 // @namespace    http://tampermonkey.net/
-// @version      6.12.0
+// @version      7.0.0
 // @description  A professional, context-aware module filter for SLIIT Courseweb.
 // @author       Dulith Divisekara
 // @match        *://courseweb.sliit.lk/course/view.php*
@@ -20,8 +20,11 @@ window.CONFIG = {
     campus: GM_getValue('campus', 'malabe'),
     batchType: GM_getValue('batchType', 'weekday'),
     batchTypeShort: GM_getValue('batchTypeShort', 'wd'),
-    groupId: GM_getValue('groupId', '')
+    groupId: GM_getValue('groupId', ''),
+    customWhitelist: GM_getValue('customWhitelist', ''),
+    customBlacklist: GM_getValue('customBlacklist', '')
 };
+window.REMOTE_RULES = null;
 
 function createUIElement(htmlString) {
     const div = document.createElement('div');
@@ -29,8 +32,24 @@ function createUIElement(htmlString) {
     return div.firstChild;
 }
 
+function autoDetectSettings() {
+    let detectedCampus = 'malabe';
+    let detectedBatch = 'weekday';
+    
+    try {
+        const headerText = document.body.innerText.toLowerCase();
+        if (headerText.includes('weekend') || headerText.includes('.we.')) detectedBatch = 'weekend';
+        if (headerText.includes('kandy')) detectedCampus = 'kandy';
+        if (headerText.includes('kurunegala')) detectedCampus = 'kurunegala';
+        if (headerText.includes('metro')) detectedCampus = 'metro';
+        if (headerText.includes('matara')) detectedCampus = 'matara';
+        if (headerText.includes('jaffna')) detectedCampus = 'jaffna';
+    } catch(e) {}
+
+    return { campus: detectedCampus, batch: detectedBatch };
+}
+
 function injectUI() {
-    // Inject the shared styles for the userscript environment
     GM_addStyle(`
         #sliit-filter-btn { position: fixed; top: 150px; right: 0; background-color: #f7b924; color: #212529; border: none; border-radius: 6px 0 0 6px; padding: 10px 14px 10px 18px; font-size: 13px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; cursor: pointer; box-shadow: -2px 2px 6px rgba(0,0,0,0.15); z-index: 9999; transition: all 0.2s ease-in-out; display: flex; align-items: center; gap: 8px; }
         #sliit-filter-btn:hover { background-color: #e5a919; padding-right: 20px; }
@@ -78,7 +97,7 @@ function injectUI() {
 
     const settingsModal = createUIElement(`
         <div class="sf-modal-container" id="sliit-filter-modal">
-            <h3>Filter Configuration</h3>
+            <h3>Filter Configuration <span style="font-size: 10px; color: #28a745; margin-left: auto;">Userscript Mode</span></h3>
             <div class="sf-toggle-container">
                 <span class="sf-toggle-label">Module Filter <span class="sf-toggle-sub">Enable or disable filtering logic</span></span>
                 <label class="sf-switch"><input type="checkbox" id="sf-enabled" ${window.CONFIG.enabled ? 'checked' : ''}><span class="sf-slider"></span></label>
@@ -104,6 +123,12 @@ function injectUI() {
             <label class="sf-input-label">Group ID (Optional)</label>
             <input type="text" id="sf-group" placeholder="e.g., 0301 (Leave empty for batch-wide view)">
             
+            <label class="sf-input-label">Custom Whitelist (Comma separated)</label>
+            <input type="text" id="sf-whitelist" placeholder="e.g., Assignment, Revision">
+            
+            <label class="sf-input-label">Custom Blacklist (Comma separated)</label>
+            <input type="text" id="sf-blacklist" placeholder="e.g., Old Syllabus, Makeup">
+            
             <div class="sliit-modal-actions">
                 <button class="sliit-btn sliit-btn-reset" id="sf-reset">Reset</button>
                 <div class="sliit-modal-actions-right">
@@ -121,15 +146,13 @@ function injectUI() {
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                 <h3>Extension Initialized</h3>
             </div>
-            <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner is now active.</p>
-            <div class="sf-welcome-credit">
-                <strong>Release Information</strong><br>
-                Version: 6.12.0<br>
-                Maintainer: Dulith Divisekara<br>
-                License: Open Source (MIT)
+            <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner v7.0 is now active.</p>
+            <div class="sf-welcome-credit" id="sf-auto-detect-area">
+                <strong>Smart Auto-Detect:</strong><br>
+                We detected your campus and batch. Please confirm in the settings.
             </div>
             <div class="sliit-modal-actions">
-                <button class="sliit-btn sliit-btn-save" id="sf-welcome-start">Configure Setup</button>
+                <button class="sliit-btn sliit-btn-save" id="sf-welcome-start">Review & Configure Setup</button>
             </div>
         </div>
     `);
@@ -142,6 +165,8 @@ function injectUI() {
     document.getElementById('sf-campus').value = window.CONFIG.campus;
     document.getElementById('sf-type').value = window.CONFIG.batchType;
     document.getElementById('sf-group').value = window.CONFIG.groupId;
+    document.getElementById('sf-whitelist').value = window.CONFIG.customWhitelist || '';
+    document.getElementById('sf-blacklist').value = window.CONFIG.customBlacklist || '';
 
     const showSettings = () => { settingsModal.style.display = 'block'; overlay.style.display = 'block'; };
     const closeModals = () => { settingsModal.style.display = 'none'; welcomeModal.style.display = 'none'; overlay.style.display = 'none'; };
@@ -151,6 +176,10 @@ function injectUI() {
     overlay.onclick = closeModals;
 
     if (!window.CONFIG.hasSeenWelcome) {
+        const detected = autoDetectSettings();
+        document.getElementById('sf-campus').value = detected.campus;
+        document.getElementById('sf-type').value = detected.batch;
+        
         welcomeModal.style.display = 'block';
         overlay.style.display = 'block';
         document.getElementById('sf-welcome-start').onclick = () => {
@@ -169,6 +198,8 @@ function injectUI() {
             GM_deleteValue('batchType');
             GM_deleteValue('batchTypeShort');
             GM_deleteValue('groupId');
+            GM_deleteValue('customWhitelist');
+            GM_deleteValue('customBlacklist');
             location.reload();
         }
     };
@@ -181,15 +212,39 @@ function injectUI() {
         GM_setValue('batchType', newType);
         GM_setValue('batchTypeShort', newType === 'weekend' ? 'we' : 'wd');
         GM_setValue('groupId', document.getElementById('sf-group').value.trim());
+        GM_setValue('customWhitelist', document.getElementById('sf-whitelist').value.trim());
+        GM_setValue('customBlacklist', document.getElementById('sf-blacklist').value.trim());
         location.reload();
     };
 }
 
+let isCleaning = false;
+function runClean() {
+    if (isCleaning) return;
+    isCleaning = true;
+    requestAnimationFrame(() => {
+        cleanCoursePage();
+        isCleaning = false;
+    });
+}
+
 window.addEventListener('load', () => {
-    cleanCoursePage();
+    runClean();
     injectUI();
+    
+    const observer = new MutationObserver((mutations) => {
+        let shouldRun = false;
+        for (let m of mutations) {
+            if (m.addedNodes.length > 0 && m.target.className !== 'sf-modal-container') {
+                shouldRun = true;
+                break;
+            }
+        }
+        if (shouldRun) runClean();
+    });
+    
+    const courseContent = document.querySelector('.course-content') || document.body;
+    observer.observe(courseContent, { childList: true, subtree: true });
 });
-setTimeout(cleanCoursePage, 1000);
-setTimeout(cleanCoursePage, 2500);
 
 // build.sh will append shared-core.js here automatically.

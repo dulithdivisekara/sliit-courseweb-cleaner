@@ -1,0 +1,33 @@
+name: Validate Rules JSON
+
+on:
+  push:
+    paths:
+      - 'rules.json'
+  pull_request:
+    paths:
+      - 'rules.json'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Validate JSON syntax
+        run: jq empty rules.json
+        
+      - name: Check Schema Structure
+        run: |
+          # Ensure version is a number
+          jq -e '.version | type == "number"' rules.json > /dev/null
+          
+          # Ensure campuses is an array
+          jq -e '.campuses | type == "array"' rules.json > /dev/null
+          
+          # Ensure batchPatterns exists
+          jq -e '.batchPatterns | type == "object"' rules.json > /dev/null
+
+      - name: Report Success
+        run: echo "rules.json is valid and ready for distribution."

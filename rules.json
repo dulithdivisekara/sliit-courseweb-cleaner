@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "lastUpdated": "2026-08-18",
+  "campuses": [
+    "malabe",
+    "kandy",
+    "kurunegala",
+    "metro",
+    "matara",
+    "mathara",
+    "jaffna",
+    "northern",
+    "nothern",
+    "nu group",
+    "nu dataset"
+  ],
+  "batchPatterns": {
+    "weekday": ["wd", "weekday"],
+    "weekend": ["we", "weekend"]
+  },
+  "ignoreKeywords": [
+    "notice",
+    "rescheduled",
+    "announcement",
+    "general"
+  ],
+  "malabeBlockRegexes": [
+    "\\\\bbatch\\\\s*\\\\d+\\\\b",
+    "\\\\by2s1\\\\.b\\\\d+",
+    "\\\\by2s1\\\\.lab_\\\\w+"
+  ]
+}

@@ -1,28 +1,74 @@
 // --- SHARED CORE LOGIC ---
+const STATE = {
+    compiled: false,
+    campuses: [],
+    foreignCampuses: [],
+    oppositeFull: '',
+    oppositeShort: '',
+    myGroupRegex: null,
+    otherGroupsRegex: null,
+    malabeBlockRegexes: [],
+    ignoreKeywords: [],
+    whitelist: [],
+    blacklist: []
+};
+
+function initFilters() {
+    if (STATE.compiled) return;
+
+    const rules = window.REMOTE_RULES || {
+        campuses: ['malabe', 'kandy', 'kurunegala', 'metro', 'matara', 'mathara', 'jaffna', 'northern', 'nothern', 'nu group', 'nu dataset'],
+        ignoreKeywords: ['notice', 'rescheduled', 'announcement', 'general'],
+        malabeBlockRegexes: ["\\bbatch\\s*\\d+\\b", "\\by2s1\\.b\\d+", "\\by2s1\\.lab_\\w+"]
+    };
+
+    STATE.campuses = rules.campuses;
+    STATE.foreignCampuses = STATE.campuses.filter(c => c !== window.CONFIG.campus);
+    STATE.oppositeFull = window.CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
+    STATE.oppositeShort = window.CONFIG.batchTypeShort === 'we' ? 'wd' : 'we';
+
+    if (window.CONFIG.groupId) {
+        STATE.otherGroupsRegex = new RegExp(`y2\\.s1\\.${window.CONFIG.batchTypeShort}\\.it\\.(?!${window.CONFIG.groupId})\\d+`, 'i');
+        STATE.myGroupRegex = new RegExp(`y2\\.s1\\.${window.CONFIG.batchTypeShort}\\.it\\.${window.CONFIG.groupId}`, 'i');
+    }
+
+    STATE.malabeBlockRegexes = (rules.malabeBlockRegexes || []).map(r => new RegExp(r, 'i'));
+    STATE.ignoreKeywords = rules.ignoreKeywords || [];
+    
+    // Parse custom keywords
+    STATE.whitelist = (window.CONFIG.customWhitelist || '').split(',').map(s => s.trim().toLowerCase()).filter(s => s);
+    STATE.blacklist = (window.CONFIG.customBlacklist || '').split(',').map(s => s.trim().toLowerCase()).filter(s => s);
+
+    STATE.compiled = true;
+}
+
 function shouldBlock(text, lower) {
     if (!lower) return false;
 
-    const campuses = ['malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara', 'jaffna', 'northern', 'nothern', 'nu group', 'nu dataset'];
-    const foreignCampuses = campuses.filter(c => c !== window.CONFIG.campus);
-    const oppositeFull = window.CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
-    const oppositeShort = window.CONFIG.batchTypeShort === 'we' ? 'wd' : 'we';
+    // 1. Custom Blacklist check
+    if (STATE.blacklist.some(keyword => lower.includes(keyword))) {
+        return true;
+    }
+
+    // 2. Custom Whitelist check
+    if (STATE.whitelist.some(keyword => lower.includes(keyword))) {
+        return false;
+    }
 
     const hasMyCampus = lower.includes(window.CONFIG.campus);
-    const hasForeignCampus = foreignCampuses.some(c => lower.includes(c));
+    const hasForeignCampus = STATE.foreignCampuses.some(c => lower.includes(c));
     const isAggregatedCampusList = hasMyCampus && hasForeignCampus;
 
     const hasMyBatchFull = lower.includes(window.CONFIG.batchType);
-    const hasOppositeFull = lower.includes(oppositeFull);
+    const hasOppositeFull = lower.includes(STATE.oppositeFull);
     const isAggregatedBatchList = hasMyBatchFull && hasOppositeFull;
 
     const hasMyShort = lower.includes(`.${window.CONFIG.batchTypeShort}.`) || lower.includes(`${window.CONFIG.batchTypeShort}.it`);
-    const hasOppositeShort = lower.includes(`.${oppositeShort}.`) || lower.includes(`${oppositeShort}.it`);
+    const hasOppositeShort = lower.includes(`.${STATE.oppositeShort}.`) || lower.includes(`${STATE.oppositeShort}.it`);
     const isAggregatedShortList = hasMyShort && hasOppositeShort;
 
-    if (window.CONFIG.groupId) {
-        const otherGroupsRegex = new RegExp(`y2\\.s1\\.${window.CONFIG.batchTypeShort}\\.it\\.(?!${window.CONFIG.groupId})\\d+`, 'i');
-        const myGroupRegex = new RegExp(`y2\\.s1\\.${window.CONFIG.batchTypeShort}\\.it\\.${window.CONFIG.groupId}`, 'i');
-        if (otherGroupsRegex.test(lower) && !myGroupRegex.test(lower)) return true;
+    if (window.CONFIG.groupId && STATE.otherGroupsRegex) {
+        if (STATE.otherGroupsRegex.test(lower) && !STATE.myGroupRegex.test(lower)) return true;
     }
 
     if (hasOppositeShort && !isAggregatedShortList && !isAggregatedCampusList) return true;
@@ -30,8 +76,7 @@ function shouldBlock(text, lower) {
     if (hasForeignCampus && !isAggregatedCampusList) return true;
 
     if (window.CONFIG.campus === 'malabe') {
-        const malabeBlockRegexes = [/\bbatch\s*\d+\b/i, /\by2s1\.b\d+/i, /\by2s1\.lab_\w+/i];
-        if (malabeBlockRegexes.some(regex => regex.test(lower))) {
+        if (STATE.malabeBlockRegexes.some(regex => regex.test(lower))) {
             if (window.CONFIG.batchType === 'weekday' && lower.includes('malabe') && !lower.includes('weekend')) return false;
             if (window.CONFIG.batchType === 'weekend' && lower.includes('malabe') && lower.includes('weekend')) return false;
             return true;
@@ -65,11 +110,9 @@ function applyHiding(element, shouldHide) {
 
 function cleanCoursePage() {
     if (!window.CONFIG.enabled) return;
+    initFilters();
 
     const activities = document.querySelectorAll('.activity');
-    const campuses = ['malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara', 'jaffna', 'northern', 'nothern', 'nu group', 'nu dataset'];
-    const oppositeFull = window.CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
-
     let activeCampus = 'all';
     let activeBatch = 'all';
 
@@ -79,10 +122,10 @@ function cleanCoursePage() {
         const isTitle = activity.classList.contains('modtype_label') || activity.querySelector('h1, h2, h3, h4, h5');
 
         if (isTitle) {
-            const foundCampuses = campuses.filter(c => lower.includes(c));
-            const hasBothBatches = lower.includes(window.CONFIG.batchType) && lower.includes(oppositeFull);
+            const foundCampuses = STATE.campuses.filter(c => lower.includes(c));
+            const hasBothBatches = lower.includes(window.CONFIG.batchType) && lower.includes(STATE.oppositeFull);
 
-            if (foundCampuses.length > 0 || lower.includes(window.CONFIG.batchType) || lower.includes(oppositeFull)) {
+            if (foundCampuses.length > 0 || lower.includes(window.CONFIG.batchType) || lower.includes(STATE.oppositeFull)) {
                 if (foundCampuses.length > 1) {
                     activeCampus = 'all';
                 } else if (foundCampuses.length === 1) {
@@ -93,14 +136,14 @@ function cleanCoursePage() {
                     activeBatch = 'all';
                 } else if (lower.includes(window.CONFIG.batchType)) {
                     activeBatch = window.CONFIG.batchType;
-                } else if (lower.includes(oppositeFull)) {
-                    activeBatch = oppositeFull;
+                } else if (lower.includes(STATE.oppositeFull)) {
+                    activeBatch = STATE.oppositeFull;
                 }
 
-                if (foundCampuses.length > 0 && !hasBothBatches && !lower.includes(window.CONFIG.batchType) && !lower.includes(oppositeFull)) {
+                if (foundCampuses.length > 0 && !hasBothBatches && !lower.includes(window.CONFIG.batchType) && !lower.includes(STATE.oppositeFull)) {
                     activeBatch = 'all';
                 }
-                if (foundCampuses.length === 0 && (lower.includes(window.CONFIG.batchType) || lower.includes(oppositeFull))) {
+                if (foundCampuses.length === 0 && (lower.includes(window.CONFIG.batchType) || lower.includes(STATE.oppositeFull))) {
                     activeCampus = 'all';
                 }
             } else {
@@ -111,9 +154,14 @@ function cleanCoursePage() {
 
         let shouldHide = false;
 
-        if (window.CONFIG.groupId && lower.includes(`y2.s1.${window.CONFIG.batchTypeShort}.it.${window.CONFIG.groupId}`)) {
+        // Custom Whitelist/Blacklist take highest priority
+        if (STATE.blacklist.some(kw => lower.includes(kw))) {
+            shouldHide = true;
+        } else if (STATE.whitelist.some(kw => lower.includes(kw))) {
             shouldHide = false;
-        } else if (lower.includes('notice') || lower.includes('rescheduled') || lower.includes('announcement')) {
+        } else if (window.CONFIG.groupId && STATE.myGroupRegex && STATE.myGroupRegex.test(lower)) {
+            shouldHide = false;
+        } else if (STATE.ignoreKeywords.some(kw => lower.includes(kw))) {
             shouldHide = false;
         } else if (activeCampus !== 'all' && activeCampus !== window.CONFIG.campus) {
             shouldHide = true;
@@ -123,7 +171,7 @@ function cleanCoursePage() {
             shouldHide = true;
         }
 
-        if (isTitle) {
+        if (isTitle && !STATE.blacklist.some(kw => lower.includes(kw)) && !STATE.whitelist.some(kw => lower.includes(kw))) {
             if ((activeCampus !== 'all' && activeCampus !== window.CONFIG.campus) ||
                 (activeBatch !== 'all' && activeBatch !== window.CONFIG.batchType)) {
                 shouldHide = true;
@@ -131,6 +179,7 @@ function cleanCoursePage() {
                 shouldHide = false;
             }
         }
+        
         applyHiding(activity, shouldHide);
     });
 
@@ -139,9 +188,13 @@ function cleanCoursePage() {
         if (el.children.length > 2 && el.tagName === 'DIV') return;
         const lowerText = el.innerText.toLowerCase();
 
-        if (window.CONFIG.groupId && lowerText.includes(`y2.s1.${window.CONFIG.batchTypeShort}.it.${window.CONFIG.groupId}`)) {
+        if (STATE.blacklist.some(kw => lowerText.includes(kw))) {
+            applyHiding(el, true);
+        } else if (STATE.whitelist.some(kw => lowerText.includes(kw))) {
             applyHiding(el, false);
-        } else if (lowerText.includes('notice') || lowerText.includes('general')) {
+        } else if (window.CONFIG.groupId && STATE.myGroupRegex && STATE.myGroupRegex.test(lowerText)) {
+            applyHiding(el, false);
+        } else if (STATE.ignoreKeywords.some(kw => lowerText.includes(kw))) {
             applyHiding(el, false);
         } else if (shouldBlock(el.innerText, lowerText)) {
             applyHiding(el, true);

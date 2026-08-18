@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLIIT Courseweb Module Cleaner
 // @namespace    http://tampermonkey.net/
-// @version      6.12.0
+// @version      7.0.0
 // @description  A professional, context-aware module filter for SLIIT Courseweb.
 // @author       Dulith Divisekara
 // @match        *://courseweb.sliit.lk/course/view.php*
@@ -20,8 +20,11 @@ window.CONFIG = {
     campus: GM_getValue('campus', 'malabe'),
     batchType: GM_getValue('batchType', 'weekday'),
     batchTypeShort: GM_getValue('batchTypeShort', 'wd'),
-    groupId: GM_getValue('groupId', '')
+    groupId: GM_getValue('groupId', ''),
+    customWhitelist: GM_getValue('customWhitelist', ''),
+    customBlacklist: GM_getValue('customBlacklist', '')
 };
+window.REMOTE_RULES = null;
 
 function createUIElement(htmlString) {
     const div = document.createElement('div');
@@ -29,8 +32,24 @@ function createUIElement(htmlString) {
     return div.firstChild;
 }
 
+function autoDetectSettings() {
+    let detectedCampus = 'malabe';
+    let detectedBatch = 'weekday';
+    
+    try {
+        const headerText = document.body.innerText.toLowerCase();
+        if (headerText.includes('weekend') || headerText.includes('.we.')) detectedBatch = 'weekend';
+        if (headerText.includes('kandy')) detectedCampus = 'kandy';
+        if (headerText.includes('kurunegala')) detectedCampus = 'kurunegala';
+        if (headerText.includes('metro')) detectedCampus = 'metro';
+        if (headerText.includes('matara')) detectedCampus = 'matara';
+        if (headerText.includes('jaffna')) detectedCampus = 'jaffna';
+    } catch(e) {}
+
+    return { campus: detectedCampus, batch: detectedBatch };
+}
+
 function injectUI() {
-    // Inject the shared styles for the userscript environment
     GM_addStyle(`
         #sliit-filter-btn { position: fixed; top: 150px; right: 0; background-color: #f7b924; color: #212529; border: none; border-radius: 6px 0 0 6px; padding: 10px 14px 10px 18px; font-size: 13px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; cursor: pointer; box-shadow: -2px 2px 6px rgba(0,0,0,0.15); z-index: 9999; transition: all 0.2s ease-in-out; display: flex; align-items: center; gap: 8px; }
         #sliit-filter-btn:hover { background-color: #e5a919; padding-right: 20px; }
@@ -78,7 +97,7 @@ function injectUI() {
 
     const settingsModal = createUIElement(`
         <div class="sf-modal-container" id="sliit-filter-modal">
-            <h3>Filter Configuration</h3>
+            <h3>Filter Configuration <span style="font-size: 10px; color: #28a745; margin-left: auto;">Userscript Mode</span></h3>
             <div class="sf-toggle-container">
                 <span class="sf-toggle-label">Module Filter <span class="sf-toggle-sub">Enable or disable filtering logic</span></span>
                 <label class="sf-switch"><input type="checkbox" id="sf-enabled" ${window.CONFIG.enabled ? 'checked' : ''}><span class="sf-slider"></span></label>
@@ -104,6 +123,12 @@ function injectUI() {
             <label class="sf-input-label">Group ID (Optional)</label>
             <input type="text" id="sf-group" placeholder="e.g., 0301 (Leave empty for batch-wide view)">
             
+            <label class="sf-input-label">Custom Whitelist (Comma separated)</label>
+            <input type="text" id="sf-whitelist" placeholder="e.g., Assignment, Revision">
+            
+            <label class="sf-input-label">Custom Blacklist (Comma separated)</label>
+            <input type="text" id="sf-blacklist" placeholder="e.g., Old Syllabus, Makeup">
+            
             <div class="sliit-modal-actions">
                 <button class="sliit-btn sliit-btn-reset" id="sf-reset">Reset</button>
                 <div class="sliit-modal-actions-right">
@@ -121,15 +146,13 @@ function injectUI() {
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                 <h3>Extension Initialized</h3>
             </div>
-            <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner is now active.</p>
-            <div class="sf-welcome-credit">
-                <strong>Release Information</strong><br>
-                Version: 6.12.0<br>
-                Maintainer: Dulith Divisekara<br>
-                License: Open Source (MIT)
+            <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner v7.0 is now active.</p>
+            <div class="sf-welcome-credit" id="sf-auto-detect-area">
+                <strong>Smart Auto-Detect:</strong><br>
+                We detected your campus and batch. Please confirm in the settings.
             </div>
             <div class="sliit-modal-actions">
-                <button class="sliit-btn sliit-btn-save" id="sf-welcome-start">Configure Setup</button>
+                <button class="sliit-btn sliit-btn-save" id="sf-welcome-start">Review & Configure Setup</button>
             </div>
         </div>
     `);
@@ -142,6 +165,8 @@ function injectUI() {
     document.getElementById('sf-campus').value = window.CONFIG.campus;
     document.getElementById('sf-type').value = window.CONFIG.batchType;
     document.getElementById('sf-group').value = window.CONFIG.groupId;
+    document.getElementById('sf-whitelist').value = window.CONFIG.customWhitelist || '';
+    document.getElementById('sf-blacklist').value = window.CONFIG.customBlacklist || '';
 
     const showSettings = () => { settingsModal.style.display = 'block'; overlay.style.display = 'block'; };
     const closeModals = () => { settingsModal.style.display = 'none'; welcomeModal.style.display = 'none'; overlay.style.display = 'none'; };
@@ -151,6 +176,10 @@ function injectUI() {
     overlay.onclick = closeModals;
 
     if (!window.CONFIG.hasSeenWelcome) {
+        const detected = autoDetectSettings();
+        document.getElementById('sf-campus').value = detected.campus;
+        document.getElementById('sf-type').value = detected.batch;
+        
         welcomeModal.style.display = 'block';
         overlay.style.display = 'block';
         document.getElementById('sf-welcome-start').onclick = () => {
@@ -169,6 +198,8 @@ function injectUI() {
             GM_deleteValue('batchType');
             GM_deleteValue('batchTypeShort');
             GM_deleteValue('groupId');
+            GM_deleteValue('customWhitelist');
+            GM_deleteValue('customBlacklist');
             location.reload();
         }
     };
@@ -181,42 +212,112 @@ function injectUI() {
         GM_setValue('batchType', newType);
         GM_setValue('batchTypeShort', newType === 'weekend' ? 'we' : 'wd');
         GM_setValue('groupId', document.getElementById('sf-group').value.trim());
+        GM_setValue('customWhitelist', document.getElementById('sf-whitelist').value.trim());
+        GM_setValue('customBlacklist', document.getElementById('sf-blacklist').value.trim());
         location.reload();
     };
 }
 
+let isCleaning = false;
+function runClean() {
+    if (isCleaning) return;
+    isCleaning = true;
+    requestAnimationFrame(() => {
+        cleanCoursePage();
+        isCleaning = false;
+    });
+}
+
 window.addEventListener('load', () => {
-    cleanCoursePage();
+    runClean();
     injectUI();
+    
+    const observer = new MutationObserver((mutations) => {
+        let shouldRun = false;
+        for (let m of mutations) {
+            if (m.addedNodes.length > 0 && m.target.className !== 'sf-modal-container') {
+                shouldRun = true;
+                break;
+            }
+        }
+        if (shouldRun) runClean();
+    });
+    
+    const courseContent = document.querySelector('.course-content') || document.body;
+    observer.observe(courseContent, { childList: true, subtree: true });
 });
-setTimeout(cleanCoursePage, 1000);
-setTimeout(cleanCoursePage, 2500);
 
 // build.sh will append shared-core.js here automatically.// --- SHARED CORE LOGIC ---
+const STATE = {
+    compiled: false,
+    campuses: [],
+    foreignCampuses: [],
+    oppositeFull: '',
+    oppositeShort: '',
+    myGroupRegex: null,
+    otherGroupsRegex: null,
+    malabeBlockRegexes: [],
+    ignoreKeywords: [],
+    whitelist: [],
+    blacklist: []
+};
+
+function initFilters() {
+    if (STATE.compiled) return;
+
+    const rules = window.REMOTE_RULES || {
+        campuses: ['malabe', 'kandy', 'kurunegala', 'metro', 'matara', 'mathara', 'jaffna', 'northern', 'nothern', 'nu group', 'nu dataset'],
+        ignoreKeywords: ['notice', 'rescheduled', 'announcement', 'general'],
+        malabeBlockRegexes: ["\\bbatch\\s*\\d+\\b", "\\by2s1\\.b\\d+", "\\by2s1\\.lab_\\w+"]
+    };
+
+    STATE.campuses = rules.campuses;
+    STATE.foreignCampuses = STATE.campuses.filter(c => c !== window.CONFIG.campus);
+    STATE.oppositeFull = window.CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
+    STATE.oppositeShort = window.CONFIG.batchTypeShort === 'we' ? 'wd' : 'we';
+
+    if (window.CONFIG.groupId) {
+        STATE.otherGroupsRegex = new RegExp(`y2\\.s1\\.${window.CONFIG.batchTypeShort}\\.it\\.(?!${window.CONFIG.groupId})\\d+`, 'i');
+        STATE.myGroupRegex = new RegExp(`y2\\.s1\\.${window.CONFIG.batchTypeShort}\\.it\\.${window.CONFIG.groupId}`, 'i');
+    }
+
+    STATE.malabeBlockRegexes = (rules.malabeBlockRegexes || []).map(r => new RegExp(r, 'i'));
+    STATE.ignoreKeywords = rules.ignoreKeywords || [];
+    
+    // Parse custom keywords
+    STATE.whitelist = (window.CONFIG.customWhitelist || '').split(',').map(s => s.trim().toLowerCase()).filter(s => s);
+    STATE.blacklist = (window.CONFIG.customBlacklist || '').split(',').map(s => s.trim().toLowerCase()).filter(s => s);
+
+    STATE.compiled = true;
+}
+
 function shouldBlock(text, lower) {
     if (!lower) return false;
 
-    const campuses = ['malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara', 'jaffna', 'northern', 'nothern', 'nu group', 'nu dataset'];
-    const foreignCampuses = campuses.filter(c => c !== window.CONFIG.campus);
-    const oppositeFull = window.CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
-    const oppositeShort = window.CONFIG.batchTypeShort === 'we' ? 'wd' : 'we';
+    // 1. Custom Blacklist check
+    if (STATE.blacklist.some(keyword => lower.includes(keyword))) {
+        return true;
+    }
+
+    // 2. Custom Whitelist check
+    if (STATE.whitelist.some(keyword => lower.includes(keyword))) {
+        return false;
+    }
 
     const hasMyCampus = lower.includes(window.CONFIG.campus);
-    const hasForeignCampus = foreignCampuses.some(c => lower.includes(c));
+    const hasForeignCampus = STATE.foreignCampuses.some(c => lower.includes(c));
     const isAggregatedCampusList = hasMyCampus && hasForeignCampus;
 
     const hasMyBatchFull = lower.includes(window.CONFIG.batchType);
-    const hasOppositeFull = lower.includes(oppositeFull);
+    const hasOppositeFull = lower.includes(STATE.oppositeFull);
     const isAggregatedBatchList = hasMyBatchFull && hasOppositeFull;
 
     const hasMyShort = lower.includes(`.${window.CONFIG.batchTypeShort}.`) || lower.includes(`${window.CONFIG.batchTypeShort}.it`);
-    const hasOppositeShort = lower.includes(`.${oppositeShort}.`) || lower.includes(`${oppositeShort}.it`);
+    const hasOppositeShort = lower.includes(`.${STATE.oppositeShort}.`) || lower.includes(`${STATE.oppositeShort}.it`);
     const isAggregatedShortList = hasMyShort && hasOppositeShort;
 
-    if (window.CONFIG.groupId) {
-        const otherGroupsRegex = new RegExp(`y2\\.s1\\.${window.CONFIG.batchTypeShort}\\.it\\.(?!${window.CONFIG.groupId})\\d+`, 'i');
-        const myGroupRegex = new RegExp(`y2\\.s1\\.${window.CONFIG.batchTypeShort}\\.it\\.${window.CONFIG.groupId}`, 'i');
-        if (otherGroupsRegex.test(lower) && !myGroupRegex.test(lower)) return true;
+    if (window.CONFIG.groupId && STATE.otherGroupsRegex) {
+        if (STATE.otherGroupsRegex.test(lower) && !STATE.myGroupRegex.test(lower)) return true;
     }
 
     if (hasOppositeShort && !isAggregatedShortList && !isAggregatedCampusList) return true;
@@ -224,8 +325,7 @@ function shouldBlock(text, lower) {
     if (hasForeignCampus && !isAggregatedCampusList) return true;
 
     if (window.CONFIG.campus === 'malabe') {
-        const malabeBlockRegexes = [/\bbatch\s*\d+\b/i, /\by2s1\.b\d+/i, /\by2s1\.lab_\w+/i];
-        if (malabeBlockRegexes.some(regex => regex.test(lower))) {
+        if (STATE.malabeBlockRegexes.some(regex => regex.test(lower))) {
             if (window.CONFIG.batchType === 'weekday' && lower.includes('malabe') && !lower.includes('weekend')) return false;
             if (window.CONFIG.batchType === 'weekend' && lower.includes('malabe') && lower.includes('weekend')) return false;
             return true;
@@ -259,11 +359,9 @@ function applyHiding(element, shouldHide) {
 
 function cleanCoursePage() {
     if (!window.CONFIG.enabled) return;
+    initFilters();
 
     const activities = document.querySelectorAll('.activity');
-    const campuses = ['malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara', 'jaffna', 'northern', 'nothern', 'nu group', 'nu dataset'];
-    const oppositeFull = window.CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
-
     let activeCampus = 'all';
     let activeBatch = 'all';
 
@@ -273,10 +371,10 @@ function cleanCoursePage() {
         const isTitle = activity.classList.contains('modtype_label') || activity.querySelector('h1, h2, h3, h4, h5');
 
         if (isTitle) {
-            const foundCampuses = campuses.filter(c => lower.includes(c));
-            const hasBothBatches = lower.includes(window.CONFIG.batchType) && lower.includes(oppositeFull);
+            const foundCampuses = STATE.campuses.filter(c => lower.includes(c));
+            const hasBothBatches = lower.includes(window.CONFIG.batchType) && lower.includes(STATE.oppositeFull);
 
-            if (foundCampuses.length > 0 || lower.includes(window.CONFIG.batchType) || lower.includes(oppositeFull)) {
+            if (foundCampuses.length > 0 || lower.includes(window.CONFIG.batchType) || lower.includes(STATE.oppositeFull)) {
                 if (foundCampuses.length > 1) {
                     activeCampus = 'all';
                 } else if (foundCampuses.length === 1) {
@@ -287,14 +385,14 @@ function cleanCoursePage() {
                     activeBatch = 'all';
                 } else if (lower.includes(window.CONFIG.batchType)) {
                     activeBatch = window.CONFIG.batchType;
-                } else if (lower.includes(oppositeFull)) {
-                    activeBatch = oppositeFull;
+                } else if (lower.includes(STATE.oppositeFull)) {
+                    activeBatch = STATE.oppositeFull;
                 }
 
-                if (foundCampuses.length > 0 && !hasBothBatches && !lower.includes(window.CONFIG.batchType) && !lower.includes(oppositeFull)) {
+                if (foundCampuses.length > 0 && !hasBothBatches && !lower.includes(window.CONFIG.batchType) && !lower.includes(STATE.oppositeFull)) {
                     activeBatch = 'all';
                 }
-                if (foundCampuses.length === 0 && (lower.includes(window.CONFIG.batchType) || lower.includes(oppositeFull))) {
+                if (foundCampuses.length === 0 && (lower.includes(window.CONFIG.batchType) || lower.includes(STATE.oppositeFull))) {
                     activeCampus = 'all';
                 }
             } else {
@@ -305,9 +403,14 @@ function cleanCoursePage() {
 
         let shouldHide = false;
 
-        if (window.CONFIG.groupId && lower.includes(`y2.s1.${window.CONFIG.batchTypeShort}.it.${window.CONFIG.groupId}`)) {
+        // Custom Whitelist/Blacklist take highest priority
+        if (STATE.blacklist.some(kw => lower.includes(kw))) {
+            shouldHide = true;
+        } else if (STATE.whitelist.some(kw => lower.includes(kw))) {
             shouldHide = false;
-        } else if (lower.includes('notice') || lower.includes('rescheduled') || lower.includes('announcement')) {
+        } else if (window.CONFIG.groupId && STATE.myGroupRegex && STATE.myGroupRegex.test(lower)) {
+            shouldHide = false;
+        } else if (STATE.ignoreKeywords.some(kw => lower.includes(kw))) {
             shouldHide = false;
         } else if (activeCampus !== 'all' && activeCampus !== window.CONFIG.campus) {
             shouldHide = true;
@@ -317,7 +420,7 @@ function cleanCoursePage() {
             shouldHide = true;
         }
 
-        if (isTitle) {
+        if (isTitle && !STATE.blacklist.some(kw => lower.includes(kw)) && !STATE.whitelist.some(kw => lower.includes(kw))) {
             if ((activeCampus !== 'all' && activeCampus !== window.CONFIG.campus) ||
                 (activeBatch !== 'all' && activeBatch !== window.CONFIG.batchType)) {
                 shouldHide = true;
@@ -325,6 +428,7 @@ function cleanCoursePage() {
                 shouldHide = false;
             }
         }
+        
         applyHiding(activity, shouldHide);
     });
 
@@ -333,9 +437,13 @@ function cleanCoursePage() {
         if (el.children.length > 2 && el.tagName === 'DIV') return;
         const lowerText = el.innerText.toLowerCase();
 
-        if (window.CONFIG.groupId && lowerText.includes(`y2.s1.${window.CONFIG.batchTypeShort}.it.${window.CONFIG.groupId}`)) {
+        if (STATE.blacklist.some(kw => lowerText.includes(kw))) {
+            applyHiding(el, true);
+        } else if (STATE.whitelist.some(kw => lowerText.includes(kw))) {
             applyHiding(el, false);
-        } else if (lowerText.includes('notice') || lowerText.includes('general')) {
+        } else if (window.CONFIG.groupId && STATE.myGroupRegex && STATE.myGroupRegex.test(lowerText)) {
+            applyHiding(el, false);
+        } else if (STATE.ignoreKeywords.some(kw => lowerText.includes(kw))) {
             applyHiding(el, false);
         } else if (shouldBlock(el.innerText, lowerText)) {
             applyHiding(el, true);
