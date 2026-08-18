@@ -32,29 +32,12 @@ function createUIElement(htmlString) {
     return div.firstChild;
 }
 
-function autoDetectSettings() {
-    let detectedCampus = 'malabe';
-    let detectedBatch = 'weekday';
-    
-    try {
-        const headerText = document.body.innerText.toLowerCase();
-        if (headerText.includes('weekend') || headerText.includes('.we.')) detectedBatch = 'weekend';
-        if (headerText.includes('kandy')) detectedCampus = 'kandy';
-        if (headerText.includes('kurunegala')) detectedCampus = 'kurunegala';
-        if (headerText.includes('metro')) detectedCampus = 'metro';
-        if (headerText.includes('matara')) detectedCampus = 'matara';
-        if (headerText.includes('jaffna')) detectedCampus = 'jaffna';
-    } catch(e) {}
-
-    return { campus: detectedCampus, batch: detectedBatch };
-}
-
 function injectUI() {
     GM_addStyle(`
-        #sliit-filter-btn { position: fixed; top: 150px; right: 0; background-color: #f7b924; color: #212529; border: none; border-radius: 6px 0 0 6px; padding: 10px 14px 10px 18px; font-size: 13px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; cursor: pointer; box-shadow: -2px 2px 6px rgba(0,0,0,0.15); z-index: 9999; transition: all 0.2s ease-in-out; display: flex; align-items: center; gap: 8px; }
-        #sliit-filter-btn:hover { background-color: #e5a919; padding-right: 20px; }
-        #sliit-filter-btn svg { width: 16px; height: 16px; }
-        .sf-modal-container { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ffffff; padding: 24px; border-radius: 8px; border-top: 4px solid #0f3b5f; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 10000; width: 340px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+        #sliit-filter-btn { position: fixed; top: 150px; right: 0; background-color: #f7b924; color: #212529; border: none; border-radius: 6px 0 0 6px; padding: 10px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: -2px 2px 6px rgba(0,0,0,0.15); z-index: 9999; transition: all 0.2s ease-in-out; display: flex; align-items: center; gap: 8px; }
+        #sliit-filter-btn:hover { background-color: #e5a919; padding-right: 14px; }
+        #sliit-filter-btn svg { width: 16px; height: 16px; margin: 0; padding: 0; display: block; }
+        .sf-modal-container { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ffffff; padding: 24px; border-radius: 8px; border-top: 4px solid #0f3b5f; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 10000; width: 340px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; max-height: 85vh; overflow-y: auto; }
         .sf-modal-container h3 { margin-top: 0; margin-bottom: 20px; color: #0f3b5f; font-size: 18px; font-weight: 600; border-bottom: 1px solid #dee2e6; padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         .sf-toggle-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #dee2e6; }
         .sf-toggle-label { font-size: 13px; font-weight: 600; color: #212529; }
@@ -90,10 +73,16 @@ function injectUI() {
         .sf-welcome-header h3 { display: block; border: none; font-size: 18px; margin: 0; padding: 0; justify-content: center; color: #212529; }
         .sf-welcome-text { font-size: 13px; color: #495057; line-height: 1.5; margin-bottom: 15px; text-align: center; }
         .sf-welcome-credit { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; padding: 12px; font-size: 12px; color: #495057; margin-bottom: 20px; text-align: left; line-height: 1.6; }
+        
+        /* Custom scrollbar for modal */
+        .sf-modal-container::-webkit-scrollbar { width: 8px; }
+        .sf-modal-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .sf-modal-container::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+        .sf-modal-container::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
     `);
 
     const overlay = createUIElement(`<div id="sliit-filter-overlay"></div>`);
-    const btn = createUIElement(`<button id="sliit-filter-btn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Settings</button>`);
+    const btn = createUIElement(`<button id="sliit-filter-btn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>`);
 
     const settingsModal = createUIElement(`
         <div class="sf-modal-container" id="sliit-filter-modal">
@@ -147,12 +136,8 @@ function injectUI() {
                 <h3>Extension Initialized</h3>
             </div>
             <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner v7.0 is now active.</p>
-            <div class="sf-welcome-credit" id="sf-auto-detect-area">
-                <strong>Smart Auto-Detect:</strong><br>
-                We detected your campus and batch. Please confirm in the settings.
-            </div>
             <div class="sliit-modal-actions">
-                <button class="sliit-btn sliit-btn-save" id="sf-welcome-start">Review & Configure Setup</button>
+                <button class="sliit-btn sliit-btn-save" id="sf-welcome-start">Configure Setup</button>
             </div>
         </div>
     `);
@@ -176,10 +161,6 @@ function injectUI() {
     overlay.onclick = closeModals;
 
     if (!window.CONFIG.hasSeenWelcome) {
-        const detected = autoDetectSettings();
-        document.getElementById('sf-campus').value = detected.campus;
-        document.getElementById('sf-type').value = detected.batch;
-        
         welcomeModal.style.display = 'block';
         overlay.style.display = 'block';
         document.getElementById('sf-welcome-start').onclick = () => {

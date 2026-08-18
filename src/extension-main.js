@@ -24,26 +24,10 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
             return div.firstChild;
         }
 
-        function autoDetectSettings() {
-            let detectedCampus = 'malabe';
-            let detectedBatch = 'weekday';
-            
-            try {
-                const headerText = document.body.innerText.toLowerCase();
-                if (headerText.includes('weekend') || headerText.includes('.we.')) detectedBatch = 'weekend';
-                if (headerText.includes('kandy')) detectedCampus = 'kandy';
-                if (headerText.includes('kurunegala')) detectedCampus = 'kurunegala';
-                if (headerText.includes('metro')) detectedCampus = 'metro';
-                if (headerText.includes('matara')) detectedCampus = 'matara';
-                if (headerText.includes('jaffna')) detectedCampus = 'jaffna';
-            } catch(e) {}
-
-            return { campus: detectedCampus, batch: detectedBatch };
-        }
-
         function injectUI() {
             const overlay = createUIElement(`<div id="sliit-filter-overlay"></div>`);
-            const btn = createUIElement(`<button id="sliit-filter-btn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Settings</button>`);
+            // Removed " Settings" text
+            const btn = createUIElement(`<button id="sliit-filter-btn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>`);
 
             const settingsModal = createUIElement(`
                 <div class="sf-modal-container" id="sliit-filter-modal">
@@ -97,12 +81,8 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
                         <h3>Extension Initialized</h3>
                     </div>
                     <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner v7.0 is now active. Configurations will sync across your devices.</p>
-                    <div class="sf-welcome-credit" id="sf-auto-detect-area">
-                        <strong>Smart Auto-Detect:</strong><br>
-                        We detected your campus and batch. Please confirm in the settings.
-                    </div>
                     <div class="sliit-modal-actions">
-                        <button class="sliit-btn sliit-btn-save" id="sf-welcome-start">Review & Configure Setup</button>
+                        <button class="sliit-btn sliit-btn-save" id="sf-welcome-start">Configure Setup</button>
                     </div>
                 </div>
             `);
@@ -126,10 +106,6 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
             overlay.onclick = closeModals;
 
             if (!window.CONFIG.hasSeenWelcome) {
-                const detected = autoDetectSettings();
-                document.getElementById('sf-campus').value = detected.campus;
-                document.getElementById('sf-type').value = detected.batch;
-                
                 welcomeModal.style.display = 'block';
                 overlay.style.display = 'block';
                 document.getElementById('sf-welcome-start').onclick = () => {
