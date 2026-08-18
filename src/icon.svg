@@ -1,0 +1,12 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Incoming clutter lines, filtered by width -->
+  <line x1="14" y1="14" x2="114" y2="14" stroke="#f7b924" stroke-width="9" stroke-linecap="round"/>
+  <line x1="24" y1="27" x2="104" y2="27" stroke="#f7b924" stroke-width="9" stroke-linecap="round"/>
+  <line x1="34" y1="40" x2="94" y2="40" stroke="#f7b924" stroke-width="9" stroke-linecap="round"/>
+
+  <!-- Filter funnel -->
+  <path d="M22,50 L106,50 L74,86 L74,108 L54,108 L54,86 Z" fill="#0f3b5f" stroke="#0f3b5f" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Clean output drop -->
+  <circle cx="64" cy="118" r="7" fill="#f7b924"/>
+</svg>
