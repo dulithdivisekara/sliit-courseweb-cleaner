@@ -109,14 +109,20 @@ function injectUI() {
                 <option value="weekday">Weekday (WD)</option>
                 <option value="weekend">Weekend (WE)</option>
             </select>
-            <label class="sf-input-label">Group ID (Optional)</label>
-            <input type="text" id="sf-group" placeholder="e.g., 0301 (Leave empty for batch-wide view)">
             
-            <label class="sf-input-label">Custom Whitelist (Comma separated)</label>
-            <input type="text" id="sf-whitelist" placeholder="e.g., Assignment, Revision">
-            
-            <label class="sf-input-label">Custom Blacklist (Comma separated)</label>
-            <input type="text" id="sf-blacklist" placeholder="e.g., Old Syllabus, Makeup">
+            <details class="sf-advanced-details">
+                <summary>Advanced Settings</summary>
+                <div style="margin-top: 10px;">
+                    <label class="sf-input-label">Group ID (Optional)</label>
+                    <input type="text" id="sf-group" placeholder="e.g., 0301 (Leave empty for batch-wide view)">
+                    
+                    <label class="sf-input-label">Custom Whitelist (Comma separated)</label>
+                    <input type="text" id="sf-whitelist" placeholder="e.g., Assignment, Revision">
+                    
+                    <label class="sf-input-label">Custom Blacklist (Comma separated)</label>
+                    <input type="text" id="sf-blacklist" placeholder="e.g., Old Syllabus, Makeup">
+                </div>
+            </details>
             
             <div class="sliit-modal-actions">
                 <button class="sliit-btn sliit-btn-reset" id="sf-reset">Reset</button>
@@ -125,7 +131,10 @@ function injectUI() {
                     <button class="sliit-btn sliit-btn-save" id="sf-save">Apply Setup</button>
                 </div>
             </div>
-            <div class="sf-footer"><a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner/issues" target="_blank">Documentation & Issues</a></div>
+            <div class="sf-footer">
+                <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner/issues" target="_blank">Documentation</a> | 
+                <a href="https://t.me/dulithdivisekara" target="_blank">Contact Dev</a>
+            </div>
         </div>
     `);
 

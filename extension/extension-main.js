@@ -31,7 +31,7 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
 
             const settingsModal = createUIElement(`
                 <div class="sf-modal-container" id="sliit-filter-modal">
-                    <h3>Filter Configuration <span style="font-size: 10px; color: #28a745; margin-left: auto;">Sync Active ☁️</span></h3>
+                    <h3>Filter Configuration <span style="font-size: 10px; color: #28a745; margin-left: auto;">Sync Active</span></h3>
                     <div class="sf-toggle-container">
                         <span class="sf-toggle-label">Module Filter <span class="sf-toggle-sub">Enable or disable filtering logic</span></span>
                         <label class="sf-switch"><input type="checkbox" id="sf-enabled" ${window.CONFIG.enabled ? 'checked' : ''}><span class="sf-slider"></span></label>
@@ -54,14 +54,20 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
                         <option value="weekday">Weekday (WD)</option>
                         <option value="weekend">Weekend (WE)</option>
                     </select>
-                    <label class="sf-input-label">Group ID (Optional)</label>
-                    <input type="text" id="sf-group" placeholder="e.g., 0301 (Leave empty for batch-wide view)">
                     
-                    <label class="sf-input-label">Custom Whitelist (Comma separated)</label>
-                    <input type="text" id="sf-whitelist" placeholder="e.g., Assignment, Revision">
-                    
-                    <label class="sf-input-label">Custom Blacklist (Comma separated)</label>
-                    <input type="text" id="sf-blacklist" placeholder="e.g., Old Syllabus, Makeup">
+                    <details class="sf-advanced-details">
+                        <summary>Advanced Settings</summary>
+                        <div style="margin-top: 10px;">
+                            <label class="sf-input-label">Group ID (Optional)</label>
+                            <input type="text" id="sf-group" placeholder="e.g., 0301 (Leave empty for batch-wide view)">
+                            
+                            <label class="sf-input-label">Custom Whitelist (Comma separated)</label>
+                            <input type="text" id="sf-whitelist" placeholder="e.g., Assignment, Revision">
+                            
+                            <label class="sf-input-label">Custom Blacklist (Comma separated)</label>
+                            <input type="text" id="sf-blacklist" placeholder="e.g., Old Syllabus, Makeup">
+                        </div>
+                    </details>
                     
                     <div class="sliit-modal-actions">
                         <button class="sliit-btn sliit-btn-reset" id="sf-reset">Reset</button>
@@ -70,7 +76,10 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
                             <button class="sliit-btn sliit-btn-save" id="sf-save">Apply Setup</button>
                         </div>
                     </div>
-                    <div class="sf-footer"><a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner/issues" target="_blank">Documentation & Issues</a></div>
+                    <div class="sf-footer">
+                        <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner/issues" target="_blank">Documentation</a> | 
+                        <a href="https://t.me/dulithdivisekara" target="_blank">Contact Dev</a>
+                    </div>
                 </div>
             `);
 

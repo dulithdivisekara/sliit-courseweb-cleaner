@@ -53,3 +53,37 @@ input:checked + .sf-slider:before { transform: translateX(18px); }
 .sf-modal-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
 .sf-modal-container::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
 .sf-modal-container::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+.sf-advanced-details { margin-top: 15px; border: 1px solid #dee2e6; border-radius: 6px; padding: 10px; background: #f8f9fa; cursor: pointer; }
+.sf-advanced-details summary { font-size: 12px; font-weight: 600; color: #0f3b5f; outline: none; }
+.sf-advanced-details div { cursor: default; }
+
+@media (prefers-color-scheme: dark) {
+    .sf-modal-container { background: #1e1e1e; border-top-color: #f7b924; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+    .sf-modal-container h3 { color: #f8f9fa; border-bottom-color: #333; }
+    .sf-welcome-header h3 { color: #f8f9fa; }
+    .sf-toggle-label { color: #e9ecef; }
+    .sf-toggle-sub { color: #adb5bd; }
+    .sf-toggle-container { border-bottom-color: #333; }
+    .sf-input-label { color: #ced4da; }
+    .sf-modal-container select, .sf-modal-container input[type="text"] { background-color: #2b2b2b; color: #f8f9fa; border-color: #444; }
+    .sf-modal-container select:focus, .sf-modal-container input[type="text"]:focus { background-color: #333; border-color: #f7b924; }
+    .sf-slider { background-color: #495057; }
+    .sf-slider:before { background-color: #ced4da; }
+    input:checked + .sf-slider { background-color: #f7b924; }
+    input:checked + .sf-slider:before { background-color: #fff; }
+    .sliit-btn-cancel { background: #333; color: #ced4da; }
+    .sliit-btn-cancel:hover { background: #444; }
+    .sliit-btn-save { background: #f7b924; color: #212529; }
+    .sliit-btn-save:hover { background: #e5a919; }
+    .sf-footer { color: #adb5bd; }
+    .sf-footer a { color: #f7b924; }
+    .sf-advanced-details { background: #2b2b2b; border-color: #444; }
+    .sf-advanced-details summary { color: #f7b924; }
+    .sf-welcome-text { color: #ced4da; }
+    .sf-welcome-credit { background: #2b2b2b; border-color: #444; color: #ced4da; }
+    .sf-welcome-header svg { stroke: #f7b924; }
+    
+    .sf-modal-container::-webkit-scrollbar-track { background: #2b2b2b; }
+    .sf-modal-container::-webkit-scrollbar-thumb { background: #555; }
+    .sf-modal-container::-webkit-scrollbar-thumb:hover { background: #777; }
+}
