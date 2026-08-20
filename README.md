@@ -25,7 +25,7 @@ Install the official extension directly from your browser's web store:
 First, navigate to your respective web store and click the **Add to Chrome** (or **Get**) button.
 
 <div align="center">
-  <img src="assets/step1-install.png" width="750" alt="Install Extension">
+  <img src="assets/step1-install.png" width="800" alt="Install Extension">
 </div>
 
 <br>
@@ -33,33 +33,37 @@ First, navigate to your respective web store and click the **Add to Chrome** (or
 Then, confirm the installation by clicking **Add extension** on the browser permission popup.
 
 <div align="center">
-  <img src="assets/step2-permission.png" width="400" alt="Confirm Permission">
-  <br><br>
+  <img src="assets/step2-permission.png" width="650" alt="Confirm Permission">
 </div>
+
+<br>
 
 ### Step 2: Initialize
 Open any module page on [SLIIT Courseweb](https://courseweb.sliit.lk/). The extension will greet you with a welcome screen. Click **Configure Setup** to proceed.
 
 <div align="center">
-  <img src="assets/step3-configure.png" width="400" alt="Welcome Modal">
-  <br><br>
+  <img src="assets/step3-configure.png" width="700" alt="Welcome Modal">
 </div>
+
+<br>
 
 ### Step 3: Configure Your Preferences
 Select your campus, batch type, and apply any advanced custom keywords. Click **Apply Setup** to lock in your preferences and clean your dashboard.
 
 <div align="center">
-  <img src="assets/step4-apply.png" width="550" alt="Settings Configuration">
-  <br><br>
+  <img src="assets/step4-apply.png" width="750" alt="Settings Configuration">
 </div>
+
+<br>
 
 ### Step 4: Re-access Settings & Support
 If you ever need to change your filters, switch to Dark Mode, or contact the developer for support, simply click the floating yellow settings icon anchored to the right side of your Courseweb screen.
 
 <div align="center">
-  <img src="assets/step5-settings-icon.png" width="750" alt="Settings Icon Location">
-  <br><br>
+  <img src="assets/step5-settings-icon.png" width="800" alt="Settings Icon Location">
 </div>
+
+<br>
 
 ---
 
