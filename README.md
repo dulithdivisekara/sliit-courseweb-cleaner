@@ -1,104 +1,76 @@
 # SLIIT Courseweb Module Cleaner
 
-A context-aware userscript designed to optimize the SLIIT Moodle (Courseweb) interface. It automatically filters out irrelevant modules, assignments, and announcements meant for unassigned campuses or batches, providing a distraction-free learning environment.
+<p align="left">
+  <a href="https://chromewebstore.google.com/detail/sliit-courseweb-cleaner/lnoadlfhebmkhmbfmehdgoffjllgadjm"><img src="https://img.shields.io/chrome-web-store/v/lnoadlfhebmkhmbfmehdgoffjllgadjm?label=Chrome%20Web%20Store&color=blue" alt="Chrome Web Store"></a>
+  <a href="https://microsoftedge.microsoft.com/addons/detail/sliit-courseweb-cleaner/gmlodfhgiopjgamoijjffcmgfenkkkhe"><img src="https://img.shields.io/badge/Edge_Add--ons-v7.0.0-blue" alt="Edge Add-ons"></a>
+  <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT">
+</p>
 
-## Visual Overview
+A professional, context-aware browser extension designed to optimize the SLIIT Moodle (Courseweb) interface. It automatically filters out irrelevant modules, assignments, and announcements meant for unassigned campuses or batches, providing a clutter-free learning environment.
+
+## Download & Install
+
+Install the official extension directly from your browser's web store:
+
+* **Google Chrome / Brave:** [Download on Chrome Web Store](https://chromewebstore.google.com/detail/sliit-courseweb-cleaner/lnoadlfhebmkhmbfmehdgoffjllgadjm?authuser=0&hl=en-GB)
+* **Microsoft Edge:** [Download on Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/sliit-courseweb-cleaner/gmlodfhgiopjgamoijjffcmgfenkkkhe)
+
+> **Advanced Users:** Prefer Tampermonkey? Check our [Userscript Installation Guide](USERSCRIPT_INSTALL.md).
+
+---
+
+## Quick Start Guide
+
+### Step 1: Add to Browser
+First, navigate to your respective web store and click the **Add to Chrome** (or **Get**) button.
 
 <div align="center">
-
-| Before (Cluttered) | After (Cleaned) |
-| :---: | :---: |
-| <img src="assets/before.png" width="400"> | <img src="assets/after.png" width="400"> |
-
+  <img src="assets/step1-install.png" width="750" alt="Install Extension">
 </div>
+
+<br>
+
+Then, confirm the installation by clicking **Add extension** on the browser permission popup.
+
+<div align="center">
+  <img src="assets/step2-permission.png" width="400" alt="Confirm Permission">
+  <br><br>
+</div>
+
+### Step 2: Initialize
+Open any module page on [SLIIT Courseweb](https://courseweb.sliit.lk/). The extension will greet you with a welcome screen. Click **Configure Setup** to proceed.
+
+<div align="center">
+  <img src="assets/step3-configure.png" width="400" alt="Welcome Modal">
+  <br><br>
+</div>
+
+### Step 3: Configure Your Preferences
+Select your campus, batch type, and apply any advanced custom keywords. Click **Apply Setup** to lock in your preferences and clean your dashboard.
+
+<div align="center">
+  <img src="assets/step4-apply.png" width="550" alt="Settings Configuration">
+  <br><br>
+</div>
+
+### Step 4: Re-access Settings & Support
+If you ever need to change your filters, switch to Dark Mode, or contact the developer for support, simply click the floating yellow settings icon anchored to the right side of your Courseweb screen.
+
+<div align="center">
+  <img src="assets/step5-settings-icon.png" width="750" alt="Settings Icon Location">
+  <br><br>
+</div>
+
+---
 
 ## Key Features
 
-* **Smart Filtering:** Hides activities belonging to unselected centers (Metro, Kandy, Matara, Northern Uni) and batch schedules (Weekday/Weekend).
-* **Ghost Mode:** An optional soft-filter that dims irrelevant items (25% opacity) instead of completely removing them from the DOM.
-* **Native UI Integration:** Features a fully integrated, Moodle-themed configuration panel accessible directly from the Courseweb interface.
+* **Smart Auto-Detect:** Automatically guesses your campus and batch to get you started instantly.
+* **Custom Keywords:** Total control over what you see using custom comma-separated Whitelists and Blacklists.
+* **Cloud-Synced Rules:** The extension periodically fetches community-sourced filtering rules in the background, ensuring it always stays up-to-date.
+* **UI Themes:** Includes a manual Dark Mode toggle for comfortable night-time browsing.
+* **Double-Lock Defense:** Prevents aggressive filtering before your initial user setup is complete.
 * **Notice Protector:** Ensures critical alerts, rescheduled labs, and general shared materials remain strictly visible regardless of filter settings.
-* **Silent Auto-Updates:** Leverages Tampermonkey's background update API to seamlessly deliver new features and bug fixes.
-
----
-
-## Installation Guide
-
-Follow these steps to deploy the script to your browser:
-
-### 1. Install a Userscript Manager
-You need a browser extension to run custom scripts. We recommend **Tampermonkey**.
-* [Tampermonkey for Chrome / Brave / Edge](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
-* [Tampermonkey for Firefox](https://addons.mozilla.org/en-US/firefox/addon/tampermonkey/)
-
-**Important Note for Chromium (Chrome/Brave/Edge) Users:**
-Recent browser security updates require you to explicitly allow Tampermonkey to execute scripts. After installing the extension:
-1. Right-click the Tampermonkey icon in your browser toolbar and select **Manage Extension**.
-<div align="center">
-  <br>
-  <img src="assets/manage-extension.png" width="700" alt="Manage Extension Menu">
-  <br><br>
-</div>
-2. Scroll down to the settings page and toggle on **Allow User Scripts** (as shown below).
-<div align="center">
-  <br>
-  <img src="assets/allow-user-scripts.png" width="800" alt="Allow User Scripts Toggle">
-  <br><br>
-</div>
-
-### 2. Install the Script
-Once Tampermonkey is active and configured, click the link below to install the Courseweb Cleaner:
-
-**[Install SLIIT Courseweb Cleaner](https://github.com/dulithdivisekara/sliit-courseweb-cleaner/raw/refs/heads/main/sliit-courseweb-cleaner.user.js)**
-
-A Tampermonkey confirmation screen will appear. Click the **Install** button as shown below:
-
-<div align="center">
-  <br>
-  <img src="assets/install-screen.png" width="650" alt="Tampermonkey Install Screen">
-  <br><br>
-</div>
-
-### 3. Initialize
-Navigate to [SLIIT Courseweb](https://courseweb.sliit.lk/) and open any module page. The script will initialize automatically and display a one-time welcome screen.
-
----
-
-## Configuration & Usage
-
-You do not need to edit any code to use this script. All settings are managed through a native UI panel.
-
-### Accessing Settings
-Look for the **Settings** tab anchored to the right side of your Courseweb screen (just below the navigation bar). Click it to open the configuration modal.
-
-<div align="center">
-  <br>
-  <img src="assets/settings-tab.png" width="600" alt="Settings Tab Location">
-  <br><br>
-</div>
-
-### Setting Up Your Filter
-1. **Module Filter:** Toggle the entire script on or off.
-2. **Ghost Mode:** Enable this if you prefer to see dimmed versions of filtered links rather than hiding them completely.
-3. **Target Campus:** Select your primary study center.
-4. **Batch Classification:** Choose between Weekday (WD) or Weekend (WE).
-5. **Group ID (Optional):** Enter your specific 4-digit group ID (e.g., `0301`). If left blank, the script will show all materials relevant to your general batch type.
-6. Click **Apply Setup**. The page will automatically reload with your saved preferences.
-
-<div align="center">
-  <br>
-  <img src="assets/config-modal.png" width="450" alt="Configuration Modal">
-  <br><br>
-</div>
-
----
-
-## Troubleshooting & Support
-
-If the script hides something you need, simply open the Settings panel and click **Reset** to restore the default configuration, or toggle the **Module Filter** off.
-
-If you encounter a bug or have a feature request, please [open an issue](https://github.com/dulithdivisekara/sliit-courseweb-cleaner/issues) on this repository.
 
 ## License
-
 This project is licensed under the MIT License. See the `LICENSE` file for details. Developed and maintained by Dulith Divisekara.
