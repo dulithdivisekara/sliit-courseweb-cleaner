@@ -15,6 +15,7 @@
 
 window.CONFIG = {
     hasSeenWelcome: GM_getValue('hasSeenWelcome', false),
+    darkMode: GM_getValue('darkMode', false),
     enabled: GM_getValue('enabled', true),
     ghostMode: GM_getValue('ghostMode', true),
     campus: GM_getValue('campus', 'malabe'),
@@ -73,12 +74,41 @@ function injectUI() {
         .sf-welcome-header h3 { display: block; border: none; font-size: 18px; margin: 0; padding: 0; justify-content: center; color: #212529; }
         .sf-welcome-text { font-size: 13px; color: #495057; line-height: 1.5; margin-bottom: 15px; text-align: center; }
         .sf-welcome-credit { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; padding: 12px; font-size: 12px; color: #495057; margin-bottom: 20px; text-align: left; line-height: 1.6; }
-        
-        /* Custom scrollbar for modal */
         .sf-modal-container::-webkit-scrollbar { width: 8px; }
         .sf-modal-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
         .sf-modal-container::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
         .sf-modal-container::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+        .sf-advanced-details { margin-top: 15px; border: 1px solid #dee2e6; border-radius: 6px; padding: 10px; background: #f8f9fa; cursor: pointer; }
+        .sf-advanced-details summary { font-size: 12px; font-weight: 600; color: #0f3b5f; outline: none; }
+        .sf-advanced-details div { cursor: default; }
+
+        .sf-dark-theme { background: #1e1e1e; border-top-color: #f7b924; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .sf-dark-theme h3 { color: #f8f9fa; border-bottom-color: #333; }
+        .sf-dark-theme .sf-welcome-header h3 { color: #f8f9fa; }
+        .sf-dark-theme .sf-toggle-label { color: #e9ecef; }
+        .sf-dark-theme .sf-toggle-sub { color: #adb5bd; }
+        .sf-dark-theme .sf-toggle-container { border-bottom-color: #333; }
+        .sf-dark-theme .sf-input-label { color: #ced4da; }
+        .sf-dark-theme select, .sf-dark-theme input[type="text"] { background-color: #2b2b2b; color: #f8f9fa; border-color: #444; }
+        .sf-dark-theme select:focus, .sf-dark-theme input[type="text"]:focus { background-color: #333; border-color: #f7b924; }
+        .sf-dark-theme .sf-slider { background-color: #495057; }
+        .sf-dark-theme .sf-slider:before { background-color: #ced4da; }
+        .sf-dark-theme input:checked + .sf-slider { background-color: #f7b924; }
+        .sf-dark-theme input:checked + .sf-slider:before { background-color: #fff; }
+        .sf-dark-theme .sliit-btn-cancel { background: #333; color: #ced4da; }
+        .sf-dark-theme .sliit-btn-cancel:hover { background: #444; }
+        .sf-dark-theme .sliit-btn-save { background: #f7b924; color: #212529; }
+        .sf-dark-theme .sliit-btn-save:hover { background: #e5a919; }
+        .sf-dark-theme .sf-footer { color: #adb5bd; }
+        .sf-dark-theme .sf-footer a { color: #f7b924; }
+        .sf-dark-theme .sf-advanced-details { background: #2b2b2b; border-color: #444; }
+        .sf-dark-theme .sf-advanced-details summary { color: #f7b924; }
+        .sf-dark-theme .sf-welcome-text { color: #ced4da; }
+        .sf-dark-theme .sf-welcome-credit { background: #2b2b2b; border-color: #444; color: #ced4da; }
+        .sf-dark-theme .sf-welcome-header svg { stroke: #f7b924; }
+        .sf-dark-theme::-webkit-scrollbar-track { background: #2b2b2b; }
+        .sf-dark-theme::-webkit-scrollbar-thumb { background: #555; }
+        .sf-dark-theme::-webkit-scrollbar-thumb:hover { background: #777; }
     `);
 
     const overlay = createUIElement(`<div id="sliit-filter-overlay"></div>`);
@@ -86,7 +116,11 @@ function injectUI() {
 
     const settingsModal = createUIElement(`
         <div class="sf-modal-container" id="sliit-filter-modal">
-            <h3>Filter Configuration <span style="font-size: 10px; color: #28a745; margin-left: auto;">Userscript Mode</span></h3>
+            <h3>Filter Configuration 
+                <button id="sf-theme-toggle" style="background:none; border:none; cursor:pointer; margin-left:auto; padding:0; display:flex; align-items:center; color:inherit;" title="Toggle Theme">
+                    <svg id="sf-theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+                </button>
+            </h3>
             <div class="sf-toggle-container">
                 <span class="sf-toggle-label">Module Filter <span class="sf-toggle-sub">Enable or disable filtering logic</span></span>
                 <label class="sf-switch"><input type="checkbox" id="sf-enabled" ${window.CONFIG.enabled ? 'checked' : ''}><span class="sf-slider"></span></label>
@@ -144,8 +178,17 @@ function injectUI() {
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                 <h3>Extension Initialized</h3>
             </div>
-            <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner v7.0 is now active.</p>
+            <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner is now active. This utility seamlessly optimizes your Moodle dashboard by filtering out unassigned contexts and centers.</p>
+            <div class="sf-welcome-credit">
+                <strong>Release Information</strong><br>
+                Version: 7.0.0<br>
+                Maintainer: Dulith Divisekara<br>
+                License: Open Source (MIT)
+            </div>
             <div class="sliit-modal-actions">
+                <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner" target="_blank" class="sliit-btn sliit-btn-github">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg> View Repository
+                </a>
                 <button class="sliit-btn sliit-btn-save" id="sf-welcome-start">Configure Setup</button>
             </div>
         </div>
@@ -155,6 +198,26 @@ function injectUI() {
     document.body.appendChild(btn);
     document.body.appendChild(settingsModal);
     document.body.appendChild(welcomeModal);
+
+    const themeIcon = document.getElementById('sf-theme-icon');
+    const updateThemeUI = (isDark) => {
+        if (isDark) {
+            settingsModal.classList.add('sf-dark-theme');
+            welcomeModal.classList.add('sf-dark-theme');
+            themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+        } else {
+            settingsModal.classList.remove('sf-dark-theme');
+            welcomeModal.classList.remove('sf-dark-theme');
+            themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+        }
+    };
+    updateThemeUI(window.CONFIG.darkMode);
+
+    document.getElementById('sf-theme-toggle').onclick = () => {
+        window.CONFIG.darkMode = !window.CONFIG.darkMode;
+        updateThemeUI(window.CONFIG.darkMode);
+        GM_setValue('darkMode', window.CONFIG.darkMode);
+    };
 
     document.getElementById('sf-campus').value = window.CONFIG.campus;
     document.getElementById('sf-type').value = window.CONFIG.batchType;
@@ -182,6 +245,7 @@ function injectUI() {
     document.getElementById('sf-reset').onclick = () => {
         if(confirm('Are you sure you want to reset all configurations to default?')) {
             GM_deleteValue('hasSeenWelcome');
+            GM_deleteValue('darkMode');
             GM_deleteValue('enabled');
             GM_deleteValue('ghostMode');
             GM_deleteValue('campus');
@@ -197,6 +261,7 @@ function injectUI() {
     document.getElementById('sf-save').onclick = () => {
         const newType = document.getElementById('sf-type').value;
         GM_setValue('enabled', document.getElementById('sf-enabled').checked);
+        GM_setValue('darkMode', window.CONFIG.darkMode);
         GM_setValue('ghostMode', document.getElementById('sf-ghost').checked);
         GM_setValue('campus', document.getElementById('sf-campus').value);
         GM_setValue('batchType', newType);
@@ -204,13 +269,15 @@ function injectUI() {
         GM_setValue('groupId', document.getElementById('sf-group').value.trim());
         GM_setValue('customWhitelist', document.getElementById('sf-whitelist').value.trim());
         GM_setValue('customBlacklist', document.getElementById('sf-blacklist').value.trim());
+        GM_setValue('hasSeenWelcome', true);
         location.reload();
     };
 }
 
 let isCleaning = false;
 function runClean() {
-    if (isCleaning) return;
+    // Abort if already cleaning OR if the user hasn't finished the initial setup
+    if (isCleaning || !window.CONFIG.hasSeenWelcome) return;
     isCleaning = true;
     requestAnimationFrame(() => {
         cleanCoursePage();
@@ -221,7 +288,7 @@ function runClean() {
 window.addEventListener('load', () => {
     runClean();
     injectUI();
-    
+
     const observer = new MutationObserver((mutations) => {
         let shouldRun = false;
         for (let m of mutations) {
@@ -232,9 +299,7 @@ window.addEventListener('load', () => {
         }
         if (shouldRun) runClean();
     });
-    
+
     const courseContent = document.querySelector('.course-content') || document.body;
     observer.observe(courseContent, { childList: true, subtree: true });
 });
-
-// build.sh will append shared-core.js here automatically.

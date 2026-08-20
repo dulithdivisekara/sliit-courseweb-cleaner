@@ -1,4 +1,15 @@
 // --- SHARED CORE LOGIC ---
+const DEFAULT_CAMPUSES = [
+    'malabe', 'kandy', 'kurunegala', 'kurunegale', 'metro',
+    'matara', 'mathara', 'jaffna', 'northern', 'nothern', 'nu group', 'nu dataset'
+];
+
+function getMergedCampuses() {
+    const remoteRules = window.REMOTE_RULES || {};
+    const remoteCampuses = remoteRules.campuses || [];
+    return Array.from(new Set([...DEFAULT_CAMPUSES, ...remoteCampuses]));
+}
+
 function shouldBlock(text, lower) {
     if (!lower) return false;
 
@@ -15,7 +26,7 @@ function shouldBlock(text, lower) {
     }
 
     const remoteRules = window.REMOTE_RULES || {};
-    const campuses = remoteRules.campuses || ['malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara', 'jaffna', 'northern', 'nothern', 'nu group', 'nu dataset'];
+    const campuses = getMergedCampuses();
     const foreignCampuses = campuses.filter(c => c !== window.CONFIG.campus);
     const oppositeFull = window.CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
     const oppositeShort = window.CONFIG.batchTypeShort === 'we' ? 'wd' : 'we';
@@ -43,10 +54,10 @@ function shouldBlock(text, lower) {
     if (hasForeignCampus && !isAggregatedCampusList) return true;
 
     if (window.CONFIG.campus === 'malabe') {
-        const malabeBlockRegexes = remoteRules.malabeBlockRegexes ? 
-            remoteRules.malabeBlockRegexes.map(r => new RegExp(r, 'i')) : 
+        const malabeBlockRegexes = remoteRules.malabeBlockRegexes ?
+            remoteRules.malabeBlockRegexes.map(r => new RegExp(r, 'i')) :
             [/\bbatch\s*\d+\b/i, /\by2s1\.b\d+/i, /\by2s1\.lab_\w+/i];
-            
+
         if (malabeBlockRegexes.some(regex => regex.test(lower))) {
             if (window.CONFIG.batchType === 'weekday' && lower.includes('malabe') && !lower.includes('weekend')) return false;
             if (window.CONFIG.batchType === 'weekend' && lower.includes('malabe') && lower.includes('weekend')) return false;
@@ -80,12 +91,15 @@ function applyHiding(element, shouldHide) {
 }
 
 function cleanCoursePage() {
-    if (!window.CONFIG.enabled) return;
+    // DOUBLE-LOCK DEFENSE: Prevent execution if disabled or setup is incomplete
+    if (!window.CONFIG || !window.CONFIG.enabled || !window.CONFIG.hasSeenWelcome) return;
 
     const activities = document.querySelectorAll('.activity');
     const remoteRules = window.REMOTE_RULES || {};
-    const campuses = remoteRules.campuses || ['malabe', 'kandy', 'kurunegal', 'metro', 'matara', 'mathara', 'jaffna', 'northern', 'nothern', 'nu group', 'nu dataset'];
+    const campuses = getMergedCampuses();
+    const foreignCampuses = campuses.filter(c => c !== window.CONFIG.campus);
     const oppositeFull = window.CONFIG.batchType === 'weekend' ? 'weekday' : 'weekend';
+    const oppositeShort = window.CONFIG.batchTypeShort === 'we' ? 'wd' : 'we';
 
     let activeCampus = 'all';
     let activeBatch = 'all';
@@ -133,12 +147,24 @@ function cleanCoursePage() {
         let shouldHide = false;
         let forcedByCustom = null;
 
+        const hasMyShort = lower.includes(`.${window.CONFIG.batchTypeShort}.`) || lower.includes(`${window.CONFIG.batchTypeShort}.it`);
+        const hasOppositeShort = lower.includes(`.${oppositeShort}.`) || lower.includes(`${oppositeShort}.it`);
+
+        // Smart Campus check for explicitlyMine override
+        let impliesMyCampus = window.CONFIG.campus === 'malabe'
+            ? !foreignCampuses.some(c => lower.includes(c))
+            : lower.includes(window.CONFIG.campus);
+
+        const explicitlyMine = hasMyShort && !hasOppositeShort && impliesMyCampus;
+
         if (customBlacklists.some(kw => lower.includes(kw))) forcedByCustom = true;
         if (customWhitelists.some(kw => lower.includes(kw))) forcedByCustom = false;
 
         if (forcedByCustom !== null) {
             shouldHide = forcedByCustom;
         } else if (window.CONFIG.groupId && lower.includes(`y2.s1.${window.CONFIG.batchTypeShort}.it.${window.CONFIG.groupId}`)) {
+            shouldHide = false;
+        } else if (explicitlyMine) {
             shouldHide = false;
         } else if (ignoreKeywords.some(kw => lower.includes(kw))) {
             shouldHide = false;
@@ -165,14 +191,26 @@ function cleanCoursePage() {
     innerElements.forEach(el => {
         if (el.children.length > 2 && el.tagName === 'DIV') return;
         const lowerText = el.innerText.toLowerCase();
-        
+
         let forcedByCustom = null;
         if (customBlacklists.some(kw => lowerText.includes(kw))) forcedByCustom = true;
         if (customWhitelists.some(kw => lowerText.includes(kw))) forcedByCustom = false;
 
+        const hasMyShortInner = lowerText.includes(`.${window.CONFIG.batchTypeShort}.`) || lowerText.includes(`${window.CONFIG.batchTypeShort}.it`);
+        const hasOppositeShortInner = lowerText.includes(`.${oppositeShort}.`) || lowerText.includes(`${oppositeShort}.it`);
+
+        // Smart Campus check for inner elements explicitlyMine override
+        let impliesMyCampusInner = window.CONFIG.campus === 'malabe'
+            ? !foreignCampuses.some(c => lowerText.includes(c))
+            : lowerText.includes(window.CONFIG.campus);
+
+        const explicitlyMineInner = hasMyShortInner && !hasOppositeShortInner && impliesMyCampusInner;
+
         if (forcedByCustom !== null) {
             applyHiding(el, forcedByCustom);
         } else if (window.CONFIG.groupId && lowerText.includes(`y2.s1.${window.CONFIG.batchTypeShort}.it.${window.CONFIG.groupId}`)) {
+            applyHiding(el, false);
+        } else if (explicitlyMineInner) {
             applyHiding(el, false);
         } else if (ignoreKeywords.some(kw => lowerText.includes(kw))) {
             applyHiding(el, false);
