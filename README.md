@@ -3,6 +3,7 @@
 <p align="left">
   <a href="https://chromewebstore.google.com/detail/sliit-courseweb-cleaner/lnoadlfhebmkhmbfmehdgoffjllgadjm"><img src="https://img.shields.io/chrome-web-store/v/lnoadlfhebmkhmbfmehdgoffjllgadjm?label=Chrome%20Web%20Store&color=blue" alt="Chrome Web Store"></a>
   <a href="https://microsoftedge.microsoft.com/addons/detail/sliit-courseweb-cleaner/gmlodfhgiopjgamoijjffcmgfenkkkhe"><img src="https://img.shields.io/badge/Edge_Add--ons-v7.0.0-blue" alt="Edge Add-ons"></a>
+  <a href="https://addons.mozilla.org/en-US/firefox/addon/sliit-courseweb-cleaner/"><img src="https://img.shields.io/amo/v/sliit-courseweb-cleaner?label=Firefox%20Add-ons&color=orange" alt="Firefox Add-ons"></a>
   <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT">
 </p>
 
@@ -14,6 +15,7 @@ Install the official extension directly from your browser's web store:
 
 * **Google Chrome / Brave:** [Download on Chrome Web Store](https://chromewebstore.google.com/detail/sliit-courseweb-cleaner/lnoadlfhebmkhmbfmehdgoffjllgadjm?authuser=0&hl=en-GB)
 * **Microsoft Edge:** [Download on Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/sliit-courseweb-cleaner/gmlodfhgiopjgamoijjffcmgfenkkkhe)
+* **Mozilla Firefox:** [Download on Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/sliit-courseweb-cleaner/)
 
 > **Advanced Users:** Prefer Tampermonkey? Check our [Userscript Installation Guide](USERSCRIPT_INSTALL.md).
 
@@ -77,4 +79,4 @@ If you ever need to change your filters, switch to Dark Mode, or contact the dev
 * **Notice Protector:** Ensures critical alerts, rescheduled labs, and general shared materials remain strictly visible regardless of filter settings.
 
 ## License
-This project is licensed under the MIT License. See the `LICENSE` file for details. Developed and maintained by Dulith Divisekara.
+This project is licensed under the MIT License. See the [`LICENSE`](LICENSE) file for details. Developed and maintained by Dulith Divisekara.
