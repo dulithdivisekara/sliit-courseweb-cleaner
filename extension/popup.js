@@ -120,13 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Control Listeners (Real-time live sync)
-    enabledToggle.addEventListener('change', () => saveSettings());
-    ghostToggle.addEventListener('change', () => saveSettings());
-    campusSelect.addEventListener('change', () => saveSettings());
-    typeSelect.addEventListener('change', () => saveSettings());
-    groupInput.addEventListener('input', () => saveSettings());
-
     // In-Page Modal Action
     if (btnOpenModal) {
         btnOpenModal.addEventListener('click', () => {
