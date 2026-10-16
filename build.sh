@@ -3,6 +3,10 @@
 # ==============================================================================
 # Build Pipeline: SLIIT Courseweb Cleaner
 # Description: Compiles the monorepo into Userscript and Browser Extension formats.
+# Targets:
+#   1. dist/sliit-courseweb-cleaner-extension.zip (Chrome Web Store & Microsoft Edge)
+#   2. dist/sliit-courseweb-cleaner-firefox.zip   (Mozilla Firefox Add-ons AMO)
+#   3. dist/sliit-courseweb-cleaner.user.js      (Tampermonkey / Violentmonkey)
 # ==============================================================================
 
 # Define terminal color codes for structured logging
@@ -35,19 +39,33 @@ cp src/popup.js extension/popup.js
 echo -e "${SUCCESS_FORMAT} Extension workspace synchronization complete."
 
 # ------------------------------------------------------------------------------
-# Phase 3: Package Extension for Web Stores
+# Phase 3: Package Extension for Chrome & Edge (Standard Chromium MV3)
 # ------------------------------------------------------------------------------
-echo -e "${INFO_FORMAT} Packaging extension into deployable ZIP archive..."
+echo -e "${INFO_FORMAT} Packaging Chromium (Chrome & Edge) deployable ZIP archive..."
 
-# Remove previous build archive to prevent stale data
 rm -f dist/sliit-courseweb-cleaner-extension.zip
-
-# Navigate to extension directory, zip contents quietly, and return to root
 cd extension || exit
-zip -qr ../dist/sliit-courseweb-cleaner-extension.zip ./*
+# Exclude firefox manifest when creating the Chromium package
+zip -qr ../dist/sliit-courseweb-cleaner-extension.zip ./* -x "manifest.firefox.json"
 cd ..
 
-echo -e "${SUCCESS_FORMAT} Deployment archive securely packaged at: dist/sliit-courseweb-cleaner-extension.zip"
+echo -e "${SUCCESS_FORMAT} Chromium archive securely packaged at: dist/sliit-courseweb-cleaner-extension.zip"
+
+# ------------------------------------------------------------------------------
+# Phase 4: Package Extension for Mozilla Firefox AMO
+# ------------------------------------------------------------------------------
+echo -e "${INFO_FORMAT} Packaging Firefox deployable ZIP archive..."
+
+rm -f dist/sliit-courseweb-cleaner-firefox.zip
+cd extension || exit
+# Temporarily swap manifest to firefox manifest for packaging
+cp manifest.json manifest.chromium.bak
+cp manifest.firefox.json manifest.json
+zip -qr ../dist/sliit-courseweb-cleaner-firefox.zip ./* -x "manifest.firefox.json" -x "manifest.chromium.bak"
+mv manifest.chromium.bak manifest.json
+cd ..
+
+echo -e "${SUCCESS_FORMAT} Firefox archive securely packaged at: dist/sliit-courseweb-cleaner-firefox.zip"
 
 # ==============================================================================
-echo -e "${SUCCESS_FORMAT} Build pipeline executed successfully. Artifacts are ready for deployment."
+echo -e "${SUCCESS_FORMAT} Build pipeline executed successfully. All artifacts are ready for deployment."

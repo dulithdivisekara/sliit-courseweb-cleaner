@@ -5,20 +5,13 @@
   "description": "A professional, context-aware module filter and dark theme for SLIIT Courseweb.",
   "author": "Dulith Divisekara",
   "permissions": ["storage", "alarms", "activeTab"],
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "courseweb-cleaner@dulithdivisekara.github.io",
-      "strict_min_version": "109.0"
-    }
-  },
   "icons": {
     "16": "icons/icon_16.png",
     "48": "icons/icon_48.png",
     "128": "icons/icon_128.png"
   },
   "background": {
-    "service_worker": "service-worker.js",
-    "scripts": ["service-worker.js"]
+    "service_worker": "service-worker.js"
   },
   "action": {
     "default_icon": {
