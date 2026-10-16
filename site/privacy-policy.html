@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - SLIIT Courseweb Cleaner</title>
+    <meta name="description" content="Privacy Policy for SLIIT Courseweb Cleaner browser extension. Privacy-first, zero tracking, and local-only data processing.">
+    <link rel="icon" type="image/svg+xml" href="src/icon.svg">
+    <style>
+        :root {
+            --primary: #0f3b5f;
+            --primary-dark: #0a2942;
+            --accent: #f7b924;
+            --text-main: #212529;
+            --text-muted: #555e68;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --border: #e9ecef;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #f7b924;
+                --primary-dark: #e5a919;
+                --accent: #f7b924;
+                --text-main: #f8f9fa;
+                --text-muted: #adb5bd;
+                --bg: #121212;
+                --card-bg: #1e1e1e;
+                --border: #2d3238;
+            }
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            line-height: 1.65;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+        }
+        header {
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: var(--primary);
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+        .date {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        h2 {
+            font-size: 19px;
+            color: var(--primary);
+            margin-top: 25px;
+            margin-bottom: 12px;
+        }
+        p {
+            margin-bottom: 16px;
+            color: var(--text-main);
+        }
+        ul {
+            margin-left: 20px;
+            margin-bottom: 16px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        code {
+            background: var(--bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            border: 1px solid var(--border);
+        }
+        a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 10px 18px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        @media (prefers-color-scheme: dark) {
+            .back-link {
+                color: #212529;
+            }
+        }
+        .back-link:hover {
+            opacity: 0.9;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Privacy Policy</h1>
+            <p class="date"><strong>SLIIT Courseweb Cleaner</strong> • Last Updated: October 2026</p>
+        </header>
+
+        <p>The <strong>SLIIT Courseweb Cleaner</strong> browser extension is developed with a strict "Privacy First" methodology. We respect your privacy and are committed to full transparency regarding how the extension operates.</p>
+
+        <h2>1. Zero Personal Data Collection</h2>
+        <p>We do not collect, transmit, distribute, sell, or monetize any of your personal data. The extension operates entirely within the confines of your local browser environment:</p>
+        <ul>
+            <li><strong>User Preferences:</strong> Your selected campus, batch, custom keywords, ghost mode, and dark mode toggles are stored locally using the native browser APIs (<code>chrome.storage.sync</code> and <code>chrome.storage.local</code>). When Chrome Sync / Edge Sync is enabled, your browser may securely synchronize these preferences across your own signed-in devices. This data is never sent to any external server maintained by us.</li>
+            <li><strong>Courseweb Data & Text Processing:</strong> The extension inspects the text of the <code>courseweb.sliit.lk</code> web pages strictly via local client-side scripts to identify which elements to filter or dim. No student names, grades, course IDs, or LMS tokens are ever stored, captured, or transmitted.</li>
+        </ul>
+
+        <h2>2. Remote Network Communication</h2>
+        <p>The extension makes a single, periodic outbound network request (scheduled once every 24 hours via <code>chrome.alarms</code>) to download the latest community-contributed filtering rules:</p>
+        <p><code>https://raw.githubusercontent.com/dulithdivisekara/sliit-courseweb-cleaner/main/rules.json</code></p>
+        <p>This request is a standard, anonymous HTTP GET request to download a static open-source JSON file. It transmits no tracking identifiers, telemetry, or user credentials.</p>
+
+        <h2>3. Third-Party Libraries & Remote Code</h2>
+        <p>The extension includes an embedded copy of the open-source <a href="https://github.com/darkreader/darkreader" target="_blank" rel="noreferrer">Dark Reader</a> engine (MIT License) packaged locally to generate high-contrast styles. The extension executes <strong>zero remote executable code</strong> (no <code>eval()</code>, no dynamic scripts, no external JavaScript downloads).</p>
+
+        <h2>4. Contact & Open Source Inquiries</h2>
+        <p>If you have any questions, feedback, or verification requests regarding this Privacy Policy or the security of the extension, you are welcome to inspect the source code or reach out directly:</p>
+        <ul>
+            <li><strong>Source Code & Issues:</strong> <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner" target="_blank" rel="noreferrer">github.com/dulithdivisekara/sliit-courseweb-cleaner</a></li>
+            <li><strong>Developer Contact:</strong> <a href="https://t.me/dulithdivisekara" target="_blank" rel="noreferrer">Telegram (@dulithdivisekara)</a></li>
+        </ul>
+
+        <a href="index.html" class="back-link">← Back to Homepage</a>
+    </div>
+</body>
+</html>

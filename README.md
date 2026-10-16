@@ -95,7 +95,17 @@ You can toggle Dark Mode and update your profile anytime using the new **Toolbar
 
 While other centers (**Metro**, **Kandy**, **Kurunegala**, **Matara**, and **Jaffna**) are supported, module naming conventions at regional centers can occasionally vary across faculties.
 
-If you encounter any issues, misidentified links, or unhidden foreign items for your specific center, community contributions are warmly welcomed! Please feel free to open a **Pull Request** with the updated regex patterns in [`rules.json`](rules.json) or [`src/shared-core.js`](src/shared-core.js) — we will gladly review and merge it. Alternatively, open an issue on our [GitHub Issues](https://github.com/dulithdivisekara/sliit-courseweb-cleaner/issues) tracker.
+If you encounter any issues, misidentified links, or unhidden foreign items for your specific center, community contributions are warmly welcomed! Please read our [**Contributing Guide**](CONTRIBUTING.md) to learn how to test locally and propose updates to [`rules.json`](rules.json). You can also view our [**Project Roadmap**](ROADMAP.md) and [**Release Changelog**](CHANGELOG.md).
+
+---
+
+## Store Listing Metadata
+
+If you are managing deployments to official browser add-on stores, refer to our prepared submission documents:
+* [Chrome Web Store Submission Guide](CHROMEWEBSTORE.md)
+* [Microsoft Edge Add-ons Submission Guide](EDGEADDONS.md)
+* [Mozilla Firefox Add-ons (AMO) Submission Guide](FIREFOXAMO.md)
+* [Privacy Policy](privacy-policy.html)
 
 ---
 

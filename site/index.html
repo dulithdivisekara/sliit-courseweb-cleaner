@@ -3,44 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SLIIT Courseweb Cleaner</title>
+    <title>SLIIT Courseweb Cleaner - Filter Modules & High-Contrast Dark Mode</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="A fast, context-aware browser extension and userscript that automatically filters unassigned campus and batch modules and adds an eye-friendly dark theme to SLIIT Courseweb (Moodle).">
+    <meta name="keywords" content="SLIIT, Courseweb, SLIIT Courseweb Cleaner, Moodle, dark theme, dark mode, browser extension, Chrome extension, Edge Add-ons, Firefox Add-ons, Tampermonkey, Malabe, Metro, Kandy">
+    <meta name="author" content="Dulith Divisekara">
+    <link rel="canonical" href="https://sliit-courseweb-cleaner-web.pages.dev/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sliit-courseweb-cleaner-web.pages.dev/">
+    <meta property="og:title" content="SLIIT Courseweb Cleaner - Filter Modules & Dark Mode">
+    <meta property="og:description" content="Clean your SLIIT Courseweb dashboard. Instantly filter unassigned batch/campus modules and enable dynamic dark mode. Available for Chrome, Edge, Firefox & Tampermonkey.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/dulithdivisekara/sliit-courseweb-cleaner/main/assets/sliit-courseweb-cleaner-social-preview.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://sliit-courseweb-cleaner-web.pages.dev/">
+    <meta property="twitter:title" content="SLIIT Courseweb Cleaner - Filter Modules & Dark Mode">
+    <meta property="twitter:description" content="Clean your SLIIT Courseweb dashboard. Instantly filter unassigned batch/campus modules and enable dynamic dark mode.">
+    <meta property="twitter:image" content="https://raw.githubusercontent.com/dulithdivisekara/sliit-courseweb-cleaner/main/assets/sliit-courseweb-cleaner-social-preview.png">
+
+    <link rel="icon" type="image/svg+xml" href="../src/icon.svg">
+
+    <!-- Structured Data (JSON-LD) for Search Engines -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "SLIIT Courseweb Cleaner",
+      "operatingSystem": "Web Browser (Chrome, Edge, Firefox, Brave, Opera)",
+      "applicationCategory": "BrowserExtension",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "softwareVersion": "7.1.0",
+      "description": "Context-aware module filter and dark theme for SLIIT Courseweb.",
+      "author": {
+        "@type": "Person",
+        "name": "Dulith Divisekara"
+      },
+      "url": "https://sliit-courseweb-cleaner-web.pages.dev/"
+    }
+    </script>
+
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8f9fa; color: #212529; text-align: center; padding: 50px 20px; }
-        .container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        h1 { color: #0f3b5f; }
-        p { line-height: 1.6; color: #495057; font-size: 1.1em; }
-        .btn { display: inline-block; background: #0f3b5f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 10px; transition: 0.2s; }
-        .btn:hover { background: #0a2942; }
-        .btn-secondary { background: #6c757d; }
-        .btn-secondary:hover { background: #5a6268; }
-        .features { text-align: left; margin-top: 30px; }
-        .features li { margin-bottom: 10px; }
+        :root {
+            --primary: #0f3b5f;
+            --primary-hover: #0a2942;
+            --accent: #f7b924;
+            --accent-hover: #e5a919;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-main: #212529;
+            --text-muted: #555e68;
+            --border: #e9ecef;
+            --btn-dark: #24292e;
+            --btn-dark-hover: #1b1f23;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #f7b924;
+                --primary-hover: #e5a919;
+                --bg: #121212;
+                --card-bg: #1e1e1e;
+                --text-main: #f8f9fa;
+                --text-muted: #adb5bd;
+                --border: #2d3238;
+                --btn-dark: #333a42;
+                --btn-dark-hover: #444c56;
+            }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            text-align: center;
+            padding: 40px 16px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 40px 30px;
+            border-radius: 14px;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+        }
+        .badge-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .badge-bar img {
+            height: 22px;
+        }
+        h1 {
+            color: var(--text-main);
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .subtitle {
+            font-size: 1.15em;
+            color: var(--text-muted);
+            max-width: 620px;
+            margin: 0 auto 28px auto;
+        }
+        .btn-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary);
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: transform 0.15s ease, background 0.2s ease;
+        }
+        @media (prefers-color-scheme: dark) {
+            .btn {
+                color: #121212;
+            }
+        }
+        .btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+        .btn-secondary {
+            background: var(--btn-dark);
+            color: white !important;
+        }
+        .btn-secondary:hover {
+            background: var(--btn-dark-hover);
+        }
+        .features {
+            text-align: left;
+            background: var(--bg);
+            padding: 24px 28px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            margin-top: 25px;
+        }
+        .features h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: var(--text-main);
+        }
+        .features ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        @media (min-width: 600px) {
+            .features ul {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .features li {
+            font-size: 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            color: var(--text-main);
+        }
+        .features li strong {
+            color: var(--text-main);
+        }
+        .features li span.icon {
+            font-size: 16px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .ecosystem-box {
+            margin-top: 25px;
+            padding: 16px 20px;
+            background: rgba(247, 185, 36, 0.12);
+            border: 1px solid rgba(247, 185, 36, 0.4);
+            border-radius: 8px;
+            text-align: left;
+            font-size: 13px;
+        }
+        .ecosystem-box a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .ecosystem-box a:hover {
+            text-decoration: underline;
+        }
+        footer {
+            margin-top: 35px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+            margin: 0 8px;
+            font-weight: 500;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="badge-bar">
+            <a href="https://chromewebstore.google.com/detail/sliit-courseweb-cleaner/lnoadlfhebmkhmbfmehdgoffjllgadjm" target="_blank" rel="noreferrer">
+                <img src="https://img.shields.io/chrome-web-store/v/lnoadlfhebmkhmbfmehdgoffjllgadjm?label=Chrome%20Web%20Store&color=blue" alt="Chrome Web Store">
+            </a>
+            <a href="https://microsoftedge.microsoft.com/addons/detail/sliit-courseweb-cleaner/gmlodfhgiopjgamoijjffcmgfenkkkhe" target="_blank" rel="noreferrer">
+                <img src="https://img.shields.io/badge/Edge_Add--ons-v7.1.0-blue" alt="Edge Add-ons">
+            </a>
+            <a href="https://addons.mozilla.org/en-US/firefox/addon/sliit-courseweb-cleaner/" target="_blank" rel="noreferrer">
+                <img src="https://img.shields.io/amo/v/sliit-courseweb-cleaner?label=Firefox%20Add-ons&color=orange" alt="Firefox Add-ons">
+            </a>
+            <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License">
+        </div>
+
         <h1>🎓 SLIIT Courseweb Cleaner</h1>
-        <p>Tired of scrolling through endless modules meant for other campuses or batches? Instantly filter the noise and get a personalized, clean dashboard tailored exactly to you.</p>
+        <p class="subtitle">A context-aware browser extension and userscript designed to clean up your SLIIT Moodle interface with automated batch/campus filtering and high-contrast dark theme.</p>
         
-        <div>
-            <a href="#" class="btn">Add to Chrome</a>
-            <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner/raw/refs/heads/main/dist/sliit-courseweb-cleaner.user.js" class="btn btn-secondary">Install Userscript</a>
+        <div class="btn-grid">
+            <a href="https://chromewebstore.google.com/detail/sliit-courseweb-cleaner/lnoadlfhebmkhmbfmehdgoffjllgadjm" class="btn" target="_blank" rel="noreferrer">
+                Add to Chrome / Brave
+            </a>
+            <a href="https://microsoftedge.microsoft.com/addons/detail/sliit-courseweb-cleaner/gmlodfhgiopjgamoijjffcmgfenkkkhe" class="btn" target="_blank" rel="noreferrer">
+                Get for Microsoft Edge
+            </a>
+            <a href="https://addons.mozilla.org/en-US/firefox/addon/sliit-courseweb-cleaner/" class="btn" target="_blank" rel="noreferrer">
+                Get for Mozilla Firefox
+            </a>
+            <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner/raw/refs/heads/main/dist/sliit-courseweb-cleaner.user.js" class="btn btn-secondary">
+                Install Userscript (.user.js)
+            </a>
         </div>
 
         <div class="features">
-            <h3>✨ Key Features (v7.0)</h3>
+            <h3>✨ Key Features (v7.1.0)</h3>
             <ul>
-                <li><strong>Smart Auto-Detect:</strong> Instantly guesses your campus and batch.</li>
-                <li><strong>Custom Keywords:</strong> Create your own Whitelists and Blacklists.</li>
-                <li><strong>Cloud Sync:</strong> Preferences sync across all your devices.</li>
-                <li><strong>Community Rules:</strong> Auto-updates with the latest SLIIT naming conventions.</li>
+                <li><span class="icon">🌙</span><div><strong>Dynamic Dark Theme:</strong> High-contrast, eye-friendly theme powered by Dark Reader across all Courseweb pages.</div></li>
+                <li><span class="icon">🧭</span><div><strong>Toolbar Action Popup:</strong> Switch profiles, toggle dark mode, or adjust ghost mode directly from your browser toolbar.</div></li>
+                <li><span class="icon">🎯</span><div><strong>Campus & Batch Filtering:</strong> Keeps Malabe, Metro, Kandy, Kurunegala, Matara, and Jaffna modules organized.</div></li>
+                <li><span class="icon">👻</span><div><strong>Ghost Mode:</strong> Optionally dims unassigned items to 25% opacity rather than hiding them completely.</div></li>
+                <li><span class="icon">🌐</span><div><strong>Partner Program Isolation:</strong> Distinguishes external partner degree materials (Deakin, Curtin) cleanly.</div></li>
+                <li><span class="icon">🛡️</span><div><strong>Notice & Form Protection:</strong> Critical notices, reschedule announcements, and Moodle forms are never hidden.</div></li>
+                <li><span class="icon">⚡</span><div><strong>Custom Whitelist & Blacklist:</strong> Pin priority assignments or mute specific lecturers with keywords.</div></li>
+                <li><span class="icon">🔄</span><div><strong>Cloud Sync & Community Rules:</strong> Syncs across your signed-in browsers and updates regex patterns in the background.</div></li>
             </ul>
         </div>
+
+        <div class="ecosystem-box">
+            🤖 <strong>Ecosystem Spotlight:</strong> Explore the <a href="https://github.com/kesaruhasun/mcp-sliit-courseweb" target="_blank" rel="noreferrer">SLIIT Courseweb MCP Server</a> by Kesaru Hasun to connect AI assistants (Claude, Cursor, etc.) directly with your Courseweb materials and notices.
+        </div>
         
-        <p style="margin-top: 30px; font-size: 0.9em;">
-            <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner" style="color: #0f3b5f;">View Source on GitHub</a> | 
-            <a href="../privacy-policy.md" style="color: #0f3b5f;">Privacy Policy</a>
-        </p>
+        <footer>
+            <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner" target="_blank" rel="noreferrer">GitHub</a> • 
+            <a href="privacy-policy.html">Privacy Policy</a> • 
+            <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner/blob/main/USERSCRIPT_INSTALL.md" target="_blank" rel="noreferrer">Userscript Guide</a> • 
+            <a href="https://t.me/dulithdivisekara" target="_blank" rel="noreferrer">Support</a>
+            <p style="margin-top: 10px; font-size: 11px;">Licensed under MIT • Created by Dulith Divisekara</p>
+        </footer>
     </div>
 </body>
 </html>
