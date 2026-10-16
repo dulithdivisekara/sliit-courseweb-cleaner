@@ -1,0 +1,60 @@
+name: Build Pipeline & Release Assets
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build & Package Stores
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Validate JSON Syntax
+        run: |
+          jq empty rules.json
+          jq empty extension/manifest.json
+          jq empty extension/manifest.firefox.json
+
+      - name: Compile Distribution Packages
+        run: |
+          chmod +x ./build.sh
+          ./build.sh
+
+      - name: Run Syntax Checks
+        run: npm test
+
+      - name: Upload Store Packages as Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sliit-courseweb-cleaner-builds
+          path: |
+            dist/sliit-courseweb-cleaner-extension.zip
+            dist/sliit-courseweb-cleaner-firefox.zip
+            dist/sliit-courseweb-cleaner.user.js
+
+      - name: Attach Assets to GitHub Release
+        if: startsWith(github.ref, 'tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/sliit-courseweb-cleaner-extension.zip
+            dist/sliit-courseweb-cleaner-firefox.zip
+            dist/sliit-courseweb-cleaner.user.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

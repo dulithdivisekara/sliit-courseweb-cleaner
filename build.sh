@@ -9,6 +9,8 @@
 #   3. dist/sliit-courseweb-cleaner.user.js      (Tampermonkey / Violentmonkey)
 # ==============================================================================
 
+set -e # Exit immediately on error
+
 # Define terminal color codes for structured logging
 INFO_FORMAT='\033[1;34m[INFO]\033[0m'
 SUCCESS_FORMAT='\033[1;32m[SUCCESS]\033[0m'
@@ -44,26 +46,28 @@ echo -e "${SUCCESS_FORMAT} Extension workspace synchronization complete."
 echo -e "${INFO_FORMAT} Packaging Chromium (Chrome & Edge) deployable ZIP archive..."
 
 rm -f dist/sliit-courseweb-cleaner-extension.zip
-cd extension || exit
-# Exclude firefox manifest when creating the Chromium package
-zip -qr ../dist/sliit-courseweb-cleaner-extension.zip ./* -x "manifest.firefox.json"
-cd ..
+ROOT_DIR=$(pwd)
+cd extension
+zip -qr "${ROOT_DIR}/dist/sliit-courseweb-cleaner-extension.zip" ./* -x "manifest.firefox.json"
+cd "${ROOT_DIR}"
 
 echo -e "${SUCCESS_FORMAT} Chromium archive securely packaged at: dist/sliit-courseweb-cleaner-extension.zip"
 
 # ------------------------------------------------------------------------------
-# Phase 4: Package Extension for Mozilla Firefox AMO
+# Phase 4: Package Extension for Mozilla Firefox AMO (Isolated Staging)
 # ------------------------------------------------------------------------------
 echo -e "${INFO_FORMAT} Packaging Firefox deployable ZIP archive..."
 
 rm -f dist/sliit-courseweb-cleaner-firefox.zip
-cd extension || exit
-# Temporarily swap manifest to firefox manifest for packaging
-cp manifest.json manifest.chromium.bak
-cp manifest.firefox.json manifest.json
-zip -qr ../dist/sliit-courseweb-cleaner-firefox.zip ./* -x "manifest.firefox.json" -x "manifest.chromium.bak"
-mv manifest.chromium.bak manifest.json
-cd ..
+TMP_FIREFOX_DIR=$(mktemp -d)
+cp -r extension/* "${TMP_FIREFOX_DIR}/"
+cp extension/manifest.firefox.json "${TMP_FIREFOX_DIR}/manifest.json"
+rm -f "${TMP_FIREFOX_DIR}/manifest.firefox.json"
+
+cd "${TMP_FIREFOX_DIR}"
+zip -qr "${ROOT_DIR}/dist/sliit-courseweb-cleaner-firefox.zip" ./*
+cd "${ROOT_DIR}"
+rm -rf "${TMP_FIREFOX_DIR}"
 
 echo -e "${SUCCESS_FORMAT} Firefox archive securely packaged at: dist/sliit-courseweb-cleaner-firefox.zip"
 
