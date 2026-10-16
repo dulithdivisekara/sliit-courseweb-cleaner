@@ -13,7 +13,9 @@
     "northern",
     "nothern",
     "nu group",
-    "nu dataset"
+    "nu dataset",
+    "deakin",
+    "curtin"
   ],
   "batchPatterns": {
     "weekday": ["wd", "weekday"],

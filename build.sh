@@ -28,6 +28,10 @@ echo -e "${INFO_FORMAT} Synchronizing shared core logic to extension workspace..
 cp src/shared-core.js extension/shared-core.js
 cp src/extension-main.js extension/extension-main.js
 cp src/shared-styles.css extension/styles.css
+cp src/darkreader.js extension/darkreader.js
+cp src/popup.html extension/popup.html
+cp src/popup.css extension/popup.css
+cp src/popup.js extension/popup.js
 echo -e "${SUCCESS_FORMAT} Extension workspace synchronization complete."
 
 # ------------------------------------------------------------------------------

@@ -1,7 +1,8 @@
 // --- SHARED CORE LOGIC ---
 const DEFAULT_CAMPUSES = [
     'malabe', 'kandy', 'kurunegala', 'kurunegale', 'metro',
-    'matara', 'mathara', 'jaffna', 'northern', 'nothern', 'nu group', 'nu dataset'
+    'matara', 'mathara', 'jaffna', 'northern', 'nothern', 'nu group', 'nu dataset',
+    'deakin', 'curtin'
 ];
 
 function getMergedCampuses() {
@@ -90,11 +91,24 @@ function applyHiding(element, shouldHide) {
     }
 }
 
+function isCourseViewPage() {
+    const path = window.location.pathname || '';
+    return path.includes('/course/view.php');
+}
+
 function cleanCoursePage() {
+    // Strictly execute filtering logic only on actual course view pages
+    if (!isCourseViewPage()) return;
+
     // DOUBLE-LOCK DEFENSE: Prevent execution if disabled or setup is incomplete
     if (!window.CONFIG || !window.CONFIG.enabled || !window.CONFIG.hasSeenWelcome) return;
 
-    const activities = document.querySelectorAll('.activity');
+    const courseContainer = document.querySelector('.course-content') || document.querySelector('#region-main');
+    if (!courseContainer) return;
+
+    const activities = courseContainer.querySelectorAll('.activity');
+    if (activities.length === 0) return;
+
     const remoteRules = window.REMOTE_RULES || {};
     const campuses = getMergedCampuses();
     const foreignCampuses = campuses.filter(c => c !== window.CONFIG.campus);
@@ -109,6 +123,10 @@ function cleanCoursePage() {
     const ignoreKeywords = remoteRules.ignoreKeywords || ['notice', 'rescheduled', 'announcement', 'general'];
 
     activities.forEach(activity => {
+        // Protect selector controls, dropdowns, navigation drawers, and Moodle forms
+        if (activity.closest('select, .dropdown, .dropdown-menu, .groupselector, .singleselect, form, nav, header')) return;
+        if (activity.querySelector('select, form, .groupselector, .singleselect')) return;
+
         const text = activity.innerText;
         const lower = text.toLowerCase();
         const isTitle = activity.classList.contains('modtype_label') || activity.querySelector('h1, h2, h3, h4, h5');
@@ -187,8 +205,10 @@ function cleanCoursePage() {
         applyHiding(activity, shouldHide);
     });
 
-    const innerElements = document.querySelectorAll('.no-overflow p, .no-overflow li, .no-overflow div');
+    const innerElements = courseContainer.querySelectorAll('.activity .no-overflow p, .activity .no-overflow li, .activity .no-overflow div');
     innerElements.forEach(el => {
+        // Protect selector controls, dropdowns, navigation drawers, and Moodle forms
+        if (el.closest('select, .dropdown, .dropdown-menu, .groupselector, .singleselect, form, nav, header')) return;
         if (el.children.length > 2 && el.tagName === 'DIV') return;
         const lowerText = el.innerText.toLowerCase();
 

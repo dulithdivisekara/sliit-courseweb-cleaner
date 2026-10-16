@@ -14,10 +14,106 @@ const DEFAULT_CONFIG = {
 // Fallback logic if chrome.storage.sync is unavailable (e.g. some obscure browsers)
 const storageApi = chrome.storage.sync ? chrome.storage.sync : chrome.storage.local;
 
+function applyDarkReader(isDark) {
+    if (typeof DarkReader === 'undefined') return;
+    if (isDark) {
+        DarkReader.enable({
+            brightness: 100,
+            contrast: 95,
+            sepia: 0
+        }, {
+            css: `
+                /* Maintain SLIIT Courseweb Cleaner branding & UI */
+                #sliit-filter-btn {
+                    background-color: #f7b924 !important;
+                    color: #212529 !important;
+                    border: none !important;
+                }
+                #sliit-filter-btn:hover {
+                    background-color: #e5a919 !important;
+                }
+                #sliit-filter-btn svg {
+                    stroke: #212529 !important;
+                }
+                #sliit-filter-overlay {
+                    background: rgba(0, 0, 0, 0.65) !important;
+                }
+                .sf-modal-container.sf-dark-theme {
+                    background-color: #1e1e1e !important;
+                    color: #f8f9fa !important;
+                    border-top-color: #f7b924 !important;
+                }
+                .sf-dark-theme h3 {
+                    color: #f8f9fa !important;
+                }
+                .sf-dark-theme .sf-welcome-header h3 {
+                    color: #f8f9fa !important;
+                }
+                .sf-dark-theme .sf-toggle-label {
+                    color: #e9ecef !important;
+                }
+                .sf-dark-theme .sf-toggle-sub {
+                    color: #adb5bd !important;
+                }
+                .sf-dark-theme .sf-input-label {
+                    color: #ced4da !important;
+                }
+                .sf-dark-theme select, .sf-dark-theme input[type="text"] {
+                    background-color: #2b2b2b !important;
+                    color: #f8f9fa !important;
+                    border-color: #444 !important;
+                }
+                .sf-dark-theme select:focus, .sf-dark-theme input[type="text"]:focus {
+                    background-color: #333 !important;
+                    border-color: #f7b924 !important;
+                }
+                .sf-dark-theme .sliit-btn-save {
+                    background-color: #f7b924 !important;
+                    color: #212529 !important;
+                }
+                .sf-dark-theme .sliit-btn-save:hover {
+                    background-color: #e5a919 !important;
+                }
+                .sf-dark-theme .sliit-btn-cancel {
+                    background-color: #333 !important;
+                    color: #ced4da !important;
+                }
+                .sf-dark-theme .sliit-btn-cancel:hover {
+                    background-color: #444 !important;
+                }
+                .sf-dark-theme .sf-footer a {
+                    color: #f7b924 !important;
+                }
+                /* Dark scheme for native select elements & dropdowns */
+                select, option, .dropdown-menu {
+                    color-scheme: dark !important;
+                }
+            `,
+            ignoreImageAnalysis: [],
+            ignoreInlineStyle: []
+        });
+    } else {
+        DarkReader.disable();
+    }
+}
+
 storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
     chrome.storage.local.get('remoteRules', (localData) => {
         window.CONFIG = syncConfig;
         window.REMOTE_RULES = localData.remoteRules || null;
+
+        // Apply dark mode immediately on startup to prevent white flash
+        if (window.CONFIG.darkMode) {
+            applyDarkReader(true);
+        }
+
+        function isCourseViewPage() {
+            const path = window.location.pathname || '';
+            return path.includes('/course/view.php');
+        }
+
+        let showSettings = null;
+        let updateThemeUI = null;
 
         function createUIElement(htmlString) {
             const div = document.createElement('div');
@@ -52,6 +148,7 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
                         <option value="kurunegala">Kurunegala</option>
                         <option value="matara">Matara</option>
                         <option value="jaffna">Jaffna</option>
+                        <option value="deakin">Deakin</option>
                     </select>
                     <label class="sf-input-label">Batch Classification</label>
                     <select id="sf-type">
@@ -96,7 +193,7 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
                     <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner is now active. This utility seamlessly optimizes your Moodle dashboard by filtering out unassigned contexts and centers.</p>
                     <div class="sf-welcome-credit">
                         <strong>Release Information</strong><br>
-                        Version: 7.0.0<br>
+                        Version: 7.1.0<br>
                         Maintainer: Dulith Divisekara<br>
                         License: Open Source (MIT)
                     </div>
@@ -115,24 +212,32 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
             document.body.appendChild(welcomeModal);
 
             const themeIcon = document.getElementById('sf-theme-icon');
-            const updateThemeUI = (isDark) => {
+            updateThemeUI = (isDark) => {
+                applyDarkReader(isDark);
                 if (isDark) {
                     settingsModal.classList.add('sf-dark-theme');
                     welcomeModal.classList.add('sf-dark-theme');
-                    themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+                    if (themeIcon) {
+                        themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+                    }
                 } else {
                     settingsModal.classList.remove('sf-dark-theme');
                     welcomeModal.classList.remove('sf-dark-theme');
-                    themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+                    if (themeIcon) {
+                        themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+                    }
                 }
             };
             updateThemeUI(window.CONFIG.darkMode);
 
-            document.getElementById('sf-theme-toggle').onclick = () => {
-                window.CONFIG.darkMode = !window.CONFIG.darkMode;
+            const toggleDarkTheme = (forcedState) => {
+                const nextState = typeof forcedState === 'boolean' ? forcedState : !window.CONFIG.darkMode;
+                window.CONFIG.darkMode = nextState;
                 updateThemeUI(window.CONFIG.darkMode);
                 storageApi.set({ darkMode: window.CONFIG.darkMode });
             };
+
+            document.getElementById('sf-theme-toggle').onclick = () => toggleDarkTheme();
 
             document.getElementById('sf-campus').value = window.CONFIG.campus;
             document.getElementById('sf-type').value = window.CONFIG.batchType;
@@ -140,7 +245,7 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
             document.getElementById('sf-whitelist').value = window.CONFIG.customWhitelist || '';
             document.getElementById('sf-blacklist').value = window.CONFIG.customBlacklist || '';
 
-            const showSettings = () => { settingsModal.style.display = 'block'; overlay.style.display = 'block'; };
+            showSettings = () => { settingsModal.style.display = 'block'; overlay.style.display = 'block'; };
             const closeModals = () => { settingsModal.style.display = 'none'; welcomeModal.style.display = 'none'; overlay.style.display = 'none'; };
 
             btn.onclick = showSettings;
@@ -160,6 +265,7 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
 
             document.getElementById('sf-reset').onclick = () => {
                 if(confirm('Are you sure you want to reset all configurations to default?')) {
+                    applyDarkReader(false);
                     storageApi.clear(() => location.reload());
                 }
             };
@@ -181,9 +287,44 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
             };
         }
 
+        // Global runtime listener for toolbar popup across all Courseweb pages
+        if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
+            chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+                if (request.action === 'openSettingsModal') {
+                    if (typeof showSettings === 'function') {
+                        showSettings();
+                    }
+                    sendResponse({ success: true });
+                } else if (request.action === 'configUpdated') {
+                    storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
+                        window.CONFIG = syncConfig;
+                        applyDarkReader(window.CONFIG.darkMode);
+                        if (isCourseViewPage()) {
+                            if (typeof updateThemeUI === 'function') {
+                                updateThemeUI(window.CONFIG.darkMode);
+                            }
+                            runClean();
+                            const enabledEl = document.getElementById('sf-enabled');
+                            const ghostEl = document.getElementById('sf-ghost');
+                            const campusEl = document.getElementById('sf-campus');
+                            const typeEl = document.getElementById('sf-type');
+                            const groupEl = document.getElementById('sf-group');
+                            if (enabledEl) enabledEl.checked = window.CONFIG.enabled;
+                            if (ghostEl) ghostEl.checked = window.CONFIG.ghostMode;
+                            if (campusEl) campusEl.value = window.CONFIG.campus;
+                            if (typeEl) typeEl.value = window.CONFIG.batchType;
+                            if (groupEl) groupEl.value = window.CONFIG.groupId;
+                        }
+                    });
+                    sendResponse({ success: true });
+                }
+            });
+        }
+
         // Initialize UI and Core
         let isCleaning = false;
         function runClean() {
+            if (!isCourseViewPage()) return;
             if (isCleaning) return;
             isCleaning = true;
             requestAnimationFrame(() => {
@@ -192,23 +333,33 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
             });
         }
 
-        window.addEventListener('load', () => {
-            runClean();
-            injectUI();
+        function init() {
+            // Apply filtering and floating UI only on course view pages
+            // This strictly protects homepage (/my/), course selectors (/my/courses.php), etc.
+            if (isCourseViewPage()) {
+                runClean();
+                injectUI();
 
-            const observer = new MutationObserver((mutations) => {
-                let shouldRun = false;
-                for (let m of mutations) {
-                    if (m.addedNodes.length > 0 && m.target.className !== 'sf-modal-container') {
-                        shouldRun = true;
-                        break;
+                const observer = new MutationObserver((mutations) => {
+                    let shouldRun = false;
+                    for (let m of mutations) {
+                        if (m.addedNodes.length > 0 && m.target.className !== 'sf-modal-container') {
+                            shouldRun = true;
+                            break;
+                        }
                     }
-                }
-                if (shouldRun) runClean();
-            });
+                    if (shouldRun) runClean();
+                });
 
-            const courseContent = document.querySelector('.course-content') || document.body;
-            observer.observe(courseContent, { childList: true, subtree: true });
-        });
+                const courseContent = document.querySelector('.course-content') || document.body;
+                observer.observe(courseContent, { childList: true, subtree: true });
+            }
+        }
+
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            init();
+        } else {
+            window.addEventListener('DOMContentLoaded', init, { once: true });
+        }
     });
 });

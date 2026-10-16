@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
   "name": "SLIIT Courseweb Cleaner",
-  "version": "7.0.0",
-  "description": "A professional, context-aware module filter for SLIIT Courseweb.",
+  "version": "7.1.0",
+  "description": "A professional, context-aware module filter and dark theme for SLIIT Courseweb.",
   "author": "Dulith Divisekara",
-  "permissions": ["storage", "alarms"],
+  "permissions": ["storage", "alarms", "activeTab"],
   "browser_specific_settings": {
     "gecko": {
       "id": "courseweb-cleaner@dulithdivisekara.github.io",
@@ -28,13 +28,14 @@
       "48": "icons/icon_48.png",
       "128": "icons/icon_128.png"
     },
-    "default_title": "SLIIT Courseweb Cleaner is active"
+    "default_title": "SLIIT Courseweb Cleaner",
+    "default_popup": "popup.html"
   },
   "content_scripts": [
     {
-      "matches": ["*://courseweb.sliit.lk/course/view.php*"],
+      "matches": ["*://courseweb.sliit.lk/*"],
       "css": ["styles.css"],
-      "js": ["shared-core.js", "extension-main.js"],
+      "js": ["darkreader.js", "shared-core.js", "extension-main.js"],
       "run_at": "document_idle"
     }
   ]

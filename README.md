@@ -1,13 +1,18 @@
 # SLIIT Courseweb Module Cleaner
 
 <p align="left">
+  <a href="https://sliit-courseweb-cleaner.pages.dev"><img src="https://img.shields.io/badge/Website-sliit--courseweb--cleaner.pages.dev-f7b924?logo=googlechrome&logoColor=black" alt="Official Website"></a>
   <a href="https://chromewebstore.google.com/detail/sliit-courseweb-cleaner/lnoadlfhebmkhmbfmehdgoffjllgadjm"><img src="https://img.shields.io/chrome-web-store/v/lnoadlfhebmkhmbfmehdgoffjllgadjm?label=Chrome%20Web%20Store&color=blue" alt="Chrome Web Store"></a>
-  <a href="https://microsoftedge.microsoft.com/addons/detail/sliit-courseweb-cleaner/gmlodfhgiopjgamoijjffcmgfenkkkhe"><img src="https://img.shields.io/badge/Edge_Add--ons-v7.0.0-blue" alt="Edge Add-ons"></a>
+  <a href="https://microsoftedge.microsoft.com/addons/detail/sliit-courseweb-cleaner/gmlodfhgiopjgamoijjffcmgfenkkkhe"><img src="https://img.shields.io/badge/Edge_Add--ons-v7.1.0-blue" alt="Edge Add-ons"></a>
   <a href="https://addons.mozilla.org/en-US/firefox/addon/sliit-courseweb-cleaner/"><img src="https://img.shields.io/amo/v/sliit-courseweb-cleaner?label=Firefox%20Add-ons&color=orange" alt="Firefox Add-ons"></a>
   <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT">
 </p>
 
-A professional, context-aware browser extension designed to optimize the SLIIT Moodle (Courseweb) interface. It automatically filters out irrelevant modules, assignments, and announcements meant for unassigned campuses or batches, providing a clutter-free learning environment.
+A professional, context-aware browser extension designed to optimize the SLIIT Moodle (Courseweb) interface. It introduces a site-wide high-contrast **Dark Theme**, quick-access **Toolbar Action Popup**, and automatically filters out irrelevant modules, assignments, and announcements meant for unassigned campuses or batches.
+
+🌐 **Official Website:** [sliit-courseweb-cleaner.pages.dev](https://sliit-courseweb-cleaner.pages.dev)
+
+---
 
 ## Download & Install
 
@@ -59,7 +64,7 @@ Select your campus, batch type, and apply any advanced custom keywords. Click **
 <br>
 
 ### Step 4: Re-access Settings & Support
-If you ever need to change your filters, switch to Dark Mode, or contact the developer for support, simply click the floating yellow settings icon anchored to the right side of your Courseweb screen.
+You can toggle Dark Mode and update your profile anytime using the new **Toolbar Action Popup** or the floating yellow settings icon anchored on course pages.
 
 <div align="center">
   <img src="assets/step5-settings-icon.png" width="800" alt="Settings Icon Location">
@@ -71,12 +76,17 @@ If you ever need to change your filters, switch to Dark Mode, or contact the dev
 
 ## Key Features
 
-* **Smart Auto-Detect:** Automatically guesses your campus and batch to get you started instantly.
-* **Custom Keywords:** Total control over what you see using custom comma-separated Whitelists and Blacklists.
-* **Cloud-Synced Rules:** The extension periodically fetches community-sourced filtering rules in the background, ensuring it always stays up-to-date.
-* **UI Themes:** Includes a manual Dark Mode toggle for comfortable night-time browsing.
+* **Dynamic Dark Theme:** Integrated with the open-source Dark Reader engine to provide an eye-friendly, high-contrast dark theme across all Courseweb pages (dashboard `/my/`, course overview `/my/courses.php`, module views, and activities).
+* **Modern Toolbar Action Popup:** Quick-access popup window right in your browser toolbar with rounded corners, live profile syncing, and Dark Mode toggle.
+* **Campus & Batch Filtering:** Clean view showing only your selected campus (Malabe, Metro, Kandy, Kurunegala, Matara, Jaffna) and batch (Weekday / Weekend).
+* **Partner Program Isolation:** Automatically filters out external international degree streams (such as Deakin or Curtin) from local batch dashboards.
+* **Course & Selector Protection:** Filtering is strictly scoped to course module views, preventing any interference with dashboard blocks, course selectors, category dropdowns, or Moodle interactive forms.
+* **Custom Keywords:** Full control with custom comma-separated Whitelists and Blacklists.
+* **Cloud-Synced Rules:** The extension periodically fetches community-sourced filtering rules in the background (`rules.json`).
 * **Double-Lock Defense:** Prevents aggressive filtering before your initial user setup is complete.
 * **Notice Protector:** Ensures critical alerts, rescheduled labs, and general shared materials remain strictly visible regardless of filter settings.
+
+---
 
 ## License
 This project is licensed under the MIT License. See the [`LICENSE`](LICENSE) file for details. Developed and maintained by Dulith Divisekara.

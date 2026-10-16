@@ -13,7 +13,10 @@ Tired of scrolling through endless modules meant for other campuses or batches o
 
 **Key Features:**
 - **Smart Auto-Detect:** Automatically guesses your campus and batch (Weekday/Weekend) to get you started instantly.
+- **Interactive Action Popup:** Click the extension icon in your browser toolbar to view live connection status, switch campuses, adjust Ghost Mode, or trigger night mode on the fly.
+- **Partner Program Filtering:** Cleanly separates international and partner university streams (e.g., Deakin, Curtin) from local campus dashboards.
 - **Custom Keywords (Whitelist & Blacklist):** Total control over what you see. Hide old syllabus materials or pin crucial assignments using custom comma-separated keywords.
+- **Dynamic Dark Theme:** Integrated with the open-source Dark Reader dynamic engine for full high-contrast, eye-friendly dark mode across Courseweb with instant live switching.
 - **Cloud-Synced Configuration:** Configure it once, and your preferences sync automatically across all your signed-in Chrome browsers.
 - **Community-Driven Updates:** The extension periodically fetches community-sourced filtering rules in the background, ensuring it always stays up-to-date even when SLIIT changes their naming conventions.
 - **Ghost Mode:** Optionally fade filtered modules instead of completely hiding them, ensuring you never accidentally miss anything.
@@ -40,6 +43,10 @@ The following permissions are required in `manifest.json`:
 2. **`alarms`**
    - **Reason:** Required to schedule a lightweight, battery-efficient background task that fetches the latest community-driven filtering rules from our public GitHub repository once every 24 hours.
 
+3. **`activeTab`**
+   - **Reason:** Required when the user clicks the toolbar extension icon so the popup interface can verify if the current tab is on SLIIT CourseWeb, show live status, and send real-time filter adjustments to the active tab.
+
 **Host Permissions:**
-1. **`*://courseweb.sliit.lk/course/view.php*`**
-   - **Reason:** Required to inject the content script that visually hides the DOM elements representing irrelevant course modules on the specific SLIIT Courseweb portal.
+1. **`*://courseweb.sliit.lk/*`**
+   - **Reason:** Required to inject the content script for site-wide dark mode and context-aware module cleaning on the SLIIT Courseweb portal.
+

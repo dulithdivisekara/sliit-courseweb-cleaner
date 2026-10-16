@@ -1,0 +1,316 @@
+:root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f4f6f8;
+    --bg-card: #ffffff;
+    --border-color: #e2e8f0;
+    --border-dashed: #cbd5e1;
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-muted: #64748b;
+    --sliit-navy: #0f3b5f;
+    --sliit-navy-dark: #0a2942;
+    --sliit-gold: #f7b924;
+    --sliit-gold-hover: #e5a919;
+    --slider-bg: #cbd5e1;
+    --slider-knob: #ffffff;
+    color-scheme: light;
+}
+
+:root.popup-dark,
+body.popup-dark,
+.popup-dark {
+    --bg-primary: #141517;
+    --bg-secondary: #1c1d20;
+    --bg-card: #1f2124;
+    --border-color: #2e3034;
+    --border-dashed: #36393e;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --sliit-navy: #38bdf8;
+    --sliit-navy-dark: #0284c7;
+    --sliit-gold: #f7b924;
+    --sliit-gold-hover: #e5a919;
+    --slider-bg: #3f444c;
+    --slider-knob: #f8fafc;
+    color-scheme: dark;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width: 320px;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.4;
+    user-select: none;
+    border-radius: 14px;
+    overflow: hidden;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.popup-wrapper {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: var(--bg-primary);
+    border-radius: 14px;
+}
+
+/* Header */
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.popup-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.popup-logo {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.popup-titles h2 {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.popup-version {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--sliit-gold);
+    background: rgba(247, 185, 36, 0.15);
+    padding: 1px 6px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.popup-icon-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 5px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.popup-icon-btn:hover {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--sliit-gold);
+}
+
+/* Controls */
+.popup-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.popup-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 9px 12px;
+}
+
+.popup-toggle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+}
+
+.popup-toggle-row:not(:last-child) {
+    border-bottom: 1px dashed var(--border-dashed);
+    margin-bottom: 5px;
+    padding-bottom: 6px;
+}
+
+.toggle-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.toggle-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.toggle-subtitle {
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+/* Switches */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: var(--slider-bg);
+    transition: .25s ease;
+    border-radius: 20px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: var(--slider-knob);
+    transition: .25s ease;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #0f3b5f;
+}
+
+.popup-dark input:checked + .slider {
+    background-color: var(--sliit-gold);
+}
+
+.popup-dark input:checked + .slider:before {
+    background-color: #111827;
+}
+
+input:checked + .slider:before {
+    transform: translateX(16px);
+}
+
+/* Form inputs */
+.field-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-top: 8px;
+    margin-bottom: 3px;
+}
+
+.field-label:first-child {
+    margin-top: 0;
+}
+
+.popup-select, .popup-input {
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+}
+
+.popup-select option {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+}
+
+.popup-select:focus, .popup-input:focus {
+    border-color: var(--sliit-gold);
+    background-color: var(--bg-primary);
+}
+
+/* Buttons */
+.popup-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
+}
+
+.btn {
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+    background-color: var(--border-color);
+}
+
+.btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Footer */
+.popup-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-size: 10.5px;
+    color: var(--text-muted);
+    padding-top: 8px;
+    border-top: 1px solid var(--border-color);
+}
+
+.popup-footer a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.popup-footer a:hover {
+    color: var(--sliit-gold);
+}
+
+.footer-dot {
+    font-size: 8px;
+}

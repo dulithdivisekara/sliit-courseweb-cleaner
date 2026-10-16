@@ -35,3 +35,8 @@ async function fetchAndSaveRules() {
         console.info('[Courseweb Cleaner] Offline or network error. Using secure local fallback rules.');
     }
 }
+
+// Acknowledge internal extension messages to prevent unhandled port warnings
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    return false;
+});
