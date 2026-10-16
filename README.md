@@ -1,7 +1,7 @@
 # SLIIT Courseweb Module Cleaner
 
 <p align="left">
-  <a href="https://sliit-courseweb-cleaner.pages.dev"><img src="https://img.shields.io/badge/Website-sliit--courseweb--cleaner.pages.dev-f7b924?logo=googlechrome&logoColor=black" alt="Official Website"></a>
+  <a href="https://sliit-courseweb-cleaner-web.pages.dev/"><img src="https://img.shields.io/badge/Website-sliit--courseweb--cleaner--web.pages.dev-f7b924?logo=googlechrome&logoColor=black" alt="Official Website"></a>
   <a href="https://chromewebstore.google.com/detail/sliit-courseweb-cleaner/lnoadlfhebmkhmbfmehdgoffjllgadjm"><img src="https://img.shields.io/chrome-web-store/v/lnoadlfhebmkhmbfmehdgoffjllgadjm?label=Chrome%20Web%20Store&color=blue" alt="Chrome Web Store"></a>
   <a href="https://microsoftedge.microsoft.com/addons/detail/sliit-courseweb-cleaner/gmlodfhgiopjgamoijjffcmgfenkkkhe"><img src="https://img.shields.io/badge/Edge_Add--ons-v7.1.0-blue" alt="Edge Add-ons"></a>
   <a href="https://addons.mozilla.org/en-US/firefox/addon/sliit-courseweb-cleaner/"><img src="https://img.shields.io/amo/v/sliit-courseweb-cleaner?label=Firefox%20Add-ons&color=orange" alt="Firefox Add-ons"></a>
@@ -10,7 +10,7 @@
 
 A professional, context-aware browser extension designed to optimize the SLIIT Moodle (Courseweb) interface. It introduces a site-wide high-contrast **Dark Theme**, quick-access **Toolbar Action Popup**, and automatically filters out irrelevant modules, assignments, and announcements meant for unassigned campuses or batches.
 
-🌐 **Official Website:** [sliit-courseweb-cleaner.pages.dev](https://sliit-courseweb-cleaner.pages.dev)
+🌐 **Official Website:** [sliit-courseweb-cleaner-web.pages.dev](https://sliit-courseweb-cleaner-web.pages.dev/)
 
 ---
 
@@ -77,7 +77,7 @@ You can toggle Dark Mode and update your profile anytime using the new **Toolbar
 ## Key Features
 
 * **Dynamic Dark Theme:** Integrated with the open-source Dark Reader engine to provide an eye-friendly, high-contrast dark theme across all Courseweb pages (dashboard `/my/`, course overview `/my/courses.php`, module views, and activities).
-* **Modern Toolbar Action Popup:** Quick-access popup window right in your browser toolbar with rounded corners, live profile syncing, and Dark Mode toggle.
+* **Modern Toolbar Action Popup:** Quick-access popup window right in your browser toolbar with rounded corners, live profile syncing, "Apply Setup" confirmation, and Dark Mode toggle.
 * **Campus & Batch Filtering:** Clean view showing only your selected campus (Malabe, Metro, Kandy, Kurunegala, Matara, Jaffna) and batch (Weekday / Weekend).
 * **Partner Program Isolation:** Automatically filters out external international degree streams (such as Deakin or Curtin) from local batch dashboards.
 * **Course & Selector Protection:** Filtering is strictly scoped to course module views, preventing any interference with dashboard blocks, course selectors, category dropdowns, or Moodle interactive forms.
@@ -85,6 +85,12 @@ You can toggle Dark Mode and update your profile anytime using the new **Toolbar
 * **Cloud-Synced Rules:** The extension periodically fetches community-sourced filtering rules in the background (`rules.json`).
 * **Double-Lock Defense:** Prevents aggressive filtering before your initial user setup is complete.
 * **Notice Protector:** Ensures critical alerts, rescheduled labs, and general shared materials remain strictly visible regardless of filter settings.
+
+---
+
+## Related Projects & Ecosystem
+
+* **[SLIIT Courseweb MCP Server](https://github.com/kesaruhasun/mcp-sliit-courseweb)** by [@kesaruhasun](https://github.com/kesaruhasun): A Model Context Protocol (MCP) server for SLIIT Courseweb that enables AI assistants (such as Claude, Cursor, and custom agentic workflows) to interact with course materials, notices, and module structures directly.
 
 ---
 

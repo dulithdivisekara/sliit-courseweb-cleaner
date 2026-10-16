@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const groupInput = document.getElementById('pop-group');
 
     const btnOpenModal = document.getElementById('btn-open-modal');
+    const btnSaveApply = document.getElementById('btn-save-apply');
 
     let activeCoursewebTab = null;
     let currentConfig = { ...DEFAULT_CONFIG };
@@ -133,6 +134,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 chrome.tabs.sendMessage(activeCoursewebTab.id, { action: 'openSettingsModal' }).catch(() => {});
                 window.close();
             }
+        });
+    }
+
+    // Apply Setup Action
+    if (btnSaveApply) {
+        btnSaveApply.addEventListener('click', () => {
+            saveSettings(true);
+            const originalHtml = btnSaveApply.innerHTML;
+            btnSaveApply.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Applied!';
+            setTimeout(() => {
+                btnSaveApply.innerHTML = originalHtml;
+            }, 1200);
         });
     }
 });
