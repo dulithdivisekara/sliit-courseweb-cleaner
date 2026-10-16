@@ -116,9 +116,8 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
         let updateThemeUI = null;
 
         function createUIElement(htmlString) {
-            const div = document.createElement('div');
-            div.innerHTML = htmlString.trim();
-            return div.firstChild;
+            const doc = new DOMParser().parseFromString(htmlString.trim(), 'text/html');
+            return doc.body.firstElementChild;
         }
 
         function injectUI() {

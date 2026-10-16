@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const btnOpenModal = document.getElementById('btn-open-modal');
     const btnSaveApply = document.getElementById('btn-save-apply');
+    const btnSaveText = document.getElementById('btn-save-text');
 
     let activeCoursewebTab = null;
     let currentConfig = { ...DEFAULT_CONFIG };
@@ -134,10 +135,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnSaveApply) {
         btnSaveApply.addEventListener('click', () => {
             saveSettings(true);
-            const originalHtml = btnSaveApply.innerHTML;
-            btnSaveApply.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Applied!';
+            if (btnSaveText) btnSaveText.textContent = 'Applied!';
             setTimeout(() => {
-                btnSaveApply.innerHTML = originalHtml;
+                if (btnSaveText) btnSaveText.textContent = 'Apply Setup';
             }, 1200);
         });
     }

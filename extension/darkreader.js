@@ -8795,10 +8795,10 @@
         });
     }
     function tryInvertChromePDF() {
-        if (!document.body || !chrome.dom) {
+        if (!document.body || typeof chrome === 'undefined' || !chrome.dom || typeof chrome.dom['openOrClosedShadowRoot'] !== 'function') {
             return;
         }
-        const root = chrome.dom.openOrClosedShadowRoot(document.body);
+        const root = chrome.dom['openOrClosedShadowRoot'](document.body);
         if (!root || !root.querySelector('link[href$="/pdf_embedder.css"]')) {
             return;
         }
