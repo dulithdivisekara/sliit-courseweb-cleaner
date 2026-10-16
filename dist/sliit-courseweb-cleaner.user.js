@@ -256,7 +256,7 @@ function injectUI() {
                 </div>
             </div>
             <div class="sf-footer">
-                <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner/issues" target="_blank">Documentation</a> | 
+                <a href="https://sliit-courseweb-cleaner-web.pages.dev/" target="_blank">Documentation</a> | 
                 <a href="https://t.me/dulithdivisekara" target="_blank">Contact Dev</a>
             </div>
         </div>

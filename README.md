@@ -10,7 +10,7 @@
 
 A professional, context-aware browser extension designed to optimize the SLIIT Moodle (Courseweb) interface. It introduces a site-wide high-contrast **Dark Theme**, quick-access **Toolbar Action Popup**, and automatically filters out irrelevant modules, assignments, and announcements meant for unassigned campuses or batches.
 
-🌐 **Official Website:** [sliit-courseweb-cleaner-web.pages.dev](https://sliit-courseweb-cleaner-web.pages.dev/)
+🌐 **Official Website & Docs:** [sliit-courseweb-cleaner-web.pages.dev](https://sliit-courseweb-cleaner-web.pages.dev/)
 
 ---
 
@@ -85,6 +85,17 @@ You can toggle Dark Mode and update your profile anytime using the new **Toolbar
 * **Cloud-Synced Rules:** The extension periodically fetches community-sourced filtering rules in the background (`rules.json`).
 * **Double-Lock Defense:** Prevents aggressive filtering before your initial user setup is complete.
 * **Notice Protector:** Ensures critical alerts, rescheduled labs, and general shared materials remain strictly visible regardless of filter settings.
+
+---
+
+## Regional Center Scope & Contributing
+
+> [!NOTE]
+> This extension is primarily developed, tailored, and tested against **SLIIT Malabe Campus (Weekday and Weekend batches)** curriculum patterns and naming structures.
+
+While other centers (**Metro**, **Kandy**, **Kurunegala**, **Matara**, and **Jaffna**) are supported, module naming conventions at regional centers can occasionally vary across faculties.
+
+If you encounter any issues, misidentified links, or unhidden foreign items for your specific center, community contributions are warmly welcomed! Please feel free to open a **Pull Request** with the updated regex patterns in [`rules.json`](rules.json) or [`src/shared-core.js`](src/shared-core.js) — we will gladly review and merge it. Alternatively, open an issue on our [GitHub Issues](https://github.com/dulithdivisekara/sliit-courseweb-cleaner/issues) tracker.
 
 ---
 
