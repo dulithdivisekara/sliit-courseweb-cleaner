@@ -43,6 +43,12 @@ function applyDarkReader(isDark) {
                     color: #f8f9fa !important;
                     border-top-color: #f7b924 !important;
                 }
+                #sliit-filter-modal.sf-side-panel.sf-dark-theme {
+                    background-color: #1e1e1e !important;
+                    color: #f8f9fa !important;
+                    border-left-color: #f7b924 !important;
+                    border-top: none !important;
+                }
                 .sf-dark-theme h3 {
                     color: #f8f9fa !important;
                 }
@@ -222,11 +228,16 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
             const btn = createUIElement(`<button id="sliit-filter-btn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>`);
 
             const settingsModal = createUIElement(`
-                <div class="sf-modal-container" id="sliit-filter-modal">
+                <div class="sf-modal-container sf-side-panel" id="sliit-filter-modal">
                     <h3>Filter Configuration 
-                        <button id="sf-theme-toggle" style="background:none; border:none; cursor:pointer; margin-left:auto; padding:0; display:flex; align-items:center; color:inherit;" title="Toggle Theme">
-                            <svg id="sf-theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
-                        </button>
+                        <div style="display:flex; align-items:center; gap:12px; margin-left:auto;">
+                            <button id="sf-theme-toggle" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center; color:inherit;" title="Toggle Theme">
+                                <svg id="sf-theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+                            </button>
+                            <button id="sf-close-panel" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center; color:inherit;" title="Close Panel">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                        </div>
                     </h3>
                     <div class="sf-toggle-container">
                         <span class="sf-toggle-label">Module Filter <span class="sf-toggle-sub">Enable or disable filtering logic</span></span>
@@ -345,12 +356,42 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
             document.getElementById('sf-whitelist').value = window.CONFIG.customWhitelist || '';
             document.getElementById('sf-blacklist').value = window.CONFIG.customBlacklist || '';
 
-            showSettings = () => { settingsModal.style.display = 'block'; overlay.style.display = 'block'; };
-            const closeModals = () => { settingsModal.style.display = 'none'; welcomeModal.style.display = 'none'; overlay.style.display = 'none'; };
+            const GEAR_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`;
+            const CLOSE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
 
-            btn.onclick = showSettings;
-            document.getElementById('sf-cancel').onclick = closeModals;
-            overlay.onclick = closeModals;
+            const isPanelOpen = () => settingsModal.classList.contains('open');
+
+            const openSidePanel = () => {
+                settingsModal.classList.add('open');
+                overlay.style.display = 'block';
+                btn.classList.add('open');
+                btn.title = 'Close Configuration';
+                btn.innerHTML = CLOSE_SVG;
+            };
+
+            const closeSidePanel = () => {
+                settingsModal.classList.remove('open');
+                overlay.style.display = 'none';
+                welcomeModal.style.display = 'none';
+                btn.classList.remove('open');
+                btn.title = 'Filter Configuration';
+                btn.innerHTML = GEAR_SVG;
+            };
+
+            const toggleSidePanel = () => {
+                if (isPanelOpen()) {
+                    closeSidePanel();
+                } else {
+                    openSidePanel();
+                }
+            };
+
+            showSettings = openSidePanel;
+            btn.onclick = toggleSidePanel;
+            const closeBtn = document.getElementById('sf-close-panel');
+            if (closeBtn) closeBtn.onclick = closeSidePanel;
+            document.getElementById('sf-cancel').onclick = closeSidePanel;
+            overlay.onclick = closeSidePanel;
 
             if (!window.CONFIG.hasSeenWelcome) {
                 welcomeModal.style.display = 'block';
@@ -358,7 +399,7 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
                 document.getElementById('sf-welcome-start').onclick = () => {
                     storageApi.set({ hasSeenWelcome: true }, () => {
                         welcomeModal.style.display = 'none';
-                        showSettings();
+                        openSidePanel();
                     });
                 };
             }
