@@ -5,6 +5,7 @@
 // @description  A professional, context-aware module filter and dark theme for SLIIT Courseweb.
 // @author       Dulith Divisekara
 // @match        *://courseweb.sliit.lk/*
+// @run-at       document-start
 // @updateURL    https://github.com/dulithdivisekara/sliit-courseweb-cleaner/raw/refs/heads/main/dist/sliit-courseweb-cleaner.user.js
 // @downloadURL  https://github.com/dulithdivisekara/sliit-courseweb-cleaner/raw/refs/heads/main/dist/sliit-courseweb-cleaner.user.js
 // @require      https://cdn.jsdelivr.net/npm/darkreader@4.9.133/darkreader.min.js
@@ -152,6 +153,26 @@ function applyDarkReader(isDark) {
     }
 }
 
+function setAntiFlashTheme(isDark) {
+    if (isDark) {
+        if (document.documentElement) {
+            document.documentElement.classList.add('sf-dark-mode-preload');
+            document.documentElement.style.backgroundColor = '#181a1b';
+            document.documentElement.style.colorScheme = 'dark';
+        }
+    } else {
+        if (document.documentElement) {
+            document.documentElement.classList.remove('sf-dark-mode-preload');
+            if (document.documentElement.style.backgroundColor === 'rgb(24, 26, 27)') {
+                document.documentElement.style.backgroundColor = '';
+            }
+            if (document.documentElement.style.colorScheme === 'dark') {
+                document.documentElement.style.colorScheme = '';
+            }
+        }
+    }
+}
+
 window.CONFIG = {
     hasSeenWelcome: GM_getValue('hasSeenWelcome', false),
     darkMode: GM_getValue('darkMode', false),
@@ -166,8 +187,9 @@ window.CONFIG = {
 };
 window.REMOTE_RULES = null;
 
-// Apply dark mode immediately on startup to prevent white flash
+// Apply dark mode immediately at document-start to prevent white flash
 if (window.CONFIG.darkMode) {
+    setAntiFlashTheme(true);
     applyDarkReader(true);
 }
 
@@ -361,6 +383,7 @@ function injectUI() {
     const toggleDarkTheme = (forcedState) => {
         const nextState = typeof forcedState === 'boolean' ? forcedState : !window.CONFIG.darkMode;
         window.CONFIG.darkMode = nextState;
+        setAntiFlashTheme(nextState);
         updateThemeUI(window.CONFIG.darkMode);
         GM_setValue('darkMode', window.CONFIG.darkMode);
     };
@@ -392,6 +415,7 @@ function injectUI() {
 
     document.getElementById('sf-reset').onclick = () => {
         if(confirm('Are you sure you want to reset all configurations to default?')) {
+            setAntiFlashTheme(false);
             applyDarkReader(false);
             GM_deleteValue('hasSeenWelcome');
             GM_deleteValue('darkMode');

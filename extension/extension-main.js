@@ -152,14 +152,53 @@ function applyDarkReader(isDark) {
     }
 }
 
+function setAntiFlashTheme(isDark) {
+    if (isDark) {
+        if (document.documentElement) {
+            document.documentElement.classList.add('sf-dark-mode-preload');
+            document.documentElement.style.backgroundColor = '#181a1b';
+            document.documentElement.style.colorScheme = 'dark';
+        }
+    } else {
+        if (document.documentElement) {
+            document.documentElement.classList.remove('sf-dark-mode-preload');
+            if (document.documentElement.style.backgroundColor === 'rgb(24, 26, 27)') {
+                document.documentElement.style.backgroundColor = '';
+            }
+            if (document.documentElement.style.colorScheme === 'dark') {
+                document.documentElement.style.colorScheme = '';
+            }
+        }
+    }
+}
+
+// 0ms synchronous anti-flash execution at document_start before async storage resolves
+let cachedDarkMode = false;
+try {
+    cachedDarkMode = localStorage.getItem('sf_darkMode') === 'true';
+} catch (e) {}
+
+if (cachedDarkMode) {
+    setAntiFlashTheme(true);
+    applyDarkReader(true);
+}
+
 storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
     chrome.storage.local.get('remoteRules', (localData) => {
         window.CONFIG = syncConfig;
         window.REMOTE_RULES = localData.remoteRules || null;
 
-        // Apply dark mode immediately on startup to prevent white flash
+        // Keep synchronous localStorage in sync for instant future navigations
+        try {
+            localStorage.setItem('sf_darkMode', window.CONFIG.darkMode ? 'true' : 'false');
+        } catch (e) {}
+
         if (window.CONFIG.darkMode) {
+            setAntiFlashTheme(true);
             applyDarkReader(true);
+        } else {
+            setAntiFlashTheme(false);
+            applyDarkReader(false);
         }
 
         function isCourseViewPage() {
@@ -287,6 +326,10 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
             const toggleDarkTheme = (forcedState) => {
                 const nextState = typeof forcedState === 'boolean' ? forcedState : !window.CONFIG.darkMode;
                 window.CONFIG.darkMode = nextState;
+                try {
+                    localStorage.setItem('sf_darkMode', nextState ? 'true' : 'false');
+                } catch (e) {}
+                setAntiFlashTheme(nextState);
                 updateThemeUI(window.CONFIG.darkMode);
                 storageApi.set({ darkMode: window.CONFIG.darkMode });
             };
@@ -319,6 +362,10 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
 
             document.getElementById('sf-reset').onclick = () => {
                 if(confirm('Are you sure you want to reset all configurations to default?')) {
+                    try {
+                        localStorage.removeItem('sf_darkMode');
+                    } catch (e) {}
+                    setAntiFlashTheme(false);
                     applyDarkReader(false);
                     storageApi.clear(() => location.reload());
                 }
@@ -352,6 +399,10 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
                 } else if (request.action === 'configUpdated') {
                     storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
                         window.CONFIG = syncConfig;
+                        try {
+                            localStorage.setItem('sf_darkMode', window.CONFIG.darkMode ? 'true' : 'false');
+                        } catch (e) {}
+                        setAntiFlashTheme(window.CONFIG.darkMode);
                         applyDarkReader(window.CONFIG.darkMode);
                         if (isCourseViewPage()) {
                             if (typeof updateThemeUI === 'function') {

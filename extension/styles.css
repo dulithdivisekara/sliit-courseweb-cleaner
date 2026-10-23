@@ -146,4 +146,14 @@ html[data-darkreader-scheme="dark"] u:has([data-darkreader-inline-bgcolor][style
 html[data-darkreader-scheme="dark"] u:has([style*="background-color: rgb(255, 207, 53)"]),
 html[data-darkreader-scheme="dark"] u:has([style*="background-color: #ffcf35" i]) {
     text-decoration-color: #141517 !important;
-}
+}
+
+/* Anti-white-flash preloader styles for seamless page transitions in dark mode */
+html.sf-dark-mode-preload,
+html.sf-dark-mode-preload body,
+html[data-darkreader-scheme="dark"],
+html[data-darkreader-scheme="dark"] body {
+    background-color: #181a1b !important;
+    color-scheme: dark !important;
+}
+
