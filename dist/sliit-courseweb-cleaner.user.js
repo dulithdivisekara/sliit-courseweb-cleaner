@@ -5,6 +5,7 @@
 // @description  A professional, context-aware module filter and dark theme for SLIIT Courseweb.
 // @author       Dulith Divisekara
 // @match        *://courseweb.sliit.lk/*
+// @run-at       document-start
 // @updateURL    https://github.com/dulithdivisekara/sliit-courseweb-cleaner/raw/refs/heads/main/dist/sliit-courseweb-cleaner.user.js
 // @downloadURL  https://github.com/dulithdivisekara/sliit-courseweb-cleaner/raw/refs/heads/main/dist/sliit-courseweb-cleaner.user.js
 // @require      https://cdn.jsdelivr.net/npm/darkreader@4.9.133/darkreader.min.js
@@ -88,12 +89,90 @@ function applyDarkReader(isDark) {
                 select, option, .dropdown-menu {
                     color-scheme: dark !important;
                 }
+                /* High-contrast yellow highlight for notices & announcements (e.g., red text on yellow highlight) */
+                :is([data-darkreader-inline-bgcolor][style*="255, 207, 53"],
+                    [data-darkreader-inline-bgcolor][style*="ffcf35" i],
+                    [data-darkreader-inline-bgcolor][style*="255, 255, 0"],
+                    [data-darkreader-inline-bgcolor][style*="ffff00" i],
+                    [data-darkreader-inline-bgcolor][style*="yellow" i],
+                    [data-darkreader-inline-bgcolor][style*="--darkreader-background-ffcf35"],
+                    [style*="background-color: rgb(255, 207, 53)"],
+                    [style*="background-color: #ffcf35" i],
+                    [style*="background-color: rgb(255, 255, 0)"],
+                    [style*="background-color: #ffff00" i],
+                    [style*="background-color: yellow" i],
+                    [style*="background: rgb(255, 207, 53)"],
+                    [style*="background: #ffcf35" i],
+                    [style*="background: rgb(255, 255, 0)"],
+                    [style*="background: #ffff00" i]),
+                :is([style*="239, 69, 64"], [style*="ef4540" i], [style*="255, 0, 0"], [style*="red" i]) :is([style*="255, 207, 53"], [style*="ffcf35" i], [style*="255, 255, 0"], [style*="yellow" i]),
+                :is([style*="255, 207, 53"], [style*="ffcf35" i], [style*="255, 255, 0"], [style*="yellow" i]) :is([style*="239, 69, 64"], [style*="ef4540" i], [style*="255, 0, 0"], [style*="red" i]),
+                :is([style*="239, 69, 64"], [style*="ef4540" i], [style*="255, 0, 0"], [style*="red" i]):is([style*="255, 207, 53"], [style*="ffcf35" i], [style*="255, 255, 0"], [style*="yellow" i]) {
+                    background-color: #f7b924 !important;
+                    color: #141517 !important;
+                    padding: 1px 5px !important;
+                    border-radius: 3px !important;
+                    box-decoration-break: clone !important;
+                    -webkit-box-decoration-break: clone !important;
+                    text-decoration-color: #141517 !important;
+                }
+                :is([data-darkreader-inline-bgcolor][style*="255, 207, 53"],
+                    [data-darkreader-inline-bgcolor][style*="ffcf35" i],
+                    [data-darkreader-inline-bgcolor][style*="255, 255, 0"],
+                    [data-darkreader-inline-bgcolor][style*="ffff00" i],
+                    [data-darkreader-inline-bgcolor][style*="yellow" i],
+                    [data-darkreader-inline-bgcolor][style*="--darkreader-background-ffcf35"],
+                    [style*="background-color: rgb(255, 207, 53)"],
+                    [style*="background-color: #ffcf35" i],
+                    [style*="background-color: rgb(255, 255, 0)"],
+                    [style*="background-color: #ffff00" i],
+                    [style*="background-color: yellow" i],
+                    [style*="background: rgb(255, 207, 53)"],
+                    [style*="background: #ffcf35" i],
+                    [style*="background: rgb(255, 255, 0)"],
+                    [style*="background: #ffff00" i]) *,
+                :is([style*="239, 69, 64"], [style*="ef4540" i], [style*="255, 0, 0"], [style*="red" i]) :is([style*="255, 207, 53"], [style*="ffcf35" i], [style*="255, 255, 0"], [style*="yellow" i]) *,
+                :is([style*="255, 207, 53"], [style*="ffcf35" i], [style*="255, 255, 0"], [style*="yellow" i]) :is([style*="239, 69, 64"], [style*="ef4540" i], [style*="255, 0, 0"], [style*="red" i]) *,
+                :is([style*="239, 69, 64"], [style*="ef4540" i], [style*="255, 0, 0"], [style*="red" i]):is([style*="255, 207, 53"], [style*="ffcf35" i], [style*="255, 255, 0"], [style*="yellow" i]) * {
+                    color: #141517 !important;
+                    text-decoration-color: #141517 !important;
+                }
+                u:has([data-darkreader-inline-bgcolor][style*="255, 207, 53"]),
+                u:has([data-darkreader-inline-bgcolor][style*="ffcf35" i]),
+                u:has([data-darkreader-inline-bgcolor][style*="255, 255, 0"]),
+                u:has([style*="background-color: rgb(255, 207, 53)"]),
+                u:has([style*="background-color: #ffcf35" i]) {
+                    text-decoration-color: #141517 !important;
+                }
             `,
             ignoreImageAnalysis: [],
-            ignoreInlineStyle: []
+            ignoreInlineStyle: [],
+            disableStyleSheetsProxy: true,
+            disableCustomElementRegistryProxy: true,
+            disableProxy: true
         });
     } else {
         DarkReader.disable();
+    }
+}
+
+function setAntiFlashTheme(isDark) {
+    if (isDark) {
+        if (document.documentElement) {
+            document.documentElement.classList.add('sf-dark-mode-preload');
+            document.documentElement.style.backgroundColor = '#181a1b';
+            document.documentElement.style.colorScheme = 'dark';
+        }
+    } else {
+        if (document.documentElement) {
+            document.documentElement.classList.remove('sf-dark-mode-preload');
+            if (document.documentElement.style.backgroundColor === 'rgb(24, 26, 27)') {
+                document.documentElement.style.backgroundColor = '';
+            }
+            if (document.documentElement.style.colorScheme === 'dark') {
+                document.documentElement.style.colorScheme = '';
+            }
+        }
     }
 }
 
@@ -111,8 +190,9 @@ window.CONFIG = {
 };
 window.REMOTE_RULES = null;
 
-// Apply dark mode immediately on startup to prevent white flash
+// Apply dark mode immediately at document-start to prevent white flash
 if (window.CONFIG.darkMode) {
+    setAntiFlashTheme(true);
     applyDarkReader(true);
 }
 
@@ -123,41 +203,18 @@ function createUIElement(htmlString) {
 
 function injectUI() {
     GM_addStyle(`
-        #sliit-filter-btn { position: fixed; top: 150px; right: 0; background-color: #f7b924; color: #212529; border: none; border-radius: 6px 0 0 6px; padding: 10px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: -2px 2px 6px rgba(0,0,0,0.15); z-index: 9999; transition: all 0.2s ease-in-out; display: flex; align-items: center; gap: 8px; }
-        #sliit-filter-btn:hover { background-color: #e5a919; padding-right: 14px; }
-        #sliit-filter-btn svg { width: 16px; height: 16px; margin: 0; padding: 0; display: block; }
+        #sliit-filter-btn { position: fixed; bottom: 60px; right: 0; background-color: #f7b924; color: #212529; border: none; border-radius: 9999px 0 0 9999px; padding: 10px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: -3px 3px 12px rgba(0,0,0,0.2); z-index: 10001; transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease; display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; outline: none; }
+        #sliit-filter-btn:hover { background-color: #e5a919; }
+        #sliit-filter-btn.open { right: 360px; box-shadow: -4px 2px 10px rgba(0,0,0,0.15); }
+        #sliit-filter-btn svg { width: 22px; height: 22px; margin: 0; padding: 0; display: block; }
         .sf-modal-container { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ffffff; padding: 24px; border-radius: 8px; border-top: 4px solid #0f3b5f; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 10000; width: 340px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; max-height: 85vh; overflow-y: auto; }
-        .sf-modal-container h3 { margin-top: 0; margin-bottom: 20px; color: #0f3b5f; font-size: 18px; font-weight: 600; border-bottom: 1px solid #dee2e6; padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .sf-toggle-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #dee2e6; }
-        .sf-toggle-label { font-size: 13px; font-weight: 600; color: #212529; }
-        .sf-toggle-sub { font-size: 11px; color: #6c757d; font-weight: normal; display: block; }
-        .sf-switch { position: relative; display: inline-block; width: 40px; height: 22px; }
-        .sf-switch input { opacity: 0; width: 0; height: 0; }
-        .sf-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ced4da; transition: .3s; border-radius: 22px; }
-        .sf-slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
-        input:checked + .sf-slider { background-color: #0f3b5f; }
-        input:checked + .sf-slider:before { transform: translateX(18px); }
-        .sf-input-label { display: block; margin-top: 15px; font-size: 12px; font-weight: 600; color: #495057; }
-        .sf-modal-container select, .sf-modal-container input[type="text"] { width: 100%; padding: 10px 12px; margin-top: 6px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; font-size: 14px; color: #495057; background-color: #f8f9fa; }
-        .sf-modal-container select:focus, .sf-modal-container input[type="text"]:focus { outline: none; border-color: #f7b924; background-color: #fff; }
-        .sliit-modal-actions { margin-top: 25px; display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .sliit-modal-actions-right { display: flex; gap: 10px; }
-        .sliit-btn { padding: 9px 16px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; }
-        .sliit-btn-save { background: #0f3b5f; color: white; }
-        .sliit-btn-save:hover { background: #0a2942; }
-        .sliit-btn-cancel { background: #e9ecef; color: #495057; }
-        .sliit-btn-cancel:hover { background: #dde0e3; }
-        .sliit-btn-github { background: #24292e; color: white; }
-        .sliit-btn-github:hover { background: #1b1f23; }
-        .sliit-btn-reset { background: transparent; color: #dc3545; border: 1px solid #dc3545; padding: 8px 14px; }
-        .sliit-btn-reset:hover { background: #dc3545; color: white; }
-        #sliit-welcome-modal .sliit-modal-actions { display: flex; gap: 12px; justify-content: center; }
-        #sliit-welcome-modal .sliit-btn { flex: 1; padding: 10px 16px; } 
-        .sf-footer { margin-top: 20px; text-align: center; font-size: 12px; color: #6c757d; }
-        .sf-footer a { color: #0f3b5f; text-decoration: none; font-weight: 600; margin: 0 5px; }
-        .sf-footer a:hover { text-decoration: underline; }
-        #sliit-filter-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9998; backdrop-filter: blur(3px); }
-        .sf-welcome-header { text-align: center; margin-bottom: 15px; }
+        #sliit-filter-modal.sf-side-panel { position: fixed; top: 0; right: 0; bottom: 0; left: auto; transform: translateX(100%); background: #ffffff; padding: 24px; border-radius: 16px 0 0 16px; border-top: none; border-left: 4px solid #0f3b5f; box-shadow: -5px 0 35px rgba(0, 0, 0, 0.25); z-index: 10000; width: 360px; max-width: calc(100vw - 50px); height: 100vh; max-height: 100vh; overflow-y: auto; box-sizing: border-box; display: flex; flex-direction: column; visibility: hidden; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s ease; }
+        #sliit-filter-modal.sf-side-panel.open { transform: translateX(0); visibility: visible; }
+        .sf-dark-theme#sliit-filter-modal.sf-side-panel { background: #1e1e1e !important; border-left-color: #f7b924 !important; border-top: none !important; box-shadow: -5px 0 35px rgba(0, 0, 0, 0.5) !important; }
+        @media (max-width: 420px) {
+            #sliit-filter-modal.sf-side-panel { width: 100vw; max-width: 100vw; border-radius: 0; border-left: none; }
+            #sliit-filter-btn.open { right: calc(100vw - 46px); }
+        }
         .sf-welcome-header svg { stroke: #0f3b5f; width: 42px; height: 42px; margin-bottom: 10px; }
         .sf-welcome-header h3 { display: block; border: none; font-size: 18px; margin: 0; padding: 0; justify-content: center; color: #212529; }
         .sf-welcome-text { font-size: 13px; color: #495057; line-height: 1.5; margin-bottom: 15px; text-align: center; }
@@ -203,11 +260,16 @@ function injectUI() {
     const btn = createUIElement(`<button id="sliit-filter-btn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>`);
 
     const settingsModal = createUIElement(`
-        <div class="sf-modal-container" id="sliit-filter-modal">
+        <div class="sf-modal-container sf-side-panel" id="sliit-filter-modal">
             <h3>Filter Configuration 
-                <button id="sf-theme-toggle" style="background:none; border:none; cursor:pointer; margin-left:auto; padding:0; display:flex; align-items:center; color:inherit;" title="Toggle Theme">
-                    <svg id="sf-theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
-                </button>
+                <div style="display:flex; align-items:center; gap:12px; margin-left:auto;">
+                    <button id="sf-theme-toggle" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center; color:inherit;" title="Toggle Theme">
+                        <svg id="sf-theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+                    </button>
+                    <button id="sf-close-panel" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center; color:inherit;" title="Close Panel">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
             </h3>
             <div class="sf-toggle-container">
                 <span class="sf-toggle-label">Module Filter <span class="sf-toggle-sub">Enable or disable filtering logic</span></span>
@@ -306,6 +368,7 @@ function injectUI() {
     const toggleDarkTheme = (forcedState) => {
         const nextState = typeof forcedState === 'boolean' ? forcedState : !window.CONFIG.darkMode;
         window.CONFIG.darkMode = nextState;
+        setAntiFlashTheme(nextState);
         updateThemeUI(window.CONFIG.darkMode);
         GM_setValue('darkMode', window.CONFIG.darkMode);
     };
@@ -318,12 +381,42 @@ function injectUI() {
     document.getElementById('sf-whitelist').value = window.CONFIG.customWhitelist || '';
     document.getElementById('sf-blacklist').value = window.CONFIG.customBlacklist || '';
 
-    const showSettings = () => { settingsModal.style.display = 'block'; overlay.style.display = 'block'; };
-    const closeModals = () => { settingsModal.style.display = 'none'; welcomeModal.style.display = 'none'; overlay.style.display = 'none'; };
+    const GEAR_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`;
+    const CLOSE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
 
-    btn.onclick = showSettings;
-    document.getElementById('sf-cancel').onclick = closeModals;
-    overlay.onclick = closeModals;
+    const isPanelOpen = () => settingsModal.classList.contains('open');
+
+    const openSidePanel = () => {
+        settingsModal.classList.add('open');
+        overlay.style.display = 'block';
+        btn.classList.add('open');
+        btn.title = 'Close Configuration';
+        btn.innerHTML = CLOSE_SVG;
+    };
+
+    const closeSidePanel = () => {
+        settingsModal.classList.remove('open');
+        overlay.style.display = 'none';
+        welcomeModal.style.display = 'none';
+        btn.classList.remove('open');
+        btn.title = 'Filter Configuration';
+        btn.innerHTML = GEAR_SVG;
+    };
+
+    const toggleSidePanel = () => {
+        if (isPanelOpen()) {
+            closeSidePanel();
+        } else {
+            openSidePanel();
+        }
+    };
+
+    showSettings = openSidePanel;
+    btn.onclick = toggleSidePanel;
+    const closeBtn = document.getElementById('sf-close-panel');
+    if (closeBtn) closeBtn.onclick = closeSidePanel;
+    document.getElementById('sf-cancel').onclick = closeSidePanel;
+    overlay.onclick = closeSidePanel;
 
     if (!window.CONFIG.hasSeenWelcome) {
         welcomeModal.style.display = 'block';
@@ -331,12 +424,13 @@ function injectUI() {
         document.getElementById('sf-welcome-start').onclick = () => {
             GM_setValue('hasSeenWelcome', true);
             welcomeModal.style.display = 'none';
-            showSettings();
+            openSidePanel();
         };
     }
 
     document.getElementById('sf-reset').onclick = () => {
         if(confirm('Are you sure you want to reset all configurations to default?')) {
+            setAntiFlashTheme(false);
             applyDarkReader(false);
             GM_deleteValue('hasSeenWelcome');
             GM_deleteValue('darkMode');

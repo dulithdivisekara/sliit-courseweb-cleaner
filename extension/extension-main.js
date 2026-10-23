@@ -43,6 +43,12 @@ function applyDarkReader(isDark) {
                     color: #f8f9fa !important;
                     border-top-color: #f7b924 !important;
                 }
+                #sliit-filter-modal.sf-side-panel.sf-dark-theme {
+                    background-color: #1e1e1e !important;
+                    color: #f8f9fa !important;
+                    border-left-color: #f7b924 !important;
+                    border-top: none !important;
+                }
                 .sf-dark-theme h3 {
                     color: #f8f9fa !important;
                 }
@@ -88,13 +94,102 @@ function applyDarkReader(isDark) {
                 select, option, .dropdown-menu {
                     color-scheme: dark !important;
                 }
+                /* High-contrast yellow highlight for notices & announcements (e.g., red text on yellow highlight) */
+                :is([data-darkreader-inline-bgcolor][style*="255, 207, 53"],
+                    [data-darkreader-inline-bgcolor][style*="ffcf35" i],
+                    [data-darkreader-inline-bgcolor][style*="255, 255, 0"],
+                    [data-darkreader-inline-bgcolor][style*="ffff00" i],
+                    [data-darkreader-inline-bgcolor][style*="yellow" i],
+                    [data-darkreader-inline-bgcolor][style*="--darkreader-background-ffcf35"],
+                    [style*="background-color: rgb(255, 207, 53)"],
+                    [style*="background-color: #ffcf35" i],
+                    [style*="background-color: rgb(255, 255, 0)"],
+                    [style*="background-color: #ffff00" i],
+                    [style*="background-color: yellow" i],
+                    [style*="background: rgb(255, 207, 53)"],
+                    [style*="background: #ffcf35" i],
+                    [style*="background: rgb(255, 255, 0)"],
+                    [style*="background: #ffff00" i]),
+                :is([style*="239, 69, 64"], [style*="ef4540" i], [style*="255, 0, 0"], [style*="red" i]) :is([style*="255, 207, 53"], [style*="ffcf35" i], [style*="255, 255, 0"], [style*="yellow" i]),
+                :is([style*="255, 207, 53"], [style*="ffcf35" i], [style*="255, 255, 0"], [style*="yellow" i]) :is([style*="239, 69, 64"], [style*="ef4540" i], [style*="255, 0, 0"], [style*="red" i]),
+                :is([style*="239, 69, 64"], [style*="ef4540" i], [style*="255, 0, 0"], [style*="red" i]):is([style*="255, 207, 53"], [style*="ffcf35" i], [style*="255, 255, 0"], [style*="yellow" i]) {
+                    background-color: #f7b924 !important;
+                    color: #141517 !important;
+                    padding: 1px 5px !important;
+                    border-radius: 3px !important;
+                    box-decoration-break: clone !important;
+                    -webkit-box-decoration-break: clone !important;
+                    text-decoration-color: #141517 !important;
+                }
+                :is([data-darkreader-inline-bgcolor][style*="255, 207, 53"],
+                    [data-darkreader-inline-bgcolor][style*="ffcf35" i],
+                    [data-darkreader-inline-bgcolor][style*="255, 255, 0"],
+                    [data-darkreader-inline-bgcolor][style*="ffff00" i],
+                    [data-darkreader-inline-bgcolor][style*="yellow" i],
+                    [data-darkreader-inline-bgcolor][style*="--darkreader-background-ffcf35"],
+                    [style*="background-color: rgb(255, 207, 53)"],
+                    [style*="background-color: #ffcf35" i],
+                    [style*="background-color: rgb(255, 255, 0)"],
+                    [style*="background-color: #ffff00" i],
+                    [style*="background-color: yellow" i],
+                    [style*="background: rgb(255, 207, 53)"],
+                    [style*="background: #ffcf35" i],
+                    [style*="background: rgb(255, 255, 0)"],
+                    [style*="background: #ffff00" i]) *,
+                :is([style*="239, 69, 64"], [style*="ef4540" i], [style*="255, 0, 0"], [style*="red" i]) :is([style*="255, 207, 53"], [style*="ffcf35" i], [style*="255, 255, 0"], [style*="yellow" i]) *,
+                :is([style*="255, 207, 53"], [style*="ffcf35" i], [style*="255, 255, 0"], [style*="yellow" i]) :is([style*="239, 69, 64"], [style*="ef4540" i], [style*="255, 0, 0"], [style*="red" i]) *,
+                :is([style*="239, 69, 64"], [style*="ef4540" i], [style*="255, 0, 0"], [style*="red" i]):is([style*="255, 207, 53"], [style*="ffcf35" i], [style*="255, 255, 0"], [style*="yellow" i]) * {
+                    color: #141517 !important;
+                    text-decoration-color: #141517 !important;
+                }
+                u:has([data-darkreader-inline-bgcolor][style*="255, 207, 53"]),
+                u:has([data-darkreader-inline-bgcolor][style*="ffcf35" i]),
+                u:has([data-darkreader-inline-bgcolor][style*="255, 255, 0"]),
+                u:has([style*="background-color: rgb(255, 207, 53)"]),
+                u:has([style*="background-color: #ffcf35" i]) {
+                    text-decoration-color: #141517 !important;
+                }
             `,
             ignoreImageAnalysis: [],
-            ignoreInlineStyle: []
+            ignoreInlineStyle: [],
+            disableStyleSheetsProxy: true,
+            disableCustomElementRegistryProxy: true,
+            disableProxy: true
         });
     } else {
         DarkReader.disable();
     }
+}
+
+function setAntiFlashTheme(isDark) {
+    if (isDark) {
+        if (document.documentElement) {
+            document.documentElement.classList.add('sf-dark-mode-preload');
+            document.documentElement.style.backgroundColor = '#181a1b';
+            document.documentElement.style.colorScheme = 'dark';
+        }
+    } else {
+        if (document.documentElement) {
+            document.documentElement.classList.remove('sf-dark-mode-preload');
+            if (document.documentElement.style.backgroundColor === 'rgb(24, 26, 27)') {
+                document.documentElement.style.backgroundColor = '';
+            }
+            if (document.documentElement.style.colorScheme === 'dark') {
+                document.documentElement.style.colorScheme = '';
+            }
+        }
+    }
+}
+
+// 0ms synchronous anti-flash execution at document_start before async storage resolves
+let cachedDarkMode = false;
+try {
+    cachedDarkMode = localStorage.getItem('sf_darkMode') === 'true';
+} catch (e) {}
+
+if (cachedDarkMode) {
+    setAntiFlashTheme(true);
+    applyDarkReader(true);
 }
 
 storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
@@ -102,9 +197,17 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
         window.CONFIG = syncConfig;
         window.REMOTE_RULES = localData.remoteRules || null;
 
-        // Apply dark mode immediately on startup to prevent white flash
+        // Keep synchronous localStorage in sync for instant future navigations
+        try {
+            localStorage.setItem('sf_darkMode', window.CONFIG.darkMode ? 'true' : 'false');
+        } catch (e) {}
+
         if (window.CONFIG.darkMode) {
+            setAntiFlashTheme(true);
             applyDarkReader(true);
+        } else {
+            setAntiFlashTheme(false);
+            applyDarkReader(false);
         }
 
         function isCourseViewPage() {
@@ -125,11 +228,16 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
             const btn = createUIElement(`<button id="sliit-filter-btn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>`);
 
             const settingsModal = createUIElement(`
-                <div class="sf-modal-container" id="sliit-filter-modal">
+                <div class="sf-modal-container sf-side-panel" id="sliit-filter-modal">
                     <h3>Filter Configuration 
-                        <button id="sf-theme-toggle" style="background:none; border:none; cursor:pointer; margin-left:auto; padding:0; display:flex; align-items:center; color:inherit;" title="Toggle Theme">
-                            <svg id="sf-theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
-                        </button>
+                        <div style="display:flex; align-items:center; gap:12px; margin-left:auto;">
+                            <button id="sf-theme-toggle" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center; color:inherit;" title="Toggle Theme">
+                                <svg id="sf-theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+                            </button>
+                            <button id="sf-close-panel" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center; color:inherit;" title="Close Panel">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                        </div>
                     </h3>
                     <div class="sf-toggle-container">
                         <span class="sf-toggle-label">Module Filter <span class="sf-toggle-sub">Enable or disable filtering logic</span></span>
@@ -232,6 +340,10 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
             const toggleDarkTheme = (forcedState) => {
                 const nextState = typeof forcedState === 'boolean' ? forcedState : !window.CONFIG.darkMode;
                 window.CONFIG.darkMode = nextState;
+                try {
+                    localStorage.setItem('sf_darkMode', nextState ? 'true' : 'false');
+                } catch (e) {}
+                setAntiFlashTheme(nextState);
                 updateThemeUI(window.CONFIG.darkMode);
                 storageApi.set({ darkMode: window.CONFIG.darkMode });
             };
@@ -244,12 +356,42 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
             document.getElementById('sf-whitelist').value = window.CONFIG.customWhitelist || '';
             document.getElementById('sf-blacklist').value = window.CONFIG.customBlacklist || '';
 
-            showSettings = () => { settingsModal.style.display = 'block'; overlay.style.display = 'block'; };
-            const closeModals = () => { settingsModal.style.display = 'none'; welcomeModal.style.display = 'none'; overlay.style.display = 'none'; };
+            const GEAR_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`;
+            const CLOSE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
 
-            btn.onclick = showSettings;
-            document.getElementById('sf-cancel').onclick = closeModals;
-            overlay.onclick = closeModals;
+            const isPanelOpen = () => settingsModal.classList.contains('open');
+
+            const openSidePanel = () => {
+                settingsModal.classList.add('open');
+                overlay.style.display = 'block';
+                btn.classList.add('open');
+                btn.title = 'Close Configuration';
+                btn.innerHTML = CLOSE_SVG;
+            };
+
+            const closeSidePanel = () => {
+                settingsModal.classList.remove('open');
+                overlay.style.display = 'none';
+                welcomeModal.style.display = 'none';
+                btn.classList.remove('open');
+                btn.title = 'Filter Configuration';
+                btn.innerHTML = GEAR_SVG;
+            };
+
+            const toggleSidePanel = () => {
+                if (isPanelOpen()) {
+                    closeSidePanel();
+                } else {
+                    openSidePanel();
+                }
+            };
+
+            showSettings = openSidePanel;
+            btn.onclick = toggleSidePanel;
+            const closeBtn = document.getElementById('sf-close-panel');
+            if (closeBtn) closeBtn.onclick = closeSidePanel;
+            document.getElementById('sf-cancel').onclick = closeSidePanel;
+            overlay.onclick = closeSidePanel;
 
             if (!window.CONFIG.hasSeenWelcome) {
                 welcomeModal.style.display = 'block';
@@ -257,13 +399,17 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
                 document.getElementById('sf-welcome-start').onclick = () => {
                     storageApi.set({ hasSeenWelcome: true }, () => {
                         welcomeModal.style.display = 'none';
-                        showSettings();
+                        openSidePanel();
                     });
                 };
             }
 
             document.getElementById('sf-reset').onclick = () => {
                 if(confirm('Are you sure you want to reset all configurations to default?')) {
+                    try {
+                        localStorage.removeItem('sf_darkMode');
+                    } catch (e) {}
+                    setAntiFlashTheme(false);
                     applyDarkReader(false);
                     storageApi.clear(() => location.reload());
                 }
@@ -297,6 +443,10 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
                 } else if (request.action === 'configUpdated') {
                     storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
                         window.CONFIG = syncConfig;
+                        try {
+                            localStorage.setItem('sf_darkMode', window.CONFIG.darkMode ? 'true' : 'false');
+                        } catch (e) {}
+                        setAntiFlashTheme(window.CONFIG.darkMode);
                         applyDarkReader(window.CONFIG.darkMode);
                         if (isCourseViewPage()) {
                             if (typeof updateThemeUI === 'function') {
