@@ -88,6 +88,61 @@ function applyDarkReader(isDark) {
                 select, option, .dropdown-menu {
                     color-scheme: dark !important;
                 }
+                /* High-contrast yellow highlight for notices & announcements (e.g., red text on yellow highlight) */
+                :is([data-darkreader-inline-bgcolor][style*="255, 207, 53"],
+                    [data-darkreader-inline-bgcolor][style*="ffcf35" i],
+                    [data-darkreader-inline-bgcolor][style*="255, 255, 0"],
+                    [data-darkreader-inline-bgcolor][style*="ffff00" i],
+                    [data-darkreader-inline-bgcolor][style*="yellow" i],
+                    [data-darkreader-inline-bgcolor][style*="--darkreader-background-ffcf35"],
+                    [style*="background-color: rgb(255, 207, 53)"],
+                    [style*="background-color: #ffcf35" i],
+                    [style*="background-color: rgb(255, 255, 0)"],
+                    [style*="background-color: #ffff00" i],
+                    [style*="background-color: yellow" i],
+                    [style*="background: rgb(255, 207, 53)"],
+                    [style*="background: #ffcf35" i],
+                    [style*="background: rgb(255, 255, 0)"],
+                    [style*="background: #ffff00" i]),
+                :is([style*="239, 69, 64"], [style*="ef4540" i], [style*="255, 0, 0"], [style*="red" i]) :is([style*="255, 207, 53"], [style*="ffcf35" i], [style*="255, 255, 0"], [style*="yellow" i]),
+                :is([style*="255, 207, 53"], [style*="ffcf35" i], [style*="255, 255, 0"], [style*="yellow" i]) :is([style*="239, 69, 64"], [style*="ef4540" i], [style*="255, 0, 0"], [style*="red" i]),
+                :is([style*="239, 69, 64"], [style*="ef4540" i], [style*="255, 0, 0"], [style*="red" i]):is([style*="255, 207, 53"], [style*="ffcf35" i], [style*="255, 255, 0"], [style*="yellow" i]) {
+                    background-color: #f7b924 !important;
+                    color: #141517 !important;
+                    padding: 1px 5px !important;
+                    border-radius: 3px !important;
+                    box-decoration-break: clone !important;
+                    -webkit-box-decoration-break: clone !important;
+                    text-decoration-color: #141517 !important;
+                }
+                :is([data-darkreader-inline-bgcolor][style*="255, 207, 53"],
+                    [data-darkreader-inline-bgcolor][style*="ffcf35" i],
+                    [data-darkreader-inline-bgcolor][style*="255, 255, 0"],
+                    [data-darkreader-inline-bgcolor][style*="ffff00" i],
+                    [data-darkreader-inline-bgcolor][style*="yellow" i],
+                    [data-darkreader-inline-bgcolor][style*="--darkreader-background-ffcf35"],
+                    [style*="background-color: rgb(255, 207, 53)"],
+                    [style*="background-color: #ffcf35" i],
+                    [style*="background-color: rgb(255, 255, 0)"],
+                    [style*="background-color: #ffff00" i],
+                    [style*="background-color: yellow" i],
+                    [style*="background: rgb(255, 207, 53)"],
+                    [style*="background: #ffcf35" i],
+                    [style*="background: rgb(255, 255, 0)"],
+                    [style*="background: #ffff00" i]) *,
+                :is([style*="239, 69, 64"], [style*="ef4540" i], [style*="255, 0, 0"], [style*="red" i]) :is([style*="255, 207, 53"], [style*="ffcf35" i], [style*="255, 255, 0"], [style*="yellow" i]) *,
+                :is([style*="255, 207, 53"], [style*="ffcf35" i], [style*="255, 255, 0"], [style*="yellow" i]) :is([style*="239, 69, 64"], [style*="ef4540" i], [style*="255, 0, 0"], [style*="red" i]) *,
+                :is([style*="239, 69, 64"], [style*="ef4540" i], [style*="255, 0, 0"], [style*="red" i]):is([style*="255, 207, 53"], [style*="ffcf35" i], [style*="255, 255, 0"], [style*="yellow" i]) * {
+                    color: #141517 !important;
+                    text-decoration-color: #141517 !important;
+                }
+                u:has([data-darkreader-inline-bgcolor][style*="255, 207, 53"]),
+                u:has([data-darkreader-inline-bgcolor][style*="ffcf35" i]),
+                u:has([data-darkreader-inline-bgcolor][style*="255, 255, 0"]),
+                u:has([style*="background-color: rgb(255, 207, 53)"]),
+                u:has([style*="background-color: #ffcf35" i]) {
+                    text-decoration-color: #141517 !important;
+                }
             `,
             ignoreImageAnalysis: [],
             ignoreInlineStyle: []
