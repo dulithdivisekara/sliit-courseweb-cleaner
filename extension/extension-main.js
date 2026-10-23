@@ -145,7 +145,10 @@ function applyDarkReader(isDark) {
                 }
             `,
             ignoreImageAnalysis: [],
-            ignoreInlineStyle: []
+            ignoreInlineStyle: [],
+            disableStyleSheetsProxy: true,
+            disableCustomElementRegistryProxy: true,
+            disableProxy: true
         });
     } else {
         DarkReader.disable();
