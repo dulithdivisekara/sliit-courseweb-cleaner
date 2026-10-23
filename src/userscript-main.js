@@ -203,7 +203,7 @@ function createUIElement(htmlString) {
 
 function injectUI() {
     GM_addStyle(`
-        #sliit-filter-btn { position: fixed; top: 150px; right: 0; background-color: #f7b924; color: #212529; border: none; border-radius: 6px 0 0 6px; padding: 10px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: -2px 2px 6px rgba(0,0,0,0.15); z-index: 9999; transition: all 0.2s ease-in-out; display: flex; align-items: center; gap: 8px; }
+        #sliit-filter-btn { position: fixed; bottom: 60px; right: 0; background-color: #f7b924; color: #212529; border: none; border-radius: 9999px 0 0 9999px; padding: 10px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: -2px 2px 6px rgba(0,0,0,0.15); z-index: 9999; transition: all 0.2s ease-in-out; display: flex; align-items: center; gap: 8px; }
         #sliit-filter-btn:hover { background-color: #e5a919; padding-right: 14px; }
         #sliit-filter-btn svg { width: 16px; height: 16px; margin: 0; padding: 0; display: block; }
         .sf-modal-container { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ffffff; padding: 24px; border-radius: 8px; border-top: 4px solid #0f3b5f; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 10000; width: 340px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; max-height: 85vh; overflow-y: auto; }
@@ -238,6 +238,30 @@ function injectUI() {
         .sf-footer a:hover { text-decoration: underline; }
         #sliit-filter-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9998; backdrop-filter: blur(3px); }
         .sf-welcome-header { text-align: center; margin-bottom: 15px; }
+    .sf-side-panel {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 340px;
+        max-height: 100vh;
+        transform: none;
+        border-top: none;
+        border-left: 4px solid #f7b924;
+        border-radius: 0;
+        display: none;
+        background: #ffffff;
+        padding: 24px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        z-index: 10000;
+    }
+    .sf-side-panel.open { display: block; }
+    .sf-side-panel.sf-dark-theme {
+        background-color: #1e1e1e !important;
+        color: #f8f9fa !important;
+        border-left-color: #f7b924 !important;
+        border-top: none !important;
+    }
         .sf-welcome-header svg { stroke: #0f3b5f; width: 42px; height: 42px; margin-bottom: 10px; }
         .sf-welcome-header h3 { display: block; border: none; font-size: 18px; margin: 0; padding: 0; justify-content: center; color: #212529; }
         .sf-welcome-text { font-size: 13px; color: #495057; line-height: 1.5; margin-bottom: 15px; text-align: center; }
