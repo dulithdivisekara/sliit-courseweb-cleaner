@@ -90,3 +90,11 @@ npm test
 
 ## 🤝 Code of Conduct
 Please be respectful, collaborative, and helpful to fellow students and contributors.
+
+---
+
+## 🌟 Contributors
+Huge thanks to all community members who help make SLIIT Courseweb Cleaner better for every student:
+* [@kavinduUdhara](https://github.com/kavinduUdhara) - UI/UX improvements, anti-flash preloader, side-panel drawer, and notice contrast enhancements (#3).
+* [@kesaruhasun](https://github.com/kesaruhasun) - Author of the SLIIT Courseweb MCP Server ecosystem integration.
+* [@dulithdivisekara](https://github.com/dulithdivisekara) - Project creator and maintainer.

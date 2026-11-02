@@ -41,7 +41,17 @@ This document tracks completed milestones and outlines the planned features and 
 
 ---
 
-## 🚀 Phase 5: Ecosystem & Future Enhancements (In Progress / Planned)
+## ✅ Phase 5: UI/UX Refinement & Anti-Flash Engine (Completed - v7.2.0)
+- [x] **Zero-Latency Anti-Flash Preloader:** Upgraded content scripts to run at `document_start` with synchronous `localStorage` theme state caching, eradicating white flashes on navigation (closes #2).
+- [x] **High-Contrast Notice Highlights:** Custom color styling for yellow alert containers ensuring red text and critical notices maintain crisp contrast in dark mode.
+- [x] **Side-Panel Drawer UI:** Re-architected in-page modal into a smooth right-aligned slide-in drawer with backdrop controls.
+- [x] **Ergonomic Trigger Placement:** Re-anchored floating trigger button to bottom-right (`bottom: 60px; right: 0`), preventing overlap with CourseWeb's block drawer.
+- [x] **CourseWeb Logo Screen Blending:** Clean logo inversion with `mix-blend-mode: screen` under dark theme.
+- [x] **CSP Compliance:** DarkReader inline proxy script guard to adhere to CourseWeb Content Security Policy.
+
+---
+
+## 🚀 Phase 6: Ecosystem & Future Enhancements (Planned)
 
 ### v7.2.0 (Upcoming)
 - [ ] **One-Click Pattern Reporter:** In-modal quick button allowing students to submit newly changed Moodle module titles directly to GitHub Issues for fast community rule updates.

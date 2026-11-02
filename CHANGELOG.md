@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [7.2.0] - 2026-11-02
+
+### Added
+- **Zero-Latency Anti-Flash Preloader:** Upgraded content scripts to execute at `document_start` with synchronous `localStorage` caching (`setAntiFlashTheme`), eliminating white flash-of-unstyled-content (FOUC) during page transitions in dark mode (contributed by [@kavinduUdhara](https://github.com/kavinduUdhara) in [#3](https://github.com/dulithdivisekara/sliit-courseweb-cleaner/pull/3), resolving [#2](https://github.com/dulithdivisekara/sliit-courseweb-cleaner/issues/2)).
+- **Interactive Side-Panel Drawer UI:** Transformed in-page configuration from a center modal into an animated slide-in drawer anchored to the right viewport, featuring dedicated close controls and backdrop dismissal.
+- **CourseWeb Logo Screen Blending:** Configured DarkReader image filter overrides to invert the SLIIT CourseWeb header logo with `mix-blend-mode: screen`, ensuring clean presentation against dark headers.
+
+### Changed
+- **Ergonomic Trigger Relocation:** Re-anchored the floating settings trigger button to `bottom: 60px; right: 0` (immediately above Moodle's native back-to-top button) with a pill-shaped border radius, permanently resolving overlay collisions with the right-hand Moodle block drawer.
+- **Enhanced Dark Theme Notice Contrast:** Added explicit high-contrast overrides (`#f7b924` background with `#141517` foreground) for yellow-highlighted notice containers, guaranteeing full readability for red text and urgent announcements under dark theme.
+- **CourseWeb CSP Compliance:** Added guard routines in DarkReader bundle to disable inline proxy script injection, preventing Content Security Policy violations on CourseWeb domains.
+
+---
+
 ## [7.1.0] - 2026-10-16
 
 ### Added

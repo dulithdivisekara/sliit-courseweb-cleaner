@@ -1,6 +1,6 @@
 {
   "name": "sliit-courseweb-cleaner",
-  "version": "7.1.0",
+  "version": "7.2.0",
   "description": "A professional, context-aware module filter and dark theme for SLIIT Courseweb.",
   "scripts": {
     "build": "./build.sh",

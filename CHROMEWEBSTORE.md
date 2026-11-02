@@ -25,7 +25,7 @@ Tired of scrolling through endless modules, assignments, and announcements meant
 
 The SLIIT Courseweb Cleaner automatically filters out the clutter, providing a clean, personalized, and distraction-free dashboard tailored specifically to your campus and batch.
 
-🚀 KEY FEATURES (v7.1.0):
+🚀 KEY FEATURES (v7.2.0):
 
 • Smart Auto-Detect & Filtering:
 Instantly filters course content to match your campus (Malabe, Metro, Kandy, Kurunegala, Matara, Jaffna) and your batch (Weekday or Weekend).

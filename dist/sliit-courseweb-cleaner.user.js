@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLIIT Courseweb Module Cleaner
 // @namespace    http://tampermonkey.net/
-// @version      7.1.0
+// @version      7.2.0
 // @description  A professional, context-aware module filter and dark theme for SLIIT Courseweb.
 // @author       Dulith Divisekara
 // @match        *://courseweb.sliit.lk/*
@@ -339,7 +339,7 @@ function injectUI() {
             <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner is now active. This utility seamlessly optimizes your Moodle dashboard by filtering out unassigned contexts and centers.</p>
             <div class="sf-welcome-credit">
                 <strong>Release Information</strong><br>
-                Version: 7.1.0<br>
+                Version: 7.2.0<br>
                 Maintainer: Dulith Divisekara<br>
                 License: Open Source (MIT)
             </div>

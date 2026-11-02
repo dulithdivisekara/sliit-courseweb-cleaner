@@ -305,7 +305,7 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
                     <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner is now active. This utility seamlessly optimizes your Moodle dashboard by filtering out unassigned contexts and centers.</p>
                     <div class="sf-welcome-credit">
                         <strong>Release Information</strong><br>
-                        Version: 7.1.0<br>
+                        Version: 7.2.0<br>
                         Maintainer: Dulith Divisekara<br>
                         License: Open Source (MIT)
                     </div>
