@@ -39,7 +39,7 @@ SLIIT Courseweb Cleaner addresses information density and visual clutter across 
 
 Operating directly within the browser document model, the extension evaluates activity blocks, section titles, and nested course labels against the student's designated profile and background-synchronized community heuristics (`rules.json`). Non-matching items are either hidden or gracefully dimmed in Ghost Mode.
 
-To prevent interface fatigue, the extension incorporates a customized Dark Reader engine configured specifically for Moodle UI tokens, alongside a modern toolbar action popup that enables rapid profile switching and configuration without disrupting active academic sessions.
+To prevent interface fatigue, the extension incorporates a customized Dark Reader engine configured specifically for Moodle UI tokens, alongside a zero-latency anti-flash preloader that eradicates white flashes during page transitions. Settings are managed through a modern toolbar action popup or an ergonomic, slide-in side panel drawer anchored above the Moodle page-top button, enabling rapid profile switching without disrupting active academic sessions.
 
 ---
 
@@ -104,7 +104,7 @@ Select your campus center (Malabe, Metro, Kandy, Kurunegala, Matara, or Jaffna) 
 </p>
 
 ### 4. Adjust Settings Anytime
-You can update your campus profile, toggle Ghost Mode, or switch Dark Theme on and off anytime using the browser **Toolbar Action Popup** or the floating yellow settings icon anchored on course pages.
+You can update your campus profile, toggle Ghost Mode, or switch Dark Theme on and off anytime using the browser **Toolbar Action Popup** or the floating yellow settings trigger anchored at the bottom-right of course pages. Clicking the trigger smoothly slides out the configuration side panel.
 
 <p align="center">
   <img src="assets/step5-settings-icon.png" width="800" alt="Floating Settings Icon and Toolbar Popup" />
@@ -123,7 +123,7 @@ The system compiles from a shared modular core into three distinct deployment ta
 | **State Persistence** | `chrome.storage.sync` with local fallback | `browser.storage.sync` / `chrome.storage.sync` | `GM_setValue` / `GM_getValue` |
 | **Rule Synchronization** | Background `chrome.alarms` (24-hour cycle) | Background periodic fetch | Manual / automatic script update via `@updateURL` |
 | **Dark Theme Strategy** | Bundled local `darkreader.js` | Bundled local `darkreader.js` | CDN require (`@require darkreader.min.js`) |
-| **UI Components** | Toolbar Popup + Floating Course Modal | Toolbar Popup + Floating Course Modal | Floating Course Modal |
+| **UI Components** | Toolbar Popup + Slide-Panel Drawer | Toolbar Popup + Slide-Panel Drawer | Slide-Panel Drawer |
 | **Distribution Channel** | Chrome Web Store / Edge Add-ons | Mozilla Firefox Add-ons (AMO) | GitHub Raw JS Distribution |
 
 ```mermaid
@@ -266,7 +266,13 @@ For environments utilizing Tampermonkey or Violentmonkey:
 | :--- | :--- |
 | **Double-Lock Defense** | Suppresses filtering routines until user setup is confirmed, preventing false-positive content removal during initial enrollment. |
 | **Notice Protector** | Scans activity text against protected tokens (`notice`, `rescheduled`, `announcement`, `general`). Crucial alerts remain visible regardless of filtering state. |
+| **Notice Contrast Correction** | Applies high-contrast overrides (`#f7b924` background with `#141517` dark text) to yellow alert containers, guaranteeing full readability for red text and urgent announcements under dark theme. |
+| **Anti-Flash Preloader** | Runs at `document_start` with synchronous `localStorage` theme state caching (`setAntiFlashTheme`), applying dark canvas background at 0ms before DOM rendering to eliminate white flashes on navigation. |
+| **Side-Panel Drawer UI** | Replaces static modals with a smooth right-aligned slide-out drawer (`sf-side-panel`) with backdrop blur, keyboard dismissal, and responsive mobile adaptations. |
+| **Ergonomic Trigger Anchor** | Anchors floating trigger to `bottom: 60px; right: 0` directly above Moodle's native back-to-top button, completely eliminating overlap with the collapsible block drawer. |
+| **Header Logo Screen Blending** | Applies image filtering with `mix-blend-mode: screen` on the CourseWeb header crest, preventing dark mode background clash. |
 | **Moodle UI Safeguard** | Explicitly excludes form elements, `.groupselector`, `.singleselect`, dropdowns, navigation drawers, and course category pickers from DOM filtering. |
+| **CourseWeb CSP Compliance** | Suppresses DarkReader inline stylesheet proxy script injection to comply strictly with CourseWeb Content Security Policies. |
 | **Custom Filter Overrides** | Allows comma-separated keyword declarations for high-priority inclusion (Whitelist) or forced suppression (Blacklist). |
 | **Dark Theme Engine** | Applies real-time CSS theme injection via Dark Reader with high-contrast rules preserving native brand buttons, form inputs, and modals. |
 

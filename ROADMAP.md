@@ -53,7 +53,8 @@ This document tracks completed milestones and outlines the planned features and 
 
 ## 🚀 Phase 6: Ecosystem & Future Enhancements (Planned)
 
-### v7.2.0 (Upcoming)
+### v7.3.0 (Upcoming)
+- [ ] **Temporary Submission Link Filter:** Quick toggle button to temporarily hide assignment submission dropboxes while searching for lecture notes and documents on course pages ([#4](https://github.com/dulithdivisekara/sliit-courseweb-cleaner/issues/4)).
 - [ ] **One-Click Pattern Reporter:** In-modal quick button allowing students to submit newly changed Moodle module titles directly to GitHub Issues for fast community rule updates.
 - [ ] **Regional Campus Presets:** Faculty-specific keyword presets for Metro, Kandy, Kurunegala, Matara, and Jaffna centers.
 - [ ] **Mobile Browser Optimization:** Polished UI testing for Firefox Android and Kiwi Browser users on mobile devices.
