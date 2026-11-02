@@ -19,6 +19,7 @@
 
 <p align="center">
   <a href="#overview">Overview</a> &bull;
+  <a href="#download--install">Download</a> &bull;
   <a href="#quick-start-guide">Quick Start</a> &bull;
   <a href="#architecture">Architecture</a> &bull;
   <a href="#project-structure">Structure</a> &bull;
@@ -39,6 +40,35 @@ SLIIT Courseweb Cleaner addresses information density and visual clutter across 
 Operating directly within the browser document model, the extension evaluates activity blocks, section titles, and nested course labels against the student's designated profile and background-synchronized community heuristics (`rules.json`). Non-matching items are either hidden or gracefully dimmed in Ghost Mode.
 
 To prevent interface fatigue, the extension incorporates a customized Dark Reader engine configured specifically for Moodle UI tokens, alongside a modern toolbar action popup that enables rapid profile switching and configuration without disrupting active academic sessions.
+
+---
+
+## Download & Install
+
+Official 1-click store links for supported desktop web browsers:
+
+<p align="center">
+  <a href="https://chromewebstore.google.com/detail/sliit-courseweb-cleaner/lnoadlfhebmkhmbfmehdgoffjllgadjm" target="_blank" rel="noopener noreferrer">
+    <img src="assets/badge-chrome.png" height="52" alt="Available in the Chrome Web Store" />
+  </a>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <a href="https://microsoftedge.microsoft.com/addons/detail/sliit-courseweb-cleaner/gmlodfhgiopjgamoijjffcmgfenkkkhe" target="_blank" rel="noopener noreferrer">
+    <img src="assets/badge-edge.png" height="52" alt="Get it from Microsoft Edge" />
+  </a>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <a href="https://addons.mozilla.org/en-US/firefox/addon/sliit-courseweb-cleaner/" target="_blank" rel="noopener noreferrer">
+    <img src="assets/badge-firefox.png" height="52" alt="Get the Add-on for Firefox" />
+  </a>
+</p>
+
+| Browser | Supported Platforms | Official Store Listing | Direct Action |
+| :--- | :--- | :--- | :--- |
+| **Google Chrome** | Chrome, Brave, Opera, Vivaldi | Chrome Web Store | [Add to Chrome](https://chromewebstore.google.com/detail/sliit-courseweb-cleaner/lnoadlfhebmkhmbfmehdgoffjllgadjm) |
+| **Microsoft Edge** | Edge, Chromium on Windows / macOS / Linux | Microsoft Edge Add-ons | [Get for Edge](https://microsoftedge.microsoft.com/addons/detail/sliit-courseweb-cleaner/gmlodfhgiopjgamoijjffcmgfenkkkhe) |
+| **Mozilla Firefox** | Firefox, Waterfox, LibreWolf, Floorp | Firefox Browser Add-ons (AMO) | [Add to Firefox](https://addons.mozilla.org/en-US/firefox/addon/sliit-courseweb-cleaner/) |
+
+> [!TIP]
+> Prefer using Tampermonkey or Violentmonkey? You can install the compiled script directly via our [Userscript Installation Guide](USERSCRIPT_INSTALL.md).
 
 ---
 
@@ -141,6 +171,9 @@ graph TD
 .
 ├── assets/                  # Brand marks, high-resolution logos, and documentation assets
 │   ├── logo.png             # Official 512x512 transparent brand mark
+│   ├── badge-chrome.png     # Official Chrome Web Store store badge
+│   ├── badge-edge.png       # Official Microsoft Edge Add-ons store badge
+│   ├── badge-firefox.png    # Official Firefox Add-ons store badge
 │   └── *.png                # Setup workflow captures and store previews
 ├── dist/                    # Compiled distribution artifacts
 │   ├── sliit-courseweb-cleaner-extension.zip # Chrome & Edge deployment package
