@@ -1,2 +1,21 @@
 .idea/
 dist/*.zip
+
+# Dependency and build caches
+node_modules/
+npm-debug.log*
+
+# Sensitive credentials and local environment configs
+.env
+.env.*
+cookies.json
+*.pem
+*.key
+
+# Runtime and audit logs
+*.log
+logs/
+
+# Operating system and editor artifacts
+.DS_Store
+Thumbs.db
