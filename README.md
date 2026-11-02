@@ -19,6 +19,7 @@
 
 <p align="center">
   <a href="#overview">Overview</a> &bull;
+  <a href="#quick-start-guide">Quick Start</a> &bull;
   <a href="#architecture">Architecture</a> &bull;
   <a href="#project-structure">Structure</a> &bull;
   <a href="#installation">Installation</a> &bull;
@@ -38,6 +39,46 @@ SLIIT Courseweb Cleaner addresses information density and visual clutter across 
 Operating directly within the browser document model, the extension evaluates activity blocks, section titles, and nested course labels against the student's designated profile and background-synchronized community heuristics (`rules.json`). Non-matching items are either hidden or gracefully dimmed in Ghost Mode.
 
 To prevent interface fatigue, the extension incorporates a customized Dark Reader engine configured specifically for Moodle UI tokens, alongside a modern toolbar action popup that enables rapid profile switching and configuration without disrupting active academic sessions.
+
+---
+
+## Quick Start Guide
+
+A visual step-by-step guide to installing and configuring the extension in Google Chrome, Microsoft Edge, and Brave.
+
+### 1. Add to Browser
+Navigate to the [Chrome Web Store](https://chromewebstore.google.com/detail/sliit-courseweb-cleaner/lnoadlfhebmkhmbfmehdgoffjllgadjm) (or [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/sliit-courseweb-cleaner/gmlodfhgiopjgamoijjffcmgfenkkkhe)) and click the **Add to Chrome** (or **Get**) button.
+
+<p align="center">
+  <img src="assets/step1-install.png" width="800" alt="Install Extension from Web Store" />
+</p>
+
+When prompted by the browser permissions dialog, click **Add extension** to complete the installation.
+
+<p align="center">
+  <img src="assets/step2-permission.png" width="650" alt="Confirm Browser Permission Prompt" />
+</p>
+
+### 2. Initialize on Courseweb
+Navigate to any course module page on [SLIIT Courseweb](https://courseweb.sliit.lk/). The setup dialog will display automatically on your first visit. Click **Configure Setup** to begin.
+
+<p align="center">
+  <img src="assets/step3-configure.png" width="700" alt="Courseweb Cleaner Welcome Dialog" />
+</p>
+
+### 3. Configure Your Preferences
+Select your campus center (Malabe, Metro, Kandy, Kurunegala, Matara, or Jaffna) and your batch schedule (Weekday or Weekend). You can also provide an optional group identifier or custom whitelist/blacklist terms. Click **Apply Setup** to lock in your preferences and clean the page view.
+
+<p align="center">
+  <img src="assets/step4-apply.png" width="750" alt="Campus and Batch Configuration Dialog" />
+</p>
+
+### 4. Adjust Settings Anytime
+You can update your campus profile, toggle Ghost Mode, or switch Dark Theme on and off anytime using the browser **Toolbar Action Popup** or the floating yellow settings icon anchored on course pages.
+
+<p align="center">
+  <img src="assets/step5-settings-icon.png" width="800" alt="Floating Settings Icon and Toolbar Popup" />
+</p>
 
 ---
 
