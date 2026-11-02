@@ -8380,14 +8380,22 @@
         const enableCustomElementRegistryProxy = !(
             fixes && fixes.disableCustomElementRegistryProxy
         );
+        const disableProxy = Boolean(
+            (fixes && (fixes.disableProxy || fixes.disableStyleSheetsProxy)) ||
+            (!enableStyleSheetsProxy && !enableCustomElementRegistryProxy)
+        );
         document.dispatchEvent(new CustomEvent("__darkreader__cleanUp"));
-        {
-            const proxyScript = createOrUpdateScript("darkreader--proxy");
-            proxyScript.append(
-                `(${injectProxy})(${enableStyleSheetsProxy}, ${enableCustomElementRegistryProxy})`
-            );
-            document.head.insertBefore(proxyScript, rootVarsStyle.nextSibling);
-            proxyScript.remove();
+        if (!disableProxy && (enableStyleSheetsProxy || enableCustomElementRegistryProxy)) {
+            try {
+                const proxyScript = createOrUpdateScript("darkreader--proxy");
+                proxyScript.append(
+                    `(${injectProxy})(${enableStyleSheetsProxy}, ${enableCustomElementRegistryProxy})`
+                );
+                document.head.insertBefore(proxyScript, rootVarsStyle.nextSibling);
+                proxyScript.remove();
+            } catch (e) {
+                // Ignore CSP inline-script restrictions gracefully
+            }
         }
         const overrideStyle = createOrUpdateStyle("darkreader--override");
         overrideStyle.textContent =

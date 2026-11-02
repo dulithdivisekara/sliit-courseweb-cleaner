@@ -34,7 +34,7 @@
       "matches": ["*://courseweb.sliit.lk/*"],
       "css": ["styles.css"],
       "js": ["darkreader.js", "shared-core.js", "extension-main.js"],
-      "run_at": "document_idle"
+      "run_at": "document_start"
     }
   ]
 }
