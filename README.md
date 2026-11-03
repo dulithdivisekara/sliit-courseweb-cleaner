@@ -97,10 +97,10 @@ Navigate to any course module page on [SLIIT Courseweb](https://courseweb.sliit.
 </p>
 
 ### 3. Configure Your Preferences
-Select your campus center (Malabe, Metro, Kandy, Kurunegala, Matara, or Jaffna) and your batch schedule (Weekday or Weekend). You can also provide an optional group identifier or custom whitelist/blacklist terms. Click **Apply Setup** to lock in your preferences and clean the page view.
+Select your campus center (Malabe, Metro, Kandy, Kurunegala, Matara, or Jaffna) and your batch schedule (Weekday or Weekend) inside the slide-in side panel drawer. You can also configure optional group identifiers, custom whitelist/blacklist terms, or toggle Ghost Mode. Click **Apply Setup** to lock in your preferences and clean the active view.
 
 <p align="center">
-  <img src="assets/step4-apply.png" width="750" alt="Campus and Batch Configuration Dialog" />
+  <img src="assets/store-screenshots/4-side-panel-drawer-settings.png" width="800" alt="Slide-In Side Panel Configuration Drawer" />
 </p>
 
 ### 4. Adjust Settings Anytime
@@ -174,6 +174,7 @@ graph TD
 │   ├── badge-chrome.png     # Official Chrome Web Store store badge
 │   ├── badge-edge.png       # Official Microsoft Edge Add-ons store badge
 │   ├── badge-firefox.png    # Official Firefox Add-ons store badge
+│   ├── store-screenshots/   # 1280x800 verified store listing screenshots
 │   └── *.png                # Setup workflow captures and store previews
 ├── dist/                    # Compiled distribution artifacts
 │   ├── sliit-courseweb-cleaner-extension.zip # Chrome & Edge deployment package
@@ -270,9 +271,13 @@ For environments utilizing Tampermonkey or Violentmonkey:
 | **Anti-Flash Preloader** | Runs at `document_start` with synchronous `localStorage` theme state caching (`setAntiFlashTheme`), applying dark canvas background at 0ms before DOM rendering to eliminate white flashes on navigation. |
 | **Side-Panel Drawer UI** | Replaces static modals with a smooth right-aligned slide-out drawer (`sf-side-panel`) with backdrop blur, keyboard dismissal, and responsive mobile adaptations. |
 | **Ergonomic Trigger Anchor** | Anchors floating trigger to `bottom: 60px; right: 0` directly above Moodle's native back-to-top button, completely eliminating overlap with the collapsible block drawer. |
+| **Ghost Mode (Peek Mode)** | Mutes unassigned cohort modules to `opacity: 0.25` instead of `display: none`, giving students a visual reference without interface clutter. |
+| **Partner Program Isolation** | Context-aware regex rules automatically isolate international degree streams (Curtin University, Deakin University) from local batch dashboards. |
 | **Header Logo Screen Blending** | Applies image filtering with `mix-blend-mode: screen` on the CourseWeb header crest, preventing dark mode background clash. |
 | **Moodle UI Safeguard** | Explicitly excludes form elements, `.groupselector`, `.singleselect`, dropdowns, navigation drawers, and course category pickers from DOM filtering. |
 | **CourseWeb CSP Compliance** | Suppresses DarkReader inline stylesheet proxy script injection to comply strictly with CourseWeb Content Security Policies. |
+| **Automated Cloud Sync** | Synchronizes student preferences across authenticated browser profiles via `chrome.storage.sync` with automatic local fallback. |
+| **Community Rule Updates** | Automatically schedules a 24-hour background alarm to fetch updated regex patterns (`rules.json`) from GitHub for newly introduced SLIIT course formats. |
 | **Custom Filter Overrides** | Allows comma-separated keyword declarations for high-priority inclusion (Whitelist) or forced suppression (Blacklist). |
 | **Dark Theme Engine** | Applies real-time CSS theme injection via Dark Reader with high-contrast rules preserving native brand buttons, form inputs, and modals. |
 

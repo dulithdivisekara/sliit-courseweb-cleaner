@@ -97,6 +97,18 @@ Critical notices, rescheduled lab alerts, category dropdowns, and Moodle submiss
 | **Official Website URL** | `https://sliit-courseweb-cleaner-web.pages.dev/` |
 | **Support URL** | `https://github.com/dulithdivisekara/sliit-courseweb-cleaner/issues` |
 
+### Store Listing Screenshots (1280 x 800, 24-bit PNG, No Alpha)
+The Chrome Web Store Developer Dashboard requires up to 5 screenshots formatted at `1280 x 800` or `640 x 400` in JPEG or 24-bit PNG (with no alpha channel). 
+
+Pre-formatted, verified assets are available in `assets/store-screenshots/`:
+1. `1-light-theme-dashboard.png` - Light Theme Dashboard (Ghost Mode / Clean Layout)
+2. `2-dark-theme-overview.png` - Dynamic Dark Theme & Course Overview
+3. `3-course-view-notice-banner.png` - Course Page with High-Contrast Protected Notice Banners
+4. `4-side-panel-drawer-settings.png` - In-Page Slide-In Side Panel Configuration Drawer
+5. `5-filtered-modules-grid.png` - Filtered Campus & Batch Modules Grid
+
+*(Alternative framed presentation mockup versions are also provided in `assets/store-screenshots/framed/`)*
+
 ---
 
 ## 3. Privacy & Data Collection Declaration
