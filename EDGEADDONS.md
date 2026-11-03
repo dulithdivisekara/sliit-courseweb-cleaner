@@ -34,7 +34,27 @@ Tired of scrolling through endless modules, assignments, and announcements meant
 
 The SLIIT Courseweb Cleaner automatically filters out the clutter, providing a clean, personalized, and distraction-free dashboard tailored specifically to your campus and batch.
 
-🚀 KEY FEATURES (v7.2.0):
+🚀 WHAT'S NEW IN VERSION 7.2.0:
+
+• Zero-Latency Anti-Flash Preloader:
+Eliminated the white flash (FOUC) when navigating between Courseweb pages in dark mode. Theme state is cached synchronously at page start for instant dark transitions.
+
+• Side-Panel Drawer Interface:
+Replaced the static center modal with a smooth, slide-in side panel drawer anchored above Moodle's back-to-top button. Configure your preferences without obscuring course materials.
+
+• Enhanced Notice Contrast in Dark Mode:
+Added high-contrast overrides for yellow notice containers, ensuring red text, exam notices, and rescheduled lab alerts remain sharp and readable in dark mode.
+
+• Ergonomic Trigger Placement:
+Moved the floating settings trigger button to the bottom-right (bottom: 60px; right: 0), permanently resolving overlay collisions with Courseweb's collapsible right-hand block drawer.
+
+• Dark Theme Logo Screen Blending:
+Inverted the Courseweb header logo with screen blend mode for a clean look on dark navigation bars.
+
+• CourseWeb CSP Compliance:
+Safeguarded DarkReader routines to prevent Content Security Policy inline-script violations.
+
+✨ CORE FEATURES:
 
 • Smart Auto-Detect & Filtering:
 Instantly filters course content to match your campus (Malabe, Metro, Kandy, Kurunegala, Matara, Jaffna) and your batch (Weekday or Weekend).
@@ -43,7 +63,7 @@ Instantly filters course content to match your campus (Malabe, Metro, Kandy, Kur
 Integrated with the open-source Dark Reader engine to provide an eye-friendly, high-contrast dark mode across all Courseweb pages (dashboard /my/, course overview, module views, and activities).
 
 • Modern Toolbar Action Popup:
-Quickly toggle dark mode, switch campus/batch profiles, adjust Ghost Mode, or open the in-page modal directly from your browser toolbar.
+Quickly toggle dark mode, switch campus/batch profiles, adjust Ghost Mode, or open the in-page side panel directly from your browser toolbar.
 
 • Ghost Mode (Peek Mode):
 Prefer not to completely hide modules? Ghost Mode fades unassigned modules to 25% opacity so you can still review them at a glance.
