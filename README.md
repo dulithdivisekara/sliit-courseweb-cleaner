@@ -358,3 +358,8 @@ ls -lh dist/
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+<p align="center">
+  <sub>Authored by <a href="https://dulith.me">Dulith Divisekara</a>. Independent student utility not affiliated with or endorsed by SLIIT.</sub>
+</p>
+
