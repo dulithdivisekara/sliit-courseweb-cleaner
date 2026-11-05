@@ -1,17 +1,20 @@
 {
-  "version": 2,
-  "lastUpdated": "2026-08-20",
+  "version": 4,
+  "lastUpdated": "2026-11-05",
   "campuses": [
     "malabe",
     "kandy",
     "kurunegala",
     "kurunegale",
+    "kurunagala",
     "metro",
     "matara",
     "mathara",
     "jaffna",
     "northern",
     "nothern",
+    "northern uni",
+    "nothern uni",
     "nu group",
     "nu dataset",
     "deakin",
@@ -28,8 +31,7 @@
     "general"
   ],
   "malabeBlockRegexes": [
-    "\\\\bbatch\\\\s*\\\\d+\\\\b",
-    "\\\\by2s1\\\\.b\\\\d+",
-    "\\\\by2s1\\\\.lab_\\\\w+"
+    "\\by[1-4]\\.?s[1-2]\\.b\\d+\\b",
+    "\\by[1-4]\\.?s[1-2]\\.lab_\\w+\\b"
   ]
 }

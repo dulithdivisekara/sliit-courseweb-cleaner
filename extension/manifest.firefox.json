@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SLIIT Courseweb Cleaner",
-  "version": "7.2.0",
+  "version": "7.3.0",
   "description": "A professional, context-aware module filter and dark theme for SLIIT Courseweb.",
   "author": "Dulith Divisekara",
   "permissions": ["storage", "alarms", "activeTab"],

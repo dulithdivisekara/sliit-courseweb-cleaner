@@ -3,6 +3,7 @@ const DEFAULT_CONFIG = {
     darkMode: false,
     enabled: true,
     ghostMode: true,
+    hideSubmissions: false,
     campus: 'malabe',
     batchType: 'weekday',
     batchTypeShort: 'wd',
@@ -22,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const enabledToggle = document.getElementById('pop-enabled');
     const ghostToggle = document.getElementById('pop-ghost');
+    const hideSubToggle = document.getElementById('pop-hide-submissions');
     const campusSelect = document.getElementById('pop-campus');
     const typeSelect = document.getElementById('pop-type');
     const groupInput = document.getElementById('pop-group');
@@ -52,8 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function saveSettings(notifyTab = true) {
         if (!storageApi) return;
         const newBatchType = typeSelect.value;
+        currentConfig.hasSeenWelcome = true;
         currentConfig.enabled = enabledToggle.checked;
         currentConfig.ghostMode = ghostToggle.checked;
+        currentConfig.hideSubmissions = hideSubToggle ? hideSubToggle.checked : false;
         currentConfig.campus = campusSelect.value;
         currentConfig.batchType = newBatchType;
         currentConfig.batchTypeShort = newBatchType === 'weekend' ? 'we' : 'wd';
@@ -72,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (tabs && tabs[0]) {
                 const tab = tabs[0];
                 const url = tab.url || '';
-                if (url.includes('/course/view.php')) {
+                if (url.includes('/course/view.php') || url.includes('/course/section.php')) {
                     activeCoursewebTab = tab;
                     if (btnOpenModal) {
                         btnOpenModal.disabled = false;
@@ -102,11 +106,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             enabledToggle.checked = currentConfig.enabled;
             ghostToggle.checked = currentConfig.ghostMode;
+            if (hideSubToggle) hideSubToggle.checked = Boolean(currentConfig.hideSubmissions);
             campusSelect.value = currentConfig.campus || 'malabe';
             typeSelect.value = currentConfig.batchType || 'weekday';
             groupInput.value = currentConfig.groupId || '';
         });
     }
+
+    // Live instant sync on toggle / select changes
+    [enabledToggle, ghostToggle, hideSubToggle, campusSelect, typeSelect].forEach(el => {
+        if (el) el.addEventListener('change', () => saveSettings(true));
+    });
 
     // Toggle Theme
     themeToggleBtn.addEventListener('click', () => {

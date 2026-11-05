@@ -25,25 +25,19 @@ Tired of scrolling through endless modules, assignments, and announcements meant
 
 The SLIIT Courseweb Cleaner automatically filters out the clutter, providing a clean, personalized, and distraction-free dashboard tailored specifically to your campus and batch.
 
-🚀 WHAT'S NEW IN VERSION 7.2.0:
+🚀 WHAT'S NEW IN VERSION 7.3.0:
 
-• Zero-Latency Anti-Flash Preloader:
-Eliminated the white flash (FOUC) when navigating between Courseweb pages in dark mode. Theme state is cached synchronously at page start for instant dark transitions.
+• Hide Submissions Toggle (New):
+Added a 1-click "Hide Submissions" toggle in the Side Panel and Toolbar Popup to temporarily hide assignment submission dropboxes while keeping assignment specification PDFs, marking rubrics, and lecture notes visible.
 
-• Side-Panel Drawer Interface:
-Replaced the static center modal with a smooth, slide-in side panel drawer anchored above Moodle's back-to-top button. Configure your preferences without obscuring course materials.
+• Live Filter Counter & Peek Hidden Mode (New):
+Added a real-time badge counter on the floating trigger and a live status bar in the Side Panel with a "Peek Hidden" button that temporarily reveals filtered items with a dashed gold outline.
 
-• Enhanced Notice Contrast in Dark Mode:
-Added high-contrast overrides for yellow notice containers, ensuring red text, exam notices, and rescheduled lab alerts remain sharp and readable in dark mode.
+• Regional Center & Multi-Batch Filtering Overhaul:
+Fixed cross-section state bleed so universal lecture slides and tutorials are always preserved across all centers (Malabe, Metro, Kandy, Kurunegala, Matara, Jaffna / Northern Uni, Deakin, and Curtin). Added full campus alias mapping (Mathara, Kurunegale, Northern Uni, NU Group, Colombo) and compound multi-batch support ("Batch 1 and 2", "Batch 02 + Weekend Batch").
 
-• Ergonomic Trigger Placement:
-Moved the floating settings trigger button to the bottom-right (bottom: 60px; right: 0), permanently resolving overlay collisions with Courseweb's collapsible right-hand block drawer.
-
-• Dark Theme Logo Screen Blending:
-Inverted the Courseweb header logo with screen blend mode for a clean look on dark navigation bars.
-
-• CourseWeb CSP Compliance:
-Safeguarded DarkReader routines to prevent Content Security Policy inline-script violations.
+• Zero-Latency Anti-Flash Preloader & Side-Panel Drawer:
+Eliminated the white flash (FOUC) when navigating between Courseweb pages in dark mode and anchored the smooth slide-in configuration panel above Moodle's back-to-top button.
 
 ✨ CORE FEATURES:
 

@@ -5,6 +5,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [7.3.0] - 2026-11-05
+
+### Added
+- **Hide Submissions Toggle ([#4](https://github.com/dulithdivisekara/sliit-courseweb-cleaner/issues/4)):** Added a dedicated **Hide Submissions** toggle in both the Side Panel Drawer and Toolbar Popup to temporarily hide assignment submission dropboxes (`.modtype_assign`, Turnitin links, and submission portals) while preserving assignment specification PDFs, marking rubrics, and lecture materials.
+- **Live Filter Counter Badge & Peek Mode:** Added a real-time counter badge (`#sf-badge-count`) on the floating settings trigger and a live status bar (`.sf-status-banner`) inside the Side Panel with a 1-click **Peek Hidden** button (`#sf-peek-btn`) that temporarily reveals hidden activities with a dashed gold outline.
+- **Canonical Campus Alias Dictionary:** Added full alias mapping (`CAMPUS_ALIASES`) so regional center spelling variations (`Mathara`, `Kurunegale`, `Northern`, `Nothern`, `Northern Uni`, `NU Group`, `NU Dataset`, `Colombo`, `Kandy Center`) resolve to the student's canonical campus profile instead of being treated as foreign centers.
+- **Curtin Campus Profile & Northern Uni Labeling:** Added `Curtin` to the Target Campus selector in the Side Panel and Toolbar Popup and updated `Jaffna` to `Jaffna / Northern Uni`.
+- **Multi-Batch & Universal Group Code Parser:** Added support for compound batch ranges (`Batch 1 and 2`, `Batch 2, 3, WE`, `Batch 02 + Weekend Batch`), multi-cohort titles (`Weekend Batch / Center Repeats & Northern Uni`), and universal academic group codes across all years (`Y1`–`Y4`), semesters (`S1`–`S2`), and faculties (`IT`, `SE`, `CS`, `DS`, `CSNE`, `ISE`, `IM`, `CY`, `BM`, `EN`).
+- **Moodle 4.5 Subpage Support:** Extended course page detection to support `/course/section.php` dedicated section views alongside `/course/view.php`.
+
+### Fixed
+- **Regional Center Cross-Section State Bleed:** Fixed a critical bug where `activeCampus` and `activeBatch` leaked across `.section` boundaries when an activity description contained an `<h1>`–`<h5>` heading, which previously caused Topic 1 and Topic 2 lecture slides and tutorials to be hidden for Kandy, Matara, Kurunegala, Jaffna, and Metro students.
+- **Malabe Numbered Batch Self-Blocking:** Removed the overly broad `\bbatch\s*\d+\b` block rule from `malabeBlockRegexes` that previously hid Malabe students' own `Batch 1`, `Batch 2`, and `Batch 3` notices and assignment links when the word `Malabe` was omitted.
+- **Moodle 4.5 Screen-Reader Notice Prefix & Blank Cards:** Stripped Moodle 4.5 `.sr-only` `"Select activity Notice"` prefixes during text extraction (`getCleanActivityText`), cached extracted text on `dataset.sfCleanText` so `display: none` never corrupts subsequent `MutationObserver` passes, and restricted inner element hiding to multi-item lists so visible activities never render as empty card shells.
+- **Instantaneous Live Configuration Updates:** Fixed `hasSeenWelcome` state persistence when saving via the Side Panel or Toolbar Popup and enabled zero-reload live re-filtering on toggle and dropdown changes.
+
+---
+
 ## [7.2.0] - 2026-11-02
 
 ### Added

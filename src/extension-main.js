@@ -3,6 +3,7 @@ const DEFAULT_CONFIG = {
     darkMode: false,
     enabled: true,
     ghostMode: true,
+    hideSubmissions: false,
     campus: 'malabe',
     batchType: 'weekday',
     batchTypeShort: 'wd',
@@ -35,7 +36,15 @@ function applyDarkReader(isDark) {
                 #sliit-filter-btn svg {
                     stroke: #212529 !important;
                 }
+                #sf-badge-count {
+                    background-color: #0f3b5f !important;
+                    color: #ffffff !important;
+                    border-color: #181a1b !important;
+                }
                 #sliit-filter-overlay {
+                    background: rgba(0, 0, 0, 0.28) !important;
+                }
+                #sliit-filter-overlay.sf-welcome-backdrop {
                     background: rgba(0, 0, 0, 0.65) !important;
                 }
                 .sf-modal-container.sf-dark-theme {
@@ -54,6 +63,21 @@ function applyDarkReader(isDark) {
                 }
                 .sf-dark-theme .sf-welcome-header h3 {
                     color: #f8f9fa !important;
+                }
+                .sf-dark-theme .sf-status-banner {
+                    background-color: #26292e !important;
+                    border-color: #3f444c !important;
+                    color: #e2e8f0 !important;
+                }
+                .sf-dark-theme .sf-peek-btn {
+                    background-color: #33373d !important;
+                    color: #f8fafc !important;
+                    border-color: #4b5563 !important;
+                }
+                .sf-dark-theme .sf-peek-btn.active {
+                    background-color: #f7b924 !important;
+                    color: #141517 !important;
+                    border-color: #f7b924 !important;
                 }
                 .sf-dark-theme .sf-toggle-label {
                     color: #e9ecef !important;
@@ -147,6 +171,18 @@ function applyDarkReader(isDark) {
                     color: #141517 !important;
                     text-decoration-color: #141517 !important;
                 }
+                /* Smooth out Moodle activity icons & drawer toggles during initial DarkReader pass */
+                img.activityicon, .activityiconcontainer, .activityiconcontainer img {
+                    background-color: transparent !important;
+                }
+                .drawer-toggles .drawer-toggler .btn {
+                    background-color: #242729 !important;
+                    border-color: #383c42 !important;
+                    color: #e2e8f0 !important;
+                }
+                .activity-item, .course-section-header, .section-item {
+                    border-color: #2e3236 !important;
+                }
                 u:has([data-darkreader-inline-bgcolor][style*="255, 207, 53"]),
                 u:has([data-darkreader-inline-bgcolor][style*="ffcf35" i]),
                 u:has([data-darkreader-inline-bgcolor][style*="255, 255, 0"]),
@@ -155,11 +191,11 @@ function applyDarkReader(isDark) {
                     text-decoration-color: #141517 !important;
                 }
             `,
-            ignoreImageAnalysis: ['#header-logo .logo img'],
+            ignoreImageAnalysis: ['#header-logo .logo img', 'img.activityicon', '.activityiconcontainer img', '.userpicture'],
             ignoreInlineStyle: [],
-            disableStyleSheetsProxy: true,
+            disableStyleSheetsProxy: false,
             disableCustomElementRegistryProxy: true,
-            disableProxy: true
+            disableProxy: false
         });
     } else {
         DarkReader.disable();
@@ -172,6 +208,16 @@ function setAntiFlashTheme(isDark) {
             document.documentElement.classList.add('sf-dark-mode-preload');
             document.documentElement.style.backgroundColor = '#181a1b';
             document.documentElement.style.colorScheme = 'dark';
+        }
+        const clearPreload = () => {
+            if (document.documentElement) {
+                document.documentElement.classList.remove('sf-dark-mode-preload');
+            }
+        };
+        if (document.readyState === 'complete') {
+            clearPreload();
+        } else {
+            window.addEventListener('load', clearPreload, { once: true });
         }
     } else {
         if (document.documentElement) {
@@ -188,23 +234,41 @@ function setAntiFlashTheme(isDark) {
 
 // 0ms synchronous anti-flash execution at document_start before async storage resolves
 let cachedDarkMode = false;
+let cachedConfig = null;
 try {
     cachedDarkMode = localStorage.getItem('sf_darkMode') === 'true';
+    const rawCached = localStorage.getItem('sf_config_cache');
+    if (rawCached) cachedConfig = JSON.parse(rawCached);
 } catch (e) {}
 
-if (cachedDarkMode) {
+if (cachedConfig) {
+    window.CONFIG = { ...DEFAULT_CONFIG, ...cachedConfig };
+}
+
+if (cachedDarkMode || (window.CONFIG && window.CONFIG.darkMode)) {
     setAntiFlashTheme(true);
     applyDarkReader(true);
+}
+
+// Run an immediate synchronous filter pass as soon as DOM parses (even before async storage resolves)
+if (window.CONFIG && window.CONFIG.enabled && window.CONFIG.hasSeenWelcome) {
+    if (document.readyState === 'interactive' || document.readyState === 'complete') {
+        cleanCoursePage();
+    } else {
+        window.addEventListener('DOMContentLoaded', () => cleanCoursePage(), { once: true });
+    }
 }
 
 storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
     chrome.storage.local.get('remoteRules', (localData) => {
         window.CONFIG = syncConfig;
         window.REMOTE_RULES = localData.remoteRules || null;
+        window.SF_PEEK_ACTIVE = false;
 
         // Keep synchronous localStorage in sync for instant future navigations
         try {
             localStorage.setItem('sf_darkMode', window.CONFIG.darkMode ? 'true' : 'false');
+            localStorage.setItem('sf_config_cache', JSON.stringify(window.CONFIG));
         } catch (e) {}
 
         if (window.CONFIG.darkMode) {
@@ -217,7 +281,7 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
 
         function isCourseViewPage() {
             const path = window.location.pathname || '';
-            return path.includes('/course/view.php');
+            return path.includes('/course/view.php') || path.includes('/course/section.php');
         }
 
         let showSettings = null;
@@ -228,9 +292,59 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
             return doc.body.firstElementChild;
         }
 
+        window.updateFilterStatsUI = function(stats) {
+            const badgeEl = document.getElementById('sf-badge-count');
+            const dotEl = document.getElementById('sf-status-dot');
+            const textEl = document.getElementById('sf-status-text');
+            const peekBtn = document.getElementById('sf-peek-btn');
+
+            if (!window.CONFIG || !window.CONFIG.enabled || !window.CONFIG.hasSeenWelcome) {
+                if (badgeEl) badgeEl.classList.remove('visible');
+                if (dotEl) dotEl.className = 'sf-status-dot paused';
+                if (textEl) textEl.textContent = 'Module filter paused';
+                if (peekBtn) peekBtn.style.display = 'none';
+                return;
+            }
+
+            const count = stats ? stats.hidden : 0;
+            if (badgeEl) {
+                if (count > 0) {
+                    badgeEl.textContent = String(count);
+                    badgeEl.classList.add('visible');
+                } else {
+                    badgeEl.classList.remove('visible');
+                }
+            }
+
+            if (peekBtn) {
+                peekBtn.style.display = count > 0 ? 'inline-block' : 'none';
+                if (window.SF_PEEK_ACTIVE) {
+                    peekBtn.classList.add('active');
+                    peekBtn.textContent = 'Hide Again';
+                } else {
+                    peekBtn.classList.remove('active');
+                    peekBtn.textContent = 'Peek Hidden';
+                }
+            }
+
+            if (dotEl && textEl) {
+                if (window.SF_PEEK_ACTIVE && count > 0) {
+                    dotEl.className = 'sf-status-dot peeking';
+                    textEl.textContent = `Peeking ${count} hidden item${count === 1 ? '' : 's'}`;
+                } else {
+                    dotEl.className = 'sf-status-dot';
+                    textEl.textContent = `${count} item${count === 1 ? '' : 's'} filtered on page`;
+                }
+            }
+        };
+
         function injectUI() {
+            if (document.getElementById('sliit-filter-btn')) return;
+            const GEAR_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`;
+            const CLOSE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+
             const overlay = createUIElement(`<div id="sliit-filter-overlay"></div>`);
-            const btn = createUIElement(`<button id="sliit-filter-btn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>`);
+            const btn = createUIElement(`<button id="sliit-filter-btn" title="Filter Configuration"><span id="sf-btn-icon" style="display:flex;align-items:center;justify-content:center;">${GEAR_SVG}</span><span id="sf-badge-count">0</span></button>`);
 
             const settingsModal = createUIElement(`
                 <div class="sf-modal-container sf-side-panel" id="sliit-filter-modal">
@@ -244,6 +358,13 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
                             </button>
                         </div>
                     </h3>
+                    <div class="sf-status-banner" id="sf-status-banner">
+                        <div class="sf-status-info">
+                            <span class="sf-status-dot" id="sf-status-dot"></span>
+                            <span id="sf-status-text">0 items filtered on page</span>
+                        </div>
+                        <button type="button" class="sf-peek-btn" id="sf-peek-btn" title="Temporarily reveal hidden items">Peek Hidden</button>
+                    </div>
                     <div class="sf-toggle-container">
                         <span class="sf-toggle-label">Module Filter <span class="sf-toggle-sub">Enable or disable filtering logic</span></span>
                         <label class="sf-switch"><input type="checkbox" id="sf-enabled" ${window.CONFIG.enabled ? 'checked' : ''}><span class="sf-slider"></span></label>
@@ -252,6 +373,10 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
                         <span class="sf-toggle-label">Ghost Mode <span class="sf-toggle-sub">Fade filtered items instead of hiding</span></span>
                         <label class="sf-switch"><input type="checkbox" id="sf-ghost" ${window.CONFIG.ghostMode ? 'checked' : ''}><span class="sf-slider"></span></label>
                     </div>
+                    <div class="sf-toggle-container">
+                        <span class="sf-toggle-label">Hide Submissions <span class="sf-toggle-sub">Temporarily hide assignment dropboxes</span></span>
+                        <label class="sf-switch"><input type="checkbox" id="sf-hide-submissions" ${window.CONFIG.hideSubmissions ? 'checked' : ''}><span class="sf-slider"></span></label>
+                    </div>
                     <label class="sf-input-label">Target Campus</label>
                     <select id="sf-campus">
                         <option value="malabe">Malabe</option>
@@ -259,8 +384,9 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
                         <option value="kandy">Kandy</option>
                         <option value="kurunegala">Kurunegala</option>
                         <option value="matara">Matara</option>
-                        <option value="jaffna">Jaffna</option>
+                        <option value="jaffna">Jaffna / Northern Uni</option>
                         <option value="deakin">Deakin</option>
+                        <option value="curtin">Curtin</option>
                     </select>
                     <label class="sf-input-label">Batch Classification</label>
                     <select id="sf-type">
@@ -271,8 +397,8 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
                     <details class="sf-advanced-details">
                         <summary>Advanced Settings</summary>
                         <div style="margin-top: 10px;">
-                            <label class="sf-input-label">Group ID (Optional)</label>
-                            <input type="text" id="sf-group" placeholder="e.g., 0301 (Leave empty for batch-wide view)">
+                            <label class="sf-input-label">Batch / Group ID (Optional)</label>
+                            <input type="text" id="sf-group" placeholder="e.g., 1, Batch 2 Group 3, or 01.02">
                             
                             <label class="sf-input-label">Custom Whitelist (Comma separated)</label>
                             <input type="text" id="sf-whitelist" placeholder="e.g., Assignment, Revision">
@@ -305,7 +431,7 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
                     <p class="sf-welcome-text">The SLIIT Courseweb Module Cleaner is now active. This utility seamlessly optimizes your Moodle dashboard by filtering out unassigned contexts and centers.</p>
                     <div class="sf-welcome-credit">
                         <strong>Release Information</strong><br>
-                        Version: 7.2.0<br>
+                        Version: 7.3.0<br>
                         Maintainer: Dulith Divisekara<br>
                         License: Open Source (MIT)
                     </div>
@@ -323,6 +449,7 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
             document.body.appendChild(settingsModal);
             document.body.appendChild(welcomeModal);
 
+            const btnIcon = document.getElementById('sf-btn-icon');
             const themeIcon = document.getElementById('sf-theme-icon');
             updateThemeUI = (isDark) => {
                 applyDarkReader(isDark);
@@ -361,9 +488,6 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
             document.getElementById('sf-whitelist').value = window.CONFIG.customWhitelist || '';
             document.getElementById('sf-blacklist').value = window.CONFIG.customBlacklist || '';
 
-            const GEAR_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`;
-            const CLOSE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-
             const isPanelOpen = () => settingsModal.classList.contains('open');
 
             const openSidePanel = () => {
@@ -371,16 +495,19 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
                 overlay.style.display = 'block';
                 btn.classList.add('open');
                 btn.title = 'Close Configuration';
-                btn.innerHTML = CLOSE_SVG;
+                if (btnIcon) btnIcon.innerHTML = CLOSE_SVG;
+                if (window.SF_LAST_STATS) window.updateFilterStatsUI(window.SF_LAST_STATS);
             };
 
             const closeSidePanel = () => {
                 settingsModal.classList.remove('open');
                 overlay.style.display = 'none';
+                overlay.classList.remove('sf-welcome-backdrop');
                 welcomeModal.style.display = 'none';
                 btn.classList.remove('open');
                 btn.title = 'Filter Configuration';
-                btn.innerHTML = GEAR_SVG;
+                if (btnIcon) btnIcon.innerHTML = GEAR_SVG;
+                if (window.SF_LAST_STATS) window.updateFilterStatsUI(window.SF_LAST_STATS);
             };
 
             const toggleSidePanel = () => {
@@ -398,21 +525,78 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
             document.getElementById('sf-cancel').onclick = closeSidePanel;
             overlay.onclick = closeSidePanel;
 
+            // Peek Hidden button handler
+            const peekBtn = document.getElementById('sf-peek-btn');
+            if (peekBtn) {
+                peekBtn.onclick = () => {
+                    window.SF_PEEK_ACTIVE = !window.SF_PEEK_ACTIVE;
+                    cleanCoursePage();
+                };
+            }
+
             if (!window.CONFIG.hasSeenWelcome) {
                 welcomeModal.style.display = 'block';
+                overlay.classList.add('sf-welcome-backdrop');
                 overlay.style.display = 'block';
                 document.getElementById('sf-welcome-start').onclick = () => {
+                    window.CONFIG.hasSeenWelcome = true;
+                    overlay.classList.remove('sf-welcome-backdrop');
                     storageApi.set({ hasSeenWelcome: true }, () => {
                         welcomeModal.style.display = 'none';
+                        cleanCoursePage();
                         openSidePanel();
                     });
                 };
             }
 
+            const persistAndApplyLive = (closeAfter = false) => {
+                const newType = document.getElementById('sf-type').value;
+                const newSettings = {
+                    hasSeenWelcome: true,
+                    enabled: document.getElementById('sf-enabled').checked,
+                    darkMode: window.CONFIG.darkMode,
+                    ghostMode: document.getElementById('sf-ghost').checked,
+                    hideSubmissions: document.getElementById('sf-hide-submissions').checked,
+                    campus: document.getElementById('sf-campus').value,
+                    batchType: newType,
+                    batchTypeShort: newType === 'weekend' ? 'we' : 'wd',
+                    groupId: document.getElementById('sf-group').value.trim(),
+                    customWhitelist: document.getElementById('sf-whitelist').value.trim(),
+                    customBlacklist: document.getElementById('sf-blacklist').value.trim()
+                };
+                window.CONFIG = { ...window.CONFIG, ...newSettings };
+                try {
+                    localStorage.setItem('sf_config_cache', JSON.stringify(window.CONFIG));
+                } catch (e) {}
+                cleanCoursePage();
+                storageApi.set(newSettings, () => {
+                    if (closeAfter) {
+                        const saveBtn = document.getElementById('sf-save');
+                        if (saveBtn) {
+                            const orig = saveBtn.textContent;
+                            saveBtn.textContent = 'Applied!';
+                            setTimeout(() => {
+                                saveBtn.textContent = orig;
+                                closeSidePanel();
+                            }, 350);
+                        } else {
+                            closeSidePanel();
+                        }
+                    }
+                });
+            };
+
+            // Live instant application on toggle / select changes
+            ['sf-enabled', 'sf-ghost', 'sf-hide-submissions', 'sf-campus', 'sf-type'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('change', () => persistAndApplyLive(false));
+            });
+
             document.getElementById('sf-reset').onclick = () => {
-                if(confirm('Are you sure you want to reset all configurations to default?')) {
+                if (confirm('Are you sure you want to reset all configurations to default?')) {
                     try {
                         localStorage.removeItem('sf_darkMode');
+                        localStorage.removeItem('sf_config_cache');
                     } catch (e) {}
                     setAntiFlashTheme(false);
                     applyDarkReader(false);
@@ -421,20 +605,12 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
             };
 
             document.getElementById('sf-save').onclick = () => {
-                const newType = document.getElementById('sf-type').value;
-                const newSettings = {
-                    enabled: document.getElementById('sf-enabled').checked,
-                    darkMode: window.CONFIG.darkMode,
-                    ghostMode: document.getElementById('sf-ghost').checked,
-                    campus: document.getElementById('sf-campus').value,
-                    batchType: newType,
-                    batchTypeShort: newType === 'weekend' ? 'we' : 'wd',
-                    groupId: document.getElementById('sf-group').value.trim(),
-                    customWhitelist: document.getElementById('sf-whitelist').value.trim(),
-                    customBlacklist: document.getElementById('sf-blacklist').value.trim()
-                };
-                storageApi.set(newSettings, () => location.reload());
+                persistAndApplyLive(true);
             };
+
+            if (window.SF_LAST_STATS) {
+                window.updateFilterStatsUI(window.SF_LAST_STATS);
+            }
         }
 
         // Global runtime listener for toolbar popup across all Courseweb pages
@@ -450,6 +626,7 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
                         window.CONFIG = syncConfig;
                         try {
                             localStorage.setItem('sf_darkMode', window.CONFIG.darkMode ? 'true' : 'false');
+                            localStorage.setItem('sf_config_cache', JSON.stringify(window.CONFIG));
                         } catch (e) {}
                         setAntiFlashTheme(window.CONFIG.darkMode);
                         applyDarkReader(window.CONFIG.darkMode);
@@ -460,11 +637,13 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
                             runClean();
                             const enabledEl = document.getElementById('sf-enabled');
                             const ghostEl = document.getElementById('sf-ghost');
+                            const hideSubEl = document.getElementById('sf-hide-submissions');
                             const campusEl = document.getElementById('sf-campus');
                             const typeEl = document.getElementById('sf-type');
                             const groupEl = document.getElementById('sf-group');
                             if (enabledEl) enabledEl.checked = window.CONFIG.enabled;
                             if (ghostEl) ghostEl.checked = window.CONFIG.ghostMode;
+                            if (hideSubEl) hideSubEl.checked = Boolean(window.CONFIG.hideSubmissions);
                             if (campusEl) campusEl.value = window.CONFIG.campus;
                             if (typeEl) typeEl.value = window.CONFIG.batchType;
                             if (groupEl) groupEl.value = window.CONFIG.groupId;
@@ -491,13 +670,16 @@ storageApi.get(DEFAULT_CONFIG, (syncConfig) => {
             // Apply filtering and floating UI only on course view pages
             // This strictly protects homepage (/my/), course selectors (/my/courses.php), etc.
             if (isCourseViewPage()) {
-                runClean();
                 injectUI();
+                runClean();
 
                 const observer = new MutationObserver((mutations) => {
                     let shouldRun = false;
                     for (let m of mutations) {
-                        if (m.addedNodes.length > 0 && m.target.className !== 'sf-modal-container') {
+                        if (m.target && m.target.closest && m.target.closest('#sliit-filter-modal, #sliit-welcome-modal, #sliit-filter-btn, #sliit-filter-overlay')) {
+                            continue;
+                        }
+                        if (m.addedNodes.length > 0) {
                             shouldRun = true;
                             break;
                         }

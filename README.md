@@ -12,7 +12,7 @@
 
 <p align="center">
   <a href="https://chromewebstore.google.com/detail/sliit-courseweb-cleaner/lnoadlfhebmkhmbfmehdgoffjllgadjm"><img src="https://img.shields.io/chrome-web-store/v/lnoadlfhebmkhmbfmehdgoffjllgadjm?style=flat-square&color=0f3b5f&label=Chrome%20Web%20Store" alt="Chrome Web Store"></a>
-  <a href="https://microsoftedge.microsoft.com/addons/detail/sliit-courseweb-cleaner/gmlodfhgiopjgamoijjffcmgfenkkkhe"><img src="https://img.shields.io/badge/Edge%20Add--ons-v7.2.0-0078d7?style=flat-square" alt="Edge Add-ons"></a>
+  <a href="https://microsoftedge.microsoft.com/addons/detail/sliit-courseweb-cleaner/gmlodfhgiopjgamoijjffcmgfenkkkhe"><img src="https://img.shields.io/badge/Edge%20Add--ons-v7.3.0-0078d7?style=flat-square" alt="Edge Add-ons"></a>
   <a href="https://addons.mozilla.org/en-US/firefox/addon/sliit-courseweb-cleaner/"><img src="https://img.shields.io/amo/v/sliit-courseweb-cleaner?style=flat-square&color=ff7139&label=Firefox%20Add-ons" alt="Firefox Add-ons"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License: MIT"></a>
 </p>
@@ -28,6 +28,7 @@
   <a href="#session-logging--inspection">Logging</a> &bull;
   <a href="#verification-tests">Testing</a> &bull;
   <a href="#security--privacy">Security</a> &bull;
+  <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner/wiki">Wiki</a> &bull;
   <a href="#license">License</a>
 </p>
 
@@ -97,7 +98,7 @@ Navigate to any course module page on [SLIIT Courseweb](https://courseweb.sliit.
 </p>
 
 ### 3. Configure Your Preferences
-Select your campus center (Malabe, Metro, Kandy, Kurunegala, Matara, or Jaffna) and your batch schedule (Weekday or Weekend) inside the slide-in side panel drawer. You can also configure optional group identifiers, custom whitelist/blacklist terms, or toggle Ghost Mode. Click **Apply Setup** to lock in your preferences and clean the active view.
+Select your campus center (Malabe, Metro, Kandy, Kurunegala, Matara, Jaffna / Northern Uni, Deakin, or Curtin) and your batch schedule (Weekday or Weekend) inside the slide-in side panel drawer. You can also configure optional group or batch identifiers (e.g., `2`, `01.02`, or `Y2.S1.WD.IT.01.02`), custom whitelist/blacklist terms, Ghost Mode, or the **Hide Submissions** toggle. All changes apply instantaneously to the active view without requiring a page reload.
 
 <p align="center">
   <img src="assets/store-screenshots/4-side-panel-drawer-settings.png" width="800" alt="Slide-In Side Panel Configuration Drawer" />
@@ -201,6 +202,7 @@ graph TD
 │   ├── shared-core.js       # Reusable campus, batch, and protection heuristics
 │   ├── shared-styles.css    # Reusable modal and floating action styles
 │   └── userscript-main.js   # Tampermonkey userscript wrapper and entrypoint
+├── wiki/                    # Multi-page GitHub Wiki technical documentation suite
 ├── build.sh                 # Multi-target assembly and packaging pipeline
 ├── package.json             # NPM metadata, build commands, and syntax validation targets
 └── rules.json               # Community regex patterns, campus aliases, and ignore keywords
@@ -254,19 +256,25 @@ For environments utilizing Tampermonkey or Violentmonkey:
 1. Navigate to any module page on [SLIIT Courseweb](https://courseweb.sliit.lk/).
 2. On initial visit, the configuration dialog displays automatically.
 3. Configure your academic profile:
-   - **Campus:** Select your campus (Malabe, Metro, Kandy, Kurunegala, Matara, or Jaffna).
+   - **Campus:** Select your campus (Malabe, Metro, Kandy, Kurunegala, Matara, Jaffna / Northern Uni, Deakin, or Curtin).
    - **Batch Track:** Select Weekday or Weekend schedule.
-   - **Specialization / Group:** Enter your designated student group identifier (e.g., `01`, `02`).
+   - **Group / Batch ID:** Enter your designated batch number or student group identifier (e.g., `2`, `01.02`, or `Y2.S1.WD.IT.01.02`).
    - **Ghost Mode:** Toggle between complete DOM suppression (`display: none`) and muted transparency (`opacity: 0.25`).
-4. Click **Apply Setup** to store preferences in synchronized browser storage and immediately filter the active view.
-5. Access configuration controls anytime via the browser toolbar popup or the floating settings button anchored to the course interface.
+   - **Hide Submissions:** Temporarily hide assignment submission dropboxes while keeping assignment specification PDFs and marking rubrics visible.
+4. Click **Apply Setup** (or toggle switches directly for instant live updates) to store preferences in synchronized browser storage.
+5. Use the **Live Filter Status Banner** and **Peek Hidden** button inside the side panel to inspect the exact number of filtered items on the page at any time.
 
 ### Operational Features
 
 | Component | Technical Behavior |
 | :--- | :--- |
 | **Double-Lock Defense** | Suppresses filtering routines until user setup is confirmed, preventing false-positive content removal during initial enrollment. |
-| **Notice Protector** | Scans activity text against protected tokens (`notice`, `rescheduled`, `announcement`, `general`). Crucial alerts remain visible regardless of filtering state. |
+| **Section-Scoped Filtering Engine** | Isolates sticky section context strictly within individual Moodle `.section` containers and protects core learning materials (Lecture Slides, Tutorials, Module Outlines, Marking Rubrics) from cross-section state bleed. |
+| **Canonical Campus Alias Resolution** | Resolves regional center spelling variants and aliases (`Mathara`, `Kurunegale`, `Northern Uni`, `Nothern`, `NU Group`, `NU Dataset`, `Colombo`, `Kandy Center`) to the user's selected campus profile. |
+| **Multi-Batch & Multi-Cohort Parser** | Parses compound batch declarations (`Batch 1 and 2`, `Batch 02 + Weekend Batch`, `Weekend Batch / Center Repeats & Northern Uni`) and universal academic group codes (`Y1`-`Y4`, `S1`-`S2`, `IT`/`SE`/`CS`/`DS`/`CSNE`/`ISE`/`IM`/`CY`/`BM`/`EN`). |
+| **Hide Submissions Mode** | Provides a 1-click toggle in the Side Panel and Toolbar Popup to temporarily hide assignment submission dropboxes (`.modtype_assign`, Turnitin links) while preserving assignment specification PDFs and marking rubrics. |
+| **Live Filter Counter & Peek Mode** | Displays a real-time filtered item badge on the floating trigger and a live status bar in the Side Panel with a **Peek Hidden** toggle to temporarily reveal hidden items with a dashed gold outline. |
+| **Notice Protector** | Scans activity text against protected tokens (`notice`, `rescheduled`, `announcement`, `general`) while stripping Moodle 4.5 screen-reader (`Select activity Notice`) prefixes to prevent false positives. |
 | **Notice Contrast Correction** | Applies high-contrast overrides (`#f7b924` background with `#141517` dark text) to yellow alert containers, guaranteeing full readability for red text and urgent announcements under dark theme. |
 | **Anti-Flash Preloader** | Runs at `document_start` with synchronous `localStorage` theme state caching (`setAntiFlashTheme`), applying dark canvas background at 0ms before DOM rendering to eliminate white flashes on navigation. |
 | **Side-Panel Drawer UI** | Replaces static modals with a smooth right-aligned slide-out drawer (`sf-side-panel`) with backdrop blur, keyboard dismissal, and responsive mobile adaptations. |
