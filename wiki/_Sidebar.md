@@ -1,12 +1,12 @@
-### Documentation
+### Navigation
 
-- **[Home](Home)**
-- **[Getting Started](Getting-Started)**
-- **[User Guide & Configuration](User-Guide-and-Configuration)**
-- **[Heuristic Filtering Engine](Heuristic-Filtering-Engine)**
-- **[Architecture & Dark Theme](Architecture-and-Dark-Theme)**
-- **[Community Rules & Development](Community-Rules-and-Development)**
-- **[Troubleshooting & FAQ](Troubleshooting-and-FAQ)**
+- **[[Home|Home]]**
+- **[[Getting Started|Getting-Started]]**
+- **[[User Guide & Configuration|User-Guide-and-Configuration]]**
+- **[[Heuristic Filtering Engine|Heuristic-Filtering-Engine]]**
+- **[[Architecture & Dark Theme|Architecture-and-Dark-Theme]]**
+- **[[Community Rules & Development|Community-Rules-and-Development]]**
+- **[[Troubleshooting & FAQ|Troubleshooting-and-FAQ]]**
 
 ---
 
@@ -24,4 +24,4 @@
 - [GitHub Repository](https://github.com/dulithdivisekara/sliit-courseweb-cleaner)
 - [Official Website](https://sliit-courseweb-cleaner-web.pages.dev/)
 - [Release Changelog](https://github.com/dulithdivisekara/sliit-courseweb-cleaner/blob/main/CHANGELOG.md)
-- [Privacy Policy](https://github.com/dulithdivisekara/sliit-courseweb-cleaner/blob/main/privacy-policy.md)
+- [MIT License](https://github.com/dulithdivisekara/sliit-courseweb-cleaner/blob/main/LICENSE)
