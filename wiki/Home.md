@@ -44,12 +44,12 @@ Install verified, signed packages directly from your browser's official extensio
 
 | Wiki Page | Technical Scope | Target Audience |
 | :--- | :--- | :--- |
-| **[[Getting Started|Getting-Started]]** | Browser compatibility matrix, 1-click store installation, userscript deployment, and first-run onboarding workflow. | All students and new users |
-| **[[User Guide and Configuration|User-Guide-and-Configuration]]** | Complete guide to the Slide-In Side Panel, Toolbar Popup, Campus/Batch/Group formats, Ghost Mode, Hide Submissions, and Peek Hidden. | Students configuring profiles |
-| **[[Heuristic Filtering Engine|Heuristic-Filtering-Engine]]** | Deep architectural breakdown of the 6-stage DOM evaluation pipeline, regex parsers, campus alias normalization, and faculty group rules. | Contributors and power users |
-| **[[Architecture and Dark Theme|Architecture-and-Dark-Theme]]** | Multi-target build pipeline, zero-flash `0ms` Dark Reader preloader, Moodle Lambda2/Boost skeleton suppression, and storage sync. | Extension developers |
-| **[[Community Rules and Development|Community-Rules-and-Development]]** | Remote `rules.json` schema, 24-hour background sync lifecycle, local build compilation (`build.sh`), and automated test suites. | Open-source maintainers |
-| **[[Troubleshooting and FAQ|Troubleshooting-and-FAQ]]** | Diagnostic decision tree, solutions for missing regional activities, userscript permissions, Service Worker inspection, and FAQs. | Users resolving edge cases |
+| **[Getting Started](Getting-Started)** | Browser compatibility matrix, 1-click store installation, userscript deployment, and first-run onboarding workflow. | All students and new users |
+| **[User Guide and Configuration](User-Guide-and-Configuration)** | Complete guide to the Slide-In Side Panel, Toolbar Popup, Campus/Batch/Group formats, Ghost Mode, Hide Submissions, and Peek Hidden. | Students configuring profiles |
+| **[Heuristic Filtering Engine](Heuristic-Filtering-Engine)** | Deep architectural breakdown of the 6-stage DOM evaluation pipeline, regex parsers, campus alias normalization, and faculty group rules. | Contributors and power users |
+| **[Architecture and Dark Theme](Architecture-and-Dark-Theme)** | Multi-target build pipeline, zero-flash `0ms` Dark Reader preloader, Moodle Lambda2/Boost skeleton suppression, and storage sync. | Extension developers |
+| **[Community Rules and Development](Community-Rules-and-Development)** | Remote `rules.json` schema, 24-hour background sync lifecycle, local build compilation (`build.sh`), and automated test suites. | Open-source maintainers |
+| **[Troubleshooting and FAQ](Troubleshooting-and-FAQ)** | Diagnostic decision tree, solutions for missing regional activities, userscript permissions, Service Worker inspection, and FAQs. | Users resolving edge cases |
 
 ---
 

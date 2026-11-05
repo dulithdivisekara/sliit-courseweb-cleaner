@@ -72,12 +72,12 @@ Lecturers across faculties use varying abbreviations and occasional misspellings
 
 | Canonical ID | Regex Pattern (`CAMPUS_PATTERNS`) | Handled Edge Cases |
 | :--- | :--- | :--- |
-| `Malabe` | `\b(?:malabe|mlb)\b` | Matches `Malabe Campus`, `MLB Weekday` |
-| `Metro` | `\b(?:metro(?:politan)?|colombo(?:\s+cent(?:er|re))?)\b` | Resolves `Colombo Center` and `Metro` to the same cohort |
-| `Kandy` | `\b(?:kandy|kdy)\b` | Matches `Kandy Center`, `Kandy Centre`, `Kandy Uni` |
-| `Kurunegala` | `\b(?:kurunegala|kurunegale|kurunagala|krn)\b` | Handles common lecturer typos `Kurunegale` and `Kurunagala` |
-| `Matara` | `\b(?:matara|mathara|mtr)\b` | Handles phonetic spelling `Mathara` |
-| `Jaffna` | `\b(?:jaffna|northern(?:\s*uni(?:versity)?)?|nothern(?:\s*uni(?:versity)?)?|jfn|nu(?=\s*(?:uni|cent|group|batch|student|intake|dataset|lecture|lab|tute|online|exam|quiz|mid|assignment|session|-|\d|$)))\b` | Matches `Jaffna`, `Northern Uni`, typo `Nothern`, and `NU` prefix tokens (`NU Dataset`, `NU Group 1`) without colliding with words like `"number"` |
+| `Malabe` | `\b(?:malabe\|mlb)\b` | Matches `Malabe Campus`, `MLB Weekday` |
+| `Metro` | `\b(?:metro(?:politan)?\|colombo(?:\s+cent(?:er\|re))?)\b` | Resolves `Colombo Center` and `Metro` to the same cohort |
+| `Kandy` | `\b(?:kandy\|kdy)\b` | Matches `Kandy Center`, `Kandy Centre`, `Kandy Uni` |
+| `Kurunegala` | `\b(?:kurunegala\|kurunegale\|kurunagala\|krn)\b` | Handles common lecturer typos `Kurunegale` and `Kurunagala` |
+| `Matara` | `\b(?:matara\|mathara\|mtr)\b` | Handles phonetic spelling `Mathara` |
+| `Jaffna` | `\b(?:jaffna\|northern(?:\s*uni(?:versity)?)?\|nothern(?:\s*uni(?:versity)?)?\|jfn\|nu(?=\s*(?:uni\|cent\|group\|batch\|student\|intake\|dataset\|lecture\|lab\|tute\|online\|exam\|quiz\|mid\|assignment\|session\|-\|\d\|$)))\b` | Matches `Jaffna`, `Northern Uni`, typo `Nothern`, and `NU` prefix tokens (`NU Dataset`, `NU Group 1`) without colliding with words like `"number"` |
 | `Curtin` | `\b(?:curtin)\b` | Isolates Curtin international degree streams |
 | `Deakin` | `\b(?:deakin)\b` | Isolates Deakin international degree streams |
 
@@ -101,7 +101,7 @@ The batch parser extracts discrete and ranged batch declarations while preventin
 | **Single Batch** | `Batch 02`, `Bacth 01` | `[2]`, `[1]` | Includes lecturer typo `bacth` (`BM1012`) |
 | **Conjunction List** | `Batch 1, 2 and 3`, `Batches 01 & 03` | `[1, 2, 3]`, `[1, 3]` | Parses comma, `&`, `+`, `/`, and `and` chains |
 | **Inclusive Range** | `Batch 01 - 04`, `Batches 1 to 3` | `[1, 2, 3, 4]`, `[1, 2, 3]` | Expands ranges up to `end - start <= 10` |
-| **Spaced Ordinal Date Guard** | `Meeting Link for Batch 02 - 17 th April 2026` | `[2]` (ignores `17`) | Negative lookahead `\d{1,2}\b(?!\s*(?:st|nd|rd|th)\b)` prevents `"02 - 17 th"` from being parsed as batches `2..17` (`BM1014`) |
+| **Spaced Ordinal Date Guard** | `Meeting Link for Batch 02 - 17 th April 2026` | `[2]` (ignores `17`) | Negative lookahead `\d{1,2}\b(?!\s*(?:st\|nd\|rd\|th)\b)` prevents `"02 - 17 th"` from being parsed as batches `2..17` (`BM1014`) |
 | **URL & Meeting ID Sanitization** | `Meeting ID: 432 891 204 11` | `[]` | Strips URLs, 8-digit dates, and Teams IDs prior to regex evaluation |
 
 ### 2. Business Faculty Sub-Group Resolution (`extractBatchSubGroups`)
