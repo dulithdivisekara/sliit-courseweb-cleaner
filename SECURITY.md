@@ -55,22 +55,23 @@ SLIIT Courseweb Cleaner is intentionally designed with an immutable privacy-firs
 ```mermaid
 graph TD
     subgraph Client Browser Sandbox
-        DOM[Courseweb Moodle DOM]
-        CS[Content Script / Isolated World]
-        SW[Background Service Worker]
-        STR[chrome.storage.sync / LocalStorage]
+        DOM["Courseweb Moodle DOM"]
+        CS["Content Script (Isolated World)"]
+        SW["Background Service Worker"]
+        STR["chrome.storage.sync / LocalStorage"]
     end
 
     subgraph External Boundaries
-        GH[GitHub Raw CDN rules.json]
-        EXT[Zero External Endpoints / No Analytics]
+        GH["GitHub Raw CDN (rules.json)"]
+        EXT["Zero External Endpoints / No Analytics"]
     end
 
-    DOM <-->|CSS Selectors & Text Content| CS
-    CS <-->|Messaging & Settings| SW
-    SW <-->|Settings Sync| STR
+    DOM -->|DOM Mutation & Events| CS
+    CS -->|CSS Suppression & Ghost Mode| DOM
+    CS -->|Runtime Messaging & Config| SW
+    SW -->|Settings Persistence| STR
     SW -->|Read-Only HTTPS GET| GH
-    CS -.x|Strictly Blocked| EXT
+    CS -.->|Strictly Blocked / No Outbound Traffic| EXT
 ```
 
 ### 1. Zero Telemetry and Client-Side Exclusivity
