@@ -1,0 +1,69 @@
+name: Bug Report
+description: Report unexpected behavior, broken styles, or false-positive filtered items
+title: "[BUG]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue! Before proceeding, please review [SUPPORT.md](../../SUPPORT.md) to ensure the issue is not caused by unconfigured preferences or protected notice tokens.
+  - type: input
+    id: version
+    attributes:
+      label: Extension / Userscript Version
+      description: What version are you running? (e.g., 7.3.0, commit hash)
+      placeholder: "7.3.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Browser & Platform
+      description: Select the browser where the issue occurred.
+      options:
+        - Google Chrome
+        - Microsoft Edge
+        - Brave Browser
+        - Mozilla Firefox
+        - Opera / Vivaldi
+        - Tampermonkey Userscript (Any browser)
+    validations:
+      required: true
+  - type: input
+    id: profile
+    attributes:
+      label: Active Profile Configuration
+      description: Campus center, schedule, and batch ID.
+      placeholder: "Malabe, Weekday, Batch 02"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description of the Problem
+      description: What happened, and what did you expect to happen instead?
+    validations:
+      required: true
+  - type: textarea
+    id: activity_title
+    attributes:
+      label: Courseweb Activity or Module Title
+      description: The exact label text of the affected item on Courseweb (do NOT include sensitive student information).
+      placeholder: "Lab 02 Submission - Malabe Weekday Batch 03"
+  - type: textarea
+    id: console_logs
+    attributes:
+      label: Console Output
+      description: Filter DevTools console by `[Courseweb Cleaner]` and paste output here.
+      render: text
+  - type: checkboxes
+    id: triage_checklist
+    attributes:
+      label: Pre-Flight Checklist
+      options:
+        - label: I verified that the issue occurs on https://courseweb.sliit.lk/
+          required: true
+        - label: I checked Peek Hidden mode to confirm if the item was filtered or absent
+          required: true
+        - label: I confirmed my configuration does not contain any sensitive student PII
+          required: true

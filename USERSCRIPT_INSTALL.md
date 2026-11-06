@@ -1,39 +1,60 @@
-# 🛠 Advanced Userscript Installation Guide
+# Userscript Installation Guide
 
-If you are a power user who prefers using a userscript manager instead of our standalone browser extension, follow these steps to install the SLIIT Courseweb Module Cleaner via Tampermonkey.
+This guide outlines how power users and developers can run the compiled userscript distribution using Tampermonkey or Violentmonkey instead of the standalone browser extension.
 
-### 1. Install a Userscript Manager
-You need a browser extension to run custom scripts. We recommend **Tampermonkey**.
-* [Tampermonkey for Chrome / Brave / Edge](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
-* [Tampermonkey for Firefox](https://addons.mozilla.org/en-US/firefox/addon/tampermonkey/)
+<p align="center">
+  <a href="README.md">README</a> &bull;
+  <a href="CONTRIBUTING.md">Contributing</a> &bull;
+  <a href="CODE_OF_CONDUCT.md">Code of Conduct</a> &bull;
+  <a href="SECURITY.md">Security Policy</a> &bull;
+  <a href="SUPPORT.md">Support</a> &bull;
+  <a href="LICENSE">License</a>
+</p>
 
-**Important Note for Chromium (Chrome/Brave/Edge) Users:**
-Recent browser security updates require you to explicitly allow Tampermonkey to execute scripts. After installing the extension:
-1. Right-click the Tampermonkey icon in your browser toolbar and select **Manage Extension**.
-<div align="center">
-  <br>
-  <img src="assets/manage-extension.png" width="700" alt="Manage Extension Menu">
-  <br><br>
-</div>
-2. Scroll down to the settings page and toggle on **Allow User Scripts** (as shown below).
-<div align="center">
-  <br>
-  <img src="assets/allow-user-scripts.png" width="800" alt="Allow User Scripts Toggle">
-  <br><br>
-</div>
+---
 
-### 2. Install the Script
-Once Tampermonkey is active and configured, click the link below to install the Courseweb Cleaner:
+## 1. Install a Userscript Manager
 
-**[Install SLIIT Courseweb Cleaner](https://github.com/dulithdivisekara/sliit-courseweb-cleaner/raw/refs/heads/main/dist/sliit-courseweb-cleaner.user.js)**
+Install a trusted userscript manager for your browser:
 
-A Tampermonkey confirmation screen will appear. Click the **Install** button as shown below:
+- **Google Chrome / Microsoft Edge / Brave:** [Tampermonkey on Chrome Web Store](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
+- **Mozilla Firefox:** [Tampermonkey on Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/tampermonkey/)
 
-<div align="center">
-  <br>
-  <img src="assets/install-screen.png" width="650" alt="Tampermonkey Install Screen">
-  <br><br>
-</div>
+### Chromium Security Note (Chrome, Edge, Brave)
 
-### 3. Initialize
-Navigate to [SLIIT Courseweb](https://courseweb.sliit.lk/) and open any module page. The script will initialize automatically. You can configure your preferences by clicking the yellow Settings icon anchored to the right side of your screen.
+Chromium extensions operating under Manifest V3 require users to grant script execution permissions:
+
+1. Right-click the Tampermonkey icon in your browser toolbar and choose **Manage Extension**.
+
+<p align="center">
+  <img src="assets/manage-extension.png" width="700" alt="Manage Extension Menu" />
+</p>
+
+2. Scroll down on the extension configuration page and enable **Allow User Scripts** (or **Developer Mode**).
+
+<p align="center">
+  <img src="assets/allow-user-scripts.png" width="800" alt="Allow User Scripts Toggle" />
+</p>
+
+---
+
+## 2. Install the Script
+
+Once Tampermonkey is active and configured:
+
+**[Click here to install sliit-courseweb-cleaner.user.js](https://github.com/dulithdivisekara/sliit-courseweb-cleaner/raw/refs/heads/main/dist/sliit-courseweb-cleaner.user.js)**
+
+Tampermonkey will display the script review dialog. Click **Install** to confirm:
+
+<p align="center">
+  <img src="assets/install-screen.png" width="650" alt="Tampermonkey Install Screen" />
+</p>
+
+---
+
+## 3. Initialize and Configure
+
+1. Navigate to any course module page on [SLIIT Courseweb](https://courseweb.sliit.lk/).
+2. The script initializes automatically upon DOM load.
+3. Click the floating yellow settings trigger anchored at the bottom-right of your screen to slide out the configuration drawer.
+4. Select your campus and batch tracks, and click **Apply Setup**.

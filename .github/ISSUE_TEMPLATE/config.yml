@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security Vulnerability Disclosure
+    url: https://github.com/dulithdivisekara/sliit-courseweb-cleaner/blob/main/SECURITY.md
+    about: Report security vulnerabilities, privacy concerns, or sensitive issues privately.
+  - name: Community Support & Diagnostics
+    url: https://github.com/dulithdivisekara/sliit-courseweb-cleaner/blob/main/SUPPORT.md
+    about: Read our troubleshooting playbook and diagnostic steps before filing a bug.
+  - name: GitHub Discussions
+    url: https://github.com/dulithdivisekara/sliit-courseweb-cleaner/discussions
+    about: Ask questions, share feedback, and discuss ideas with fellow student contributors.

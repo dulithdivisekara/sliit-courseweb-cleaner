@@ -7,14 +7,16 @@
 <h1 align="center">SLIIT Courseweb Module Cleaner</h1>
 
 <p align="center">
-  Context-aware browser extension and userscript engineered to optimize the SLIIT Moodle interface through intelligent campus-batch filtering, partner program isolation, and native dark theme integration.
+  A high-performance, context-aware browser extension and userscript engineered by the student developer community to streamline the SLIIT Moodle experience through intelligent campus-batch filtering, partner program isolation, and native dark theme integration.
 </p>
 
 <p align="center">
   <a href="https://chromewebstore.google.com/detail/sliit-courseweb-cleaner/lnoadlfhebmkhmbfmehdgoffjllgadjm"><img src="https://img.shields.io/chrome-web-store/v/lnoadlfhebmkhmbfmehdgoffjllgadjm?style=flat-square&color=0f3b5f&label=Chrome%20Web%20Store" alt="Chrome Web Store"></a>
   <a href="https://microsoftedge.microsoft.com/addons/detail/sliit-courseweb-cleaner/gmlodfhgiopjgamoijjffcmgfenkkkhe"><img src="https://img.shields.io/badge/Edge%20Add--ons-v7.3.0-0078d7?style=flat-square" alt="Edge Add-ons"></a>
   <a href="https://addons.mozilla.org/en-US/firefox/addon/sliit-courseweb-cleaner/"><img src="https://img.shields.io/amo/v/sliit-courseweb-cleaner?style=flat-square&color=ff7139&label=Firefox%20Add-ons" alt="Firefox Add-ons"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License: MIT"></a>
+  <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner/actions"><img src="https://img.shields.io/badge/tests-passing-brightgreen?style=flat-square" alt="Tests Status"></a>
+  <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square" alt="PRs Welcome"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="License: MIT"></a>
 </p>
 
 <p align="center">
@@ -27,6 +29,7 @@
   <a href="#usage">Usage</a> &bull;
   <a href="#session-logging--inspection">Logging</a> &bull;
   <a href="#verification-tests">Testing</a> &bull;
+  <a href="#community--governance">Community</a> &bull;
   <a href="#security--privacy">Security</a> &bull;
   <a href="https://github.com/dulithdivisekara/sliit-courseweb-cleaner/wiki">Wiki</a> &bull;
   <a href="#license">License</a>
@@ -36,17 +39,17 @@
 
 ## Overview
 
-SLIIT Courseweb Cleaner addresses information density and visual clutter across the SLIIT Moodle learning management system. Course pages routinely aggregate assignments, lecture materials, lab schedules, announcements, and quizzes intended for disparate physical centers (Malabe, Metro, Kandy, Kurunegala, Matara, Jaffna), independent cohort schedules (Weekday and Weekend tracks), and international partner degree programs (such as Curtin University and Deakin University). Without automated filtering, students must manually discern relevant coursework from hundreds of irrelevant listings.
+SLIIT Courseweb Cleaner resolves interface clutter and cognitive overload across the SLIIT Moodle learning management system. Course pages frequently aggregate hundreds of learning resources, assignment dropboxes, lab schedules, and announcements spanning multiple physical centers (Malabe, Metro, Kandy, Kurunegala, Matara, Jaffna), separate schedules (Weekday and Weekend tracks), and international partner programs (Curtin University, Deakin University). Without automated filtering, students must repeatedly sift through unrelated course activities.
 
-Operating directly within the browser document model, the extension evaluates activity blocks, section titles, and nested course labels against the student's designated profile and background-synchronized community heuristics (`rules.json`). Non-matching items are either hidden or gracefully dimmed in Ghost Mode.
+Operating directly within the browser document model, the extension evaluates activity containers, section headings, and nested course labels against the student's designated profile and background-synchronized community heuristics (`rules.json`). Non-matching entries are either hidden or gracefully muted in Ghost Mode.
 
-To prevent interface fatigue, the extension incorporates a customized Dark Reader engine configured specifically for Moodle UI tokens, alongside a zero-latency anti-flash preloader that eradicates white flashes during page transitions. Settings are managed through a modern toolbar action popup or an ergonomic, slide-in side panel drawer anchored above the Moodle page-top button, enabling rapid profile switching without disrupting active academic sessions.
+To combat interface fatigue, the extension integrates an anti-flash dark mode engine configured for Moodle UI tokens, paired with a synchronous preloader that eliminates white flashes during page transitions. Settings are accessible via a browser toolbar popup or an ergonomic slide-in side panel drawer anchored directly above Moodle's native back-to-top control.
 
 ---
 
 ## Download & Install
 
-Official 1-click store links for supported desktop web browsers:
+Official 1-click store releases for supported desktop web browsers:
 
 <p align="center">
   <a href="https://chromewebstore.google.com/detail/sliit-courseweb-cleaner/lnoadlfhebmkhmbfmehdgoffjllgadjm" target="_blank" rel="noopener noreferrer">
@@ -69,22 +72,22 @@ Official 1-click store links for supported desktop web browsers:
 | **Mozilla Firefox** | Firefox, Waterfox, LibreWolf, Floorp | Firefox Browser Add-ons (AMO) | [Add to Firefox](https://addons.mozilla.org/en-US/firefox/addon/sliit-courseweb-cleaner/) |
 
 > [!TIP]
-> Prefer using Tampermonkey or Violentmonkey? You can install the compiled script directly via our [Userscript Installation Guide](USERSCRIPT_INSTALL.md).
+> Prefer using Tampermonkey or Violentmonkey? Install the compiled script directly via our [Userscript Installation Guide](USERSCRIPT_INSTALL.md).
 
 ---
 
 ## Quick Start Guide
 
-A visual step-by-step guide to installing and configuring the extension in Google Chrome, Microsoft Edge, and Brave.
+A step-by-step walkthrough for installing and configuring the extension in Google Chrome, Microsoft Edge, and Brave.
 
 ### 1. Add to Browser
-Navigate to the [Chrome Web Store](https://chromewebstore.google.com/detail/sliit-courseweb-cleaner/lnoadlfhebmkhmbfmehdgoffjllgadjm) (or [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/sliit-courseweb-cleaner/gmlodfhgiopjgamoijjffcmgfenkkkhe)) and click the **Add to Chrome** (or **Get**) button.
+Navigate to the [Chrome Web Store](https://chromewebstore.google.com/detail/sliit-courseweb-cleaner/lnoadlfhebmkhmbfmehdgoffjllgadjm) or [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/sliit-courseweb-cleaner/gmlodfhgiopjgamoijjffcmgfenkkkhe) and click **Add to Chrome** (or **Get**).
 
 <p align="center">
   <img src="assets/step1-install.png" width="800" alt="Install Extension from Web Store" />
 </p>
 
-When prompted by the browser permissions dialog, click **Add extension** to complete the installation.
+When prompted by the browser permissions dialog, click **Add extension** to complete installation.
 
 <p align="center">
   <img src="assets/step2-permission.png" width="650" alt="Confirm Browser Permission Prompt" />
@@ -98,14 +101,14 @@ Navigate to any course module page on [SLIIT Courseweb](https://courseweb.sliit.
 </p>
 
 ### 3. Configure Your Preferences
-Select your campus center (Malabe, Metro, Kandy, Kurunegala, Matara, Jaffna / Northern Uni, Deakin, or Curtin) and your batch schedule (Weekday or Weekend) inside the slide-in side panel drawer. You can also configure optional group or batch identifiers (e.g., `2`, `01.02`, or `Y2.S1.WD.IT.01.02`), custom whitelist/blacklist terms, Ghost Mode, or the **Hide Submissions** toggle. All changes apply instantaneously to the active view without requiring a page reload.
+Select your campus center (Malabe, Metro, Kandy, Kurunegala, Matara, Jaffna / Northern Uni, Deakin, or Curtin) and your batch schedule (Weekday or Weekend) inside the slide-in side panel drawer. You can also configure optional group or batch identifiers (e.g., `2`, `01.02`, or `Y2.S1.WD.IT.01.02`), custom whitelist/blacklist terms, Ghost Mode, or the **Hide Submissions** toggle. All changes apply instantaneously without a page reload.
 
 <p align="center">
   <img src="assets/store-screenshots/4-side-panel-drawer-settings.png" width="800" alt="Slide-In Side Panel Configuration Drawer" />
 </p>
 
 ### 4. Adjust Settings Anytime
-You can update your campus profile, toggle Ghost Mode, or switch Dark Theme on and off anytime using the browser **Toolbar Action Popup** or the floating yellow settings trigger anchored at the bottom-right of course pages. Clicking the trigger smoothly slides out the configuration side panel.
+Update your campus profile, toggle Ghost Mode, or switch Dark Theme on and off anytime using the browser **Toolbar Action Popup** or the floating yellow settings trigger anchored at the bottom-right of course pages.
 
 <p align="center">
   <img src="assets/step5-settings-icon.png" width="800" alt="Floating Settings Icon and Toolbar Popup" />
@@ -205,7 +208,12 @@ graph TD
 ├── wiki/                    # Multi-page GitHub Wiki technical documentation suite
 ├── build.sh                 # Multi-target assembly and packaging pipeline
 ├── package.json             # NPM metadata, build commands, and syntax validation targets
-└── rules.json               # Community regex patterns, campus aliases, and ignore keywords
+├── rules.json               # Community regex patterns, campus aliases, and ignore keywords
+├── CODE_OF_CONDUCT.md       # Contributor Covenant v2.1 community standards
+├── CONTRIBUTING.md          # Developer setup, branching, and pull request guidelines
+├── LICENSE                  # MIT open-source license terms
+├── SECURITY.md              # Vulnerability reporting protocol and threat model
+└── SUPPORT.md               # Diagnostic checklist, troubleshooting playbook, and FAQs
 ```
 
 ---
@@ -214,7 +222,7 @@ graph TD
 
 ### Official Web Stores
 
-Install verified builds directly from official browser repositories:
+Install verified builds directly from official browser stores:
 
 - **Google Chrome / Brave / Opera:** [Chrome Web Store](https://chromewebstore.google.com/detail/sliit-courseweb-cleaner/lnoadlfhebmkhmbfmehdgoffjllgadjm)
 - **Microsoft Edge:** [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/sliit-courseweb-cleaner/gmlodfhgiopjgamoijjffcmgfenkkkhe)
@@ -347,13 +355,29 @@ ls -lh dist/
 
 ---
 
+## Community & Governance
+
+SLIIT Courseweb Cleaner thrives on contributions from students and alumni across all faculties and campuses. The project is governed by open, professional community standards:
+
+| Document | Purpose & Standards | Status |
+| :--- | :--- | :--- |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Development setup, architecture, coding style, git workflow, and pull requests | Active & Enforced |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Contributor Covenant v2.1 community pledge, standards, and enforcement ladder | Active & Enforced |
+| [SECURITY.md](SECURITY.md) | Vulnerability disclosure SLA, client threat model, and security sandbox invariants | Active & Enforced |
+| [SUPPORT.md](SUPPORT.md) | Diagnostic checklist, troubleshooting playbook, FAQs, and support channels | Active & Enforced |
+| [ROADMAP.md](ROADMAP.md) | Architectural roadmap, feature progression, and planned milestones | Active & Maintained |
+| [CHANGELOG.md](CHANGELOG.md) | Semantic release notes, version history, and migration guides | Active & Maintained |
+| [Wiki](https://github.com/dulithdivisekara/sliit-courseweb-cleaner/wiki) | In-depth engineering specifications, heuristic engine breakdown, and guides | Active & Maintained |
+
+---
+
 ## Security & Privacy
 
 - **Client-Side Processing:** All DOM parsing and filtering heuristics run strictly within the client browser sandbox. No student credentials, registration numbers, session cookies, or page contents are transmitted to external servers.
 - **Minimal Host Permissions:** Extension permissions are restricted exclusively to `*://courseweb.sliit.lk/*` for DOM modification and GitHub raw endpoints for read-only `rules.json` updates.
 - **Zero Third-Party Telemetry:** The extension contains no analytics trackers, advertising scripts, or data collectors.
 - **Repository Credential Hygiene:** The repository `.gitignore` strictly excludes credentials, session logs (`*.log`), and local environment configurations (`.env*`, `cookies.json`).
-- Review the complete [Privacy Policy](privacy-policy.html) and [Store Submission Metadata](CHROMEWEBSTORE.md).
+- Review the complete [Privacy Policy](site/privacy-policy.html), [Security Policy](SECURITY.md), and [Store Submission Metadata](CHROMEWEBSTORE.md).
 
 ---
 
@@ -370,4 +394,3 @@ This project is licensed under the [MIT License](LICENSE).
 <p align="center">
   <sub>Authored by <a href="https://dulith.me">Dulith Divisekara</a>. Independent student utility not affiliated with or endorsed by SLIIT.</sub>
 </p>
-

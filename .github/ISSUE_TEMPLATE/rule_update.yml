@@ -1,0 +1,38 @@
+name: Course Pattern / Rule Request
+description: Request support for a newly introduced campus alias, batch format, or cohort pattern
+title: "[RULES]: "
+labels: ["rules"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template when SLIIT Courseweb introduces a new batch name, campus alias, or course format that is not recognized by `rules.json`.
+  - type: input
+    id: campus
+    attributes:
+      label: Campus / Center
+      description: Which campus or partner program is this for?
+      placeholder: "e.g., Kandy Center, Northern Uni / Jaffna, Metro, Deakin, Curtin"
+    validations:
+      required: true
+  - type: input
+    id: batch
+    attributes:
+      label: Batch or Cohort Identifier
+      description: What is the cohort or semester identifier?
+      placeholder: "e.g., Y2.S1.WD.IT, Batch 03 + Weekend Repeat"
+    validations:
+      required: true
+  - type: textarea
+    id: sample_titles
+    attributes:
+      label: Sample Course Activity Titles
+      description: Paste exact titles of course items as they appear on Courseweb (anonymized, no student names).
+      placeholder: "Tutorial 04 - Kandy Center Weekday Batch 01\nLab 03 Submission (Batch 02 & Repeat Students)"
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_regex
+    attributes:
+      label: Proposed Regex Pattern (Optional)
+      description: If you tested a regex pattern in the browser console, paste it here.
