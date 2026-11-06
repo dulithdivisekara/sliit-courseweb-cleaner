@@ -2,15 +2,6 @@
 
 This document outlines completed milestones, current developments, and future architectural enhancements for the SLIIT Courseweb Cleaner ecosystem.
 
-<p align="center">
-  <a href="README.md">README</a> &bull;
-  <a href="CONTRIBUTING.md">Contributing</a> &bull;
-  <a href="CODE_OF_CONDUCT.md">Code of Conduct</a> &bull;
-  <a href="SECURITY.md">Security Policy</a> &bull;
-  <a href="SUPPORT.md">Support</a> &bull;
-  <a href="LICENSE">License</a>
-</p>
-
 ---
 
 ## Phase 1: Core Filtering Foundations (v1.0 - v4.0)

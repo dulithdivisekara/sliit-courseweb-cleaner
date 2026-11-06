@@ -4,15 +4,6 @@ Thank you for your interest in contributing to SLIIT Courseweb Cleaner. This pro
 
 This guide outlines our architecture, engineering standards, testing routines, and pull request procedures to ensure seamless cross-browser reliability.
 
-<p align="center">
-  <a href="README.md">README</a> &bull;
-  <a href="CONTRIBUTING.md">Contributing</a> &bull;
-  <a href="CODE_OF_CONDUCT.md">Code of Conduct</a> &bull;
-  <a href="SECURITY.md">Security Policy</a> &bull;
-  <a href="SUPPORT.md">Support</a> &bull;
-  <a href="LICENSE">License</a>
-</p>
-
 ---
 
 ## Core Engineering Principles

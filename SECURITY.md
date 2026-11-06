@@ -2,15 +2,6 @@
 
 The SLIIT Courseweb Cleaner project adheres to strict client-side sandboxing, data privacy, and vulnerability disclosure standards. Because this extension operates directly within students' authenticated academic environments, safeguarding user privacy and preventing malicious code execution are foundational requirements.
 
-<p align="center">
-  <a href="README.md">README</a> &bull;
-  <a href="CONTRIBUTING.md">Contributing</a> &bull;
-  <a href="CODE_OF_CONDUCT.md">Code of Conduct</a> &bull;
-  <a href="SECURITY.md">Security Policy</a> &bull;
-  <a href="SUPPORT.md">Support</a> &bull;
-  <a href="LICENSE">License</a>
-</p>
-
 ---
 
 ## Supported Versions

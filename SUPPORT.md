@@ -2,15 +2,6 @@
 
 Welcome to the SLIIT Courseweb Cleaner support center. This guide provides an end-to-end troubleshooting manual, diagnostics playbook, and community support channels to help resolve issues quickly.
 
-<p align="center">
-  <a href="README.md">README</a> &bull;
-  <a href="CONTRIBUTING.md">Contributing</a> &bull;
-  <a href="CODE_OF_CONDUCT.md">Code of Conduct</a> &bull;
-  <a href="SECURITY.md">Security Policy</a> &bull;
-  <a href="SUPPORT.md">Support</a> &bull;
-  <a href="LICENSE">License</a>
-</p>
-
 ---
 
 ## Community Support Channels

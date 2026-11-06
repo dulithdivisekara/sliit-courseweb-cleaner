@@ -6,15 +6,6 @@ We as members, contributors, and maintainers of the SLIIT Courseweb Cleaner proj
 
 We pledge to act and interact in ways that contribute to an open, welcoming, diverse, inclusive, and healthy community across all SLIIT campuses (Malabe, Metro, Kandy, Kurunegala, Matara, Jaffna) and partner academic programs (Curtin, Deakin).
 
-<p align="center">
-  <a href="README.md">README</a> &bull;
-  <a href="CONTRIBUTING.md">Contributing</a> &bull;
-  <a href="CODE_OF_CONDUCT.md">Code of Conduct</a> &bull;
-  <a href="SECURITY.md">Security Policy</a> &bull;
-  <a href="SUPPORT.md">Support</a> &bull;
-  <a href="LICENSE">License</a>
-</p>
-
 ---
 
 ## Our Standards

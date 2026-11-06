@@ -2,15 +2,6 @@
 
 This guide outlines how power users and developers can run the compiled userscript distribution using Tampermonkey or Violentmonkey instead of the standalone browser extension.
 
-<p align="center">
-  <a href="README.md">README</a> &bull;
-  <a href="CONTRIBUTING.md">Contributing</a> &bull;
-  <a href="CODE_OF_CONDUCT.md">Code of Conduct</a> &bull;
-  <a href="SECURITY.md">Security Policy</a> &bull;
-  <a href="SUPPORT.md">Support</a> &bull;
-  <a href="LICENSE">License</a>
-</p>
-
 ---
 
 ## 1. Install a Userscript Manager
