@@ -112,9 +112,10 @@ input:checked + .sf-slider:before { transform: translateX(18px); }
 .sf-dark-theme::-webkit-scrollbar-thumb { background: #555; }
 .sf-dark-theme::-webkit-scrollbar-thumb:hover { background: #777; }
 
-/* CourseWeb logo dark theme inversion */
-html[data-darkreader-scheme="dark"] #header-logo .logo img {
-    filter: invert(1) !important;
+/* CourseWeb logo dark theme inversion (monochrome white on dark header) */
+html[data-darkreader-scheme="dark"] #header-logo .logo img,
+html.sf-dark-mode-preload #header-logo .logo img {
+    filter: invert(1) grayscale(1) brightness(3) contrast(100) !important;
     mix-blend-mode: screen !important;
 }
 

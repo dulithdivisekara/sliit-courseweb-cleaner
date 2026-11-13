@@ -114,9 +114,9 @@ function applyDarkReader(isDark) {
                 .sf-dark-theme .sf-footer a {
                     color: #f7b924 !important;
                 }
-                /* CourseWeb logo dark theme inversion */
+                /* CourseWeb logo dark theme inversion (monochrome white on dark header) */
                 #header-logo .logo img {
-                    filter: invert(1) !important;
+                    filter: invert(1) grayscale(1) brightness(3) contrast(100) !important;
                     mix-blend-mode: screen !important;
                 }
                 /* Dark scheme for native select elements & dropdowns */
@@ -406,8 +406,8 @@ function injectUI() {
         .sf-dark-theme::-webkit-scrollbar-track { background: #2b2b2b; }
         .sf-dark-theme::-webkit-scrollbar-thumb { background: #555; }
         .sf-dark-theme::-webkit-scrollbar-thumb:hover { background: #777; }
-        /* CourseWeb logo dark theme inversion */
-        html[data-darkreader-scheme="dark"] #header-logo .logo img { filter: invert(1) !important; mix-blend-mode: screen !important; }
+        /* CourseWeb logo dark theme inversion (monochrome white on dark header) */
+        html[data-darkreader-scheme="dark"] #header-logo .logo img, html.sf-dark-mode-preload #header-logo .logo img { filter: invert(1) grayscale(1) brightness(3) contrast(100) !important; mix-blend-mode: screen !important; }
         /* Anti-white-flash & instant skeleton preloader styles for seamless first-load in dark mode */
         html.sf-dark-mode-preload, html.sf-dark-mode-preload body, html[data-darkreader-scheme="dark"], html[data-darkreader-scheme="dark"] body { background-color: #181a1b !important; color-scheme: dark !important; }
         html.sf-dark-mode-preload body { color: #e2e8f0; }
