@@ -94,7 +94,7 @@ When Dark Reader initializes (`brightness: 100, contrast: 95, sepia: 0`), the ex
 
 | Target Component | CSS Override Strategy | Visual Purpose |
 | :--- | :--- | :--- |
-| **CourseWeb Header Crest (`img.logo`)** | `filter: invert(1) hue-rotate(180deg) brightness(1.1); mix-blend-mode: screen;` | Blends the white-background SLIIT CourseWeb header banner seamlessly into the dark navbar without inverting the gold/navy shield colors. |
+| **CourseWeb Header Crest (`#header-logo .logo img`)** | `filter: invert(1) grayscale(1) brightness(3) contrast(100) !important; mix-blend-mode: screen !important;` | Converts the white-background SLIIT CourseWeb JPEG banner into crisp, uniform monochrome white while screening out the inverted black background against the dark header. |
 | **High-Priority Notice Banners** | `background-color: #f7b924 !important; color: #141517 !important;` | Restores high-contrast dark text (`#141517`) and crimson emphasis (`#a8071a`) inside yellow announcement boxes (`#f7b924`). |
 | **Moodle Completion Badges** | `.badge-success` (`#1e4620` / `#a3e635`), `.badge-warning` (`#f7b924` / `#141517`) | Preserves clear visual distinction between completed (`Done`) and pending (`To do`) activity badges. |
 

@@ -114,9 +114,9 @@ function applyDarkReader(isDark) {
                 .sf-dark-theme .sf-footer a {
                     color: #f7b924 !important;
                 }
-                /* CourseWeb logo dark theme inversion */
+                /* CourseWeb logo dark theme inversion (monochrome white on dark header) */
                 #header-logo .logo img {
-                    filter: invert(1) !important;
+                    filter: invert(1) grayscale(1) brightness(3) contrast(100) !important;
                     mix-blend-mode: screen !important;
                 }
                 /* Dark scheme for native select elements & dropdowns */
